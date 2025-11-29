@@ -1,0 +1,76 @@
+
+
+.conteudo{
+    display: flex;
+    flex-direction: column;
+    margin-top: 15vh;
+    margin-bottom: 5vh;
+    width: 80vw;
+    height: 180vh;
+    gap: 3vh;
+    /* background-color: green; */
+}
+
+.conteudo .cardConteudoFiltros{
+    display: flex;
+    gap: 2vw;
+    padding: 1.2vw;
+    flex-direction: row;
+    align-items: flex-end;
+}
+
+.containerFiltro{
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+    width: 100%;
+}
+.tituloFiltro{
+    font-size: 0.9vw;
+    color: #6D6875;
+    font-weight: 900;
+}
+.filtros{
+    border-radius: 0.5vw;
+    border-color: #D8E2DC;
+    border-style: solid;
+    height: 5vh;
+    width: 31.3vw;
+}
+.cardConteudoFiltros .botaoFiltro{
+    padding: 0.8vw 1.6vw;
+    width: auto;
+}
+
+.containerCards{
+    display: flex;
+    /* align-items: center; */
+    /* justify-content: center ;  */
+    gap: 0.925vw;
+}
+
+.titulo{
+    font-size: 2.5vw;
+    color: #F4ACB7;
+}
+.textoSecundario{
+    font-size: 1vw;
+    color: #9D8189;
+}
+
+.containerCards .rosa{
+    background-color: #FFCAD4;
+}
+
+.containerCards .rosaForte{
+    background-color: #F4ACB7;
+}
+
+.containerCards .marrom{
+    background-color: #9D8189;
+}
+
+.containerCards .rosaClaro{
+    background-color: #FFE5D9;
+}
+

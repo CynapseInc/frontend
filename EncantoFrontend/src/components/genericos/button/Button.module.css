@@ -1,10 +1,20 @@
+.botaoBranco, .botaoRosa{
+    padding: 0.5vw;
+    white-space: nowrap;
+    height: fit-content;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none; 
+    border-radius: 8px; 
+    cursor: pointer;
+}
+
 .botaoRosa{
     background-color: #F4ACB7;
     color: #FFFFFF;
-    padding: 1rem;
 }
 .botaoBranco{
     background-color: #FFFFFF;
     color: #9D8189;
-    padding: 1rem;
 }
