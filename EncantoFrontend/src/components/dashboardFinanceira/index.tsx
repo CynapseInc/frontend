@@ -6,6 +6,7 @@ import { IoAlertOutline } from "react-icons/io5";
 import { CardKPI } from "./cardKPI";
 import { Card } from "../genericos/card";
 import { Button } from "../genericos/button";
+import { EvolucaoMensalGrafico } from "./evolucaoMensalGrafico";
 
 
 export function DashFinanceira() {
@@ -30,6 +31,19 @@ export function DashFinanceira() {
         <CardKPI icone={<FiCreditCard/>} classeIconeCor={styles.rosaForte} porcentagem='-5.3%' textoAbaixo='vs mês anterior' tipo='negativo' titulo='Despesas' valor='R$ 12.000,00' />
         <CardKPI icone={<TfiWallet/>} classeIconeCor={styles.marrom} porcentagem='+18.2%' textoAbaixo='vs mês anterior' tipo='positivo' titulo='Lucro' valor='R$ 16.000,00' />
         <CardKPI icone={<IoAlertOutline/>} classeIconeCor={styles.rosaClaro} porcentagem='-8.7%' textoAbaixo='vs mês anterior' tipo='negativo' titulo='A Pagar' valor='R$ 7.950,00' />
+      </div>
+      <div style={{display: 'flex'}}>
+        
+        <div >
+           <EvolucaoMensalGrafico />
+        </div>
+
+        <div >
+           <Card>
+             <p>Lista de Categorias vai aqui...</p>
+           </Card>
+        </div>
+
       </div>
     </div>
   );

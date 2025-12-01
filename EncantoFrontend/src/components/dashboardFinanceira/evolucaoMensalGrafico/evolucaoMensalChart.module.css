@@ -1,0 +1,49 @@
+.containerGrafico {
+  height: 40vh; 
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 1vh 2vw;
+}
+
+.tituloGrafico {
+  color: #FF9BB5; 
+  font-size: 1.2vw;
+  margin-bottom: 3vh;
+  font-weight: bold;
+}
+
+.areaGrafico {
+  flex: 1; 
+  width: 43vw;
+  min-height: 0;
+}
+
+.legenda {
+  display: flex;
+  justify-content: center;
+  gap: 2vw;
+  margin-top: 1vh;
+}
+
+.itemLegenda {
+  display: flex;
+  align-items: center;
+  gap: 0.5vw;
+  font-size: 0.9vw;
+  color: #9D8189;
+}
+
+.quadradoDespesa {
+  width: 0.8vw;
+  height: 0.8vw;
+  background-color: #FFB5C2; 
+  border-radius: 2px;
+}
+
+.quadradoReceita {
+  width: 0.8vw;
+  height: 0.8vw;
+  background-color: #FFD6E0;
+  border-radius: 2px;
+}
