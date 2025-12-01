@@ -73,3 +73,8 @@
 .containerCards .rosaClaro{
     background-color: #FFE5D9;
 }
+
+.containerCardGraficos{
+    display: flex;
+    gap: 1.4vw;
+}

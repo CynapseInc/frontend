@@ -7,6 +7,7 @@ import { CardKPI } from "./cardKPI";
 import { Card } from "../genericos/card";
 import { Button } from "../genericos/button";
 import { EvolucaoMensalGrafico } from "./evolucaoMensalGrafico";
+import { DespesasPorCategoria } from "./despesasPorCategoria";
 
 
 export function DashFinanceira() {
@@ -34,14 +35,10 @@ export function DashFinanceira() {
       </div>
       <div style={{display: 'flex'}}>
         
-        <div >
-           <EvolucaoMensalGrafico />
-        </div>
-
-        <div >
-           <Card>
-             <p>Lista de Categorias vai aqui...</p>
-           </Card>
+        <div className={styles.containerCardGraficos}>
+          <EvolucaoMensalGrafico />
+        
+          <DespesasPorCategoria/>
         </div>
 
       </div>

@@ -1,0 +1,32 @@
+.tituloGrafico {
+  color: #FF9BB5; 
+  font-size: 1.2vw;
+  margin-bottom: 2vh;
+  font-weight: bold;
+}
+
+.containerProgressBar{
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vh;
+}
+
+.headerTxt {
+  color: #6D6875; 
+  font-size: 0.9vw;
+  margin-bottom: 1vh;
+  margin-top: 1vh;
+  font-weight: bold;
+}
+.cardDespesas{
+    width: 27.775vw;
+}
+
+.porcentagem{
+    color: #9D8189;
+    font-size: 0.8vw;
+}
+.headerContainer{
+    display: flex;
+    justify-content: space-between;
+}
