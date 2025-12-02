@@ -1,0 +1,26 @@
+.containerGrafico {
+    display: flex;
+    flex-direction: column;
+    height: 100%; 
+    padding: 0.5vw 1.5vw 1.5vw 1.5vw;
+    gap: 2vh;
+    box-sizing: border-box;
+}
+
+.tituloGrafico {
+    font-size: 1.2vw;
+    font-weight: 700;
+    color: #F4ACB7;
+}
+
+/* IMPORTANTE: 
+   O pai precisa ter a altura definida para o flex: 1 funcionar, se não ele quebra.
+*/
+.areaGrafico {
+    flex: 1; 
+    width: 43vw;
+    min-height: 30vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}

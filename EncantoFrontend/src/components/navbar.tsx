@@ -6,7 +6,7 @@ import logo from '../assets/logoEncanto.png';
 function Navbar() {
 
     return (
-        <div style={{ backgroundColor: 'white', alignItems: 'center', width: '100vw', display: 'flex', position: 'fixed', justifyContent: 'center', justifySelf: 'center', top: '0%', height: '56px', gap: "20px" }}>
+        <div style={{ backgroundColor: 'white', alignItems: 'center', width: '100vw', display: 'flex', position: 'fixed', justifyContent: 'center', justifySelf: 'center', top: '0%', height: '56px', gap: "20px", zIndex: "10" }}>
 
                 {/* Logo Encanto Personalizados */}
             <div><img src={logo} alt="logoEncanto" height={"48px"} /></div>

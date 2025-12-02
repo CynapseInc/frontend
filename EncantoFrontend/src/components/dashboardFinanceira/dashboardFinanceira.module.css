@@ -6,7 +6,7 @@
     margin-top: 15vh;
     margin-bottom: 5vh;
     width: 80vw;
-    height: 180vh;
+    height: 150vh;
     gap: 3vh;
     /* background-color: green; */
 }
@@ -44,8 +44,6 @@
 
 .containerCards{
     display: flex;
-    /* align-items: center; */
-    /* justify-content: center ;  */
     gap: 0.925vw;
 }
 
@@ -76,5 +74,11 @@
 
 .containerCardGraficos{
     display: flex;
+    gap: 1.4vw;
+}
+
+.containerContentCharts{
+    display: flex;
+    flex-direction: column;
     gap: 1.4vw;
 }

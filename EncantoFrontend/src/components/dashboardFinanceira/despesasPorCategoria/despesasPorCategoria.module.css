@@ -1,7 +1,7 @@
 .tituloGrafico {
   color: #FF9BB5; 
   font-size: 1.2vw;
-  margin-bottom: 2vh;
+  margin-bottom: 1vh;
   font-weight: bold;
 }
 
@@ -14,7 +14,7 @@
 .headerTxt {
   color: #6D6875; 
   font-size: 0.9vw;
-  margin-bottom: 1vh;
+  margin-bottom: 0.5vh;
   margin-top: 1vh;
   font-weight: bold;
 }

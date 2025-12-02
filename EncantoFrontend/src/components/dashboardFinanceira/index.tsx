@@ -8,6 +8,8 @@ import { Card } from "../genericos/card";
 import { Button } from "../genericos/button";
 import { EvolucaoMensalGrafico } from "./evolucaoMensalGrafico";
 import { DespesasPorCategoria } from "./despesasPorCategoria";
+import { GraficoVendasCategoria } from "./vendasPorCategoria";
+import { ProximosPagamentos } from "./proximosPagamentos";
 
 
 export function DashFinanceira() {
@@ -33,12 +35,18 @@ export function DashFinanceira() {
         <CardKPI icone={<TfiWallet/>} classeIconeCor={styles.marrom} porcentagem='+18.2%' textoAbaixo='vs mês anterior' tipo='positivo' titulo='Lucro' valor='R$ 16.000,00' />
         <CardKPI icone={<IoAlertOutline/>} classeIconeCor={styles.rosaClaro} porcentagem='-8.7%' textoAbaixo='vs mês anterior' tipo='negativo' titulo='A Pagar' valor='R$ 7.950,00' />
       </div>
-      <div style={{display: 'flex'}}>
+      <div className={styles.containerContentCharts}>
         
         <div className={styles.containerCardGraficos}>
           <EvolucaoMensalGrafico />
         
           <DespesasPorCategoria/>
+        </div>
+
+        <div className={styles.containerCardGraficos}>
+          <GraficoVendasCategoria/>
+
+          <ProximosPagamentos/>         
         </div>
 
       </div>
