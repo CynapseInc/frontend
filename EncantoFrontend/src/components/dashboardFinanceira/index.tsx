@@ -6,6 +6,7 @@ import { IoAlertOutline } from "react-icons/io5";
 import { CardKPI } from "./cardKPI";
 import { Card } from "../genericos/card";
 import { Button } from "../genericos/button";
+import { Input } from "../genericos/input";
 import { EvolucaoMensalGrafico } from "./evolucaoMensalGrafico";
 import { DespesasPorCategoria } from "./despesasPorCategoria";
 import { GraficoVendasCategoria } from "./vendasPorCategoria";
@@ -20,11 +21,11 @@ export function DashFinanceira() {
       <Card classeCss={styles.cardConteudoFiltros}>
         <div className={styles.containerFiltro}>
           <span className={styles.tituloFiltro}>Data Inicial</span>
-          <input type="text" className={styles.filtros} />
+          <Input classeCss={styles.filtros} />
         </div>
         <div className={styles.containerFiltro}>
           <span className={styles.tituloFiltro}>Data Final</span>
-          <input type="text" className={styles.filtros} />
+          <Input classeCss={styles.filtros} />
         </div>
         <Button classeCss={styles.botaoFiltro}>Aplicar Filtros</Button>
         
