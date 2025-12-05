@@ -9,7 +9,7 @@ function App() {
     <>
     <Navbar/>
     <CadastroPedidos/>
-    <DashFinanceira/>
+    {/* <DashFinanceira/> */}
     </>
   )
 }

@@ -26,7 +26,7 @@
 .sectionCard{
     display: flex;
     padding: 1vw;
-    gap: 1vh;
+    gap: 3vh;
     width: 100%;
 }
 .tituloSectionCard{
@@ -38,12 +38,49 @@
     display: flex;
     height: fit-content;
     width: 100%;
-    align-items: flex-end;
-    background-color: aqua;
+    gap: 3vh;
+    flex-direction: column;
+    /* background-color: aqua; */
+}
+.inputBox{
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
 }
 
 .tituloInputLabel{
     font-size: 0.9vw;
     color: #6D6875;
     font-weight: 900;
+}
+.inputCadastro{
+    width: auto ;
+}
+.inputRow{
+    display: flex;
+    align-items: flex-end;
+    gap: 2%;
+}
+.inputRow .inputCadastro{
+    width: 100% ;
+}
+.inputDividida{
+    width: 48.5%;
+    display: flex;
+    gap: 1vw;
+    flex-direction: column;
+}
+.inputDividida .inputTextBox{
+    height: 12vh;
+    padding-top: 1vw;
+}
+.botao{
+    padding: 1.6vh 0.7vw;
+    font-size: 1vw;
+    font-weight: 100;
+    gap: 0.3vw;
+}
+.corBotaoSecundario{
+    background-color: #D8E2DC;
+    color: #6D6875;
 }
