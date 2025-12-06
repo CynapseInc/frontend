@@ -6,16 +6,30 @@ interface InputProps {
   classeCss?: string; 
   multiLinha?: boolean
   placeholder?: string;
+  value?: string;
+  type?: string;
+  readOnly?: boolean;
+  onChange?: (e: any)=> void;
 }
 
-export function Input({classeCss = '', placeholder = '', multiLinha = false}: InputProps){
+export function Input({classeCss = '', placeholder = '', multiLinha = false, value, onChange, type = "text", readOnly = false}: InputProps){
   
   if(multiLinha){
         return(  
-        <textarea placeholder={placeholder} className={`${Styles.input} ${classeCss}`}/>  
+        <textarea 
+            value={value}
+            onChange={onChange}
+            placeholder={placeholder} 
+            className={`${Styles.input} ${classeCss}`}/>  
         )
   }
   return(
-        <input type="text" placeholder={placeholder} className={`${Styles.input} ${classeCss}`} />
+        <input 
+          type={type} 
+          readOnly={readOnly}
+          value={value} 
+          onChange={onChange} 
+          placeholder={placeholder} 
+          className={`${Styles.input} ${classeCss}`} />
     )
 }

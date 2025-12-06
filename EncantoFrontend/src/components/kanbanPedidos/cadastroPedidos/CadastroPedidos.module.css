@@ -1,5 +1,5 @@
 .contentPage{
-    width: 50vw;
+    width: 60vw;
     margin-top: 10vh;
     display: flex;
     flex-direction: column;
@@ -83,4 +83,135 @@
 .corBotaoSecundario{
     background-color: #D8E2DC;
     color: #6D6875;
+}
+.barraPesquisaContainer {
+    position: relative;
+    width: 94.75%;
+    margin-bottom: 3vh;
+}
+.iconePesquisa {
+    position: absolute;
+    left: 1vw;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #9D8189;
+    font-size: 1.2vw;
+}
+
+/* Ajuste para o Input ter espaço para o ícone */
+.inputPesquisa {
+    padding-left: 3vw; 
+    width: 100%;
+}
+
+.gridProdutos {
+    display: grid;
+    /* Cria 4 colunas ou ajusta conforme a tela */
+    grid-template-columns: repeat(auto-fill, minmax(13vw, 1fr)); 
+    gap: 1vw;
+    width: 100%;
+}
+
+/* --- Estilos da Lista de Produtos Selecionados --- */
+
+.itemSelecionadoContainer {
+    background-color: #FFFFFF; /* Fundo branco */
+    border: 1px solid #E0E0E0; /* Borda cinza suave */
+    border-radius: 8px;
+    padding: 2vh;
+    margin-bottom: 2vh;
+    display: flex;
+    flex-direction: column;
+    gap: 2vh;
+    /* Sombra leve para dar destaque igual ao da imagem */
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03); 
+}
+
+/* --- Cabeçalho: Imagem, Títulos e Botão --- */
+.cabecalhoItem {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+}
+
+.dadosProdutoItem {
+    display: flex;
+    gap: 1vw;
+    align-items: center;
+}
+
+.thumbProdutoPequena {
+    width: 3.5vw;
+    height: 3.5vw;
+    border-radius: 6px;
+    object-fit: cover;
+    background-color: #f8f8f8;
+}
+
+.textosProdutoItem {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.tituloItem {
+    font-weight: bold;
+    color: #495057;
+    font-size: 0.95vw;
+    margin-bottom: 0.3vh;
+}
+
+.descItem {
+    font-size: 0.75vw;
+    color: #868E96;
+    max-width: 30vw;
+}
+
+.botaoRemover {
+    background-color: transparent;
+    color: #F4ACB7;
+    border: 1px solid #F4ACB7;
+    padding: 0.6vh 1.2vw;
+    font-size: 0.75vw;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.botaoRemover:hover {
+    background-color: #fff0f3;
+    color: #d68c99;
+}
+
+.gridInputsValores {
+    display: grid;
+    grid-template-columns: 0.7fr 1fr 1.3fr 1fr 1.3fr; 
+    gap: 0.475vw;
+    width: 100%;
+    align-items: end; 
+}
+
+.labelInputPequeno {
+    display: block;
+    font-size: 0.7vw;
+    font-weight: bold;
+    color: #868E96;
+    margin-bottom: 0.8vh;
+}
+
+.inputEditavel {
+    background-color: #FFFFFF;
+    border: 1px solid #DEE2E6;
+    border-radius: 4px;
+    color: #495057;
+    height: 4vh;
+}
+
+.inputReadOnly {
+    background-color: #E2E8E4 !important;
+    border: 1px solid #CED4DA;
+    border-radius: 4px;
+    color: #495057;
+    font-weight: bold;
+    height: 4vh;
 }
