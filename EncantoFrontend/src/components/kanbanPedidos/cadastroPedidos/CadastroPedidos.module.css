@@ -4,9 +4,9 @@
     display: flex;
     flex-direction: column;
     gap: 3vh;
-    /* background-color: antiquewhite; */
     height: fit-content;
 }
+
 .voltarKanban{
     display: flex;
     gap: 1vw;
@@ -23,25 +23,28 @@
     font-size: 0.9vw;
     color: #9D8189;
 }
+
 .sectionCard{
     display: flex;
     padding: 1vw;
     gap: 3vh;
     width: 100%;
 }
+
 .tituloSectionCard{
     font-size: 1.2vw;
     font-weight: bold;
     color: #F4ACB7;
 }
+
 .containerInputs{
     display: flex;
     height: fit-content;
     width: 100%;
     gap: 3vh;
     flex-direction: column;
-    /* background-color: aqua; */
 }
+
 .inputBox{
     display: flex;
     flex-direction: column;
@@ -53,42 +56,51 @@
     color: #6D6875;
     font-weight: 900;
 }
+
 .inputCadastro{
-    width: auto ;
+    width: auto;
 }
+
 .inputRow{
     display: flex;
     align-items: flex-end;
     gap: 2%;
 }
+
 .inputRow .inputCadastro{
-    width: 100% ;
+    width: 100%;
 }
+
 .inputDividida{
     width: 48.5%;
     display: flex;
     gap: 1vw;
     flex-direction: column;
 }
+
 .inputDividida .inputTextBox{
     height: 12vh;
     padding-top: 1vw;
 }
+
 .botao{
     padding: 1.6vh 0.7vw;
     font-size: 1vw;
     font-weight: 100;
     gap: 0.3vw;
 }
+
 .corBotaoSecundario{
     background-color: #D8E2DC;
     color: #6D6875;
 }
+
 .barraPesquisaContainer {
     position: relative;
     width: 94.75%;
     margin-bottom: 3vh;
 }
+
 .iconePesquisa {
     position: absolute;
     left: 1vw;
@@ -98,7 +110,6 @@
     font-size: 1.2vw;
 }
 
-/* Ajuste para o Input ter espaço para o ícone */
 .inputPesquisa {
     padding-left: 3vw; 
     width: 100%;
@@ -106,28 +117,23 @@
 
 .gridProdutos {
     display: grid;
-    /* Cria 4 colunas ou ajusta conforme a tela */
     grid-template-columns: repeat(auto-fill, minmax(13vw, 1fr)); 
     gap: 1vw;
     width: 100%;
 }
 
-/* --- Estilos da Lista de Produtos Selecionados --- */
-
 .itemSelecionadoContainer {
-    background-color: #FFFFFF; /* Fundo branco */
-    border: 1px solid #E0E0E0; /* Borda cinza suave */
+    background-color: #FFFFFF;
+    border: 1px solid #E0E0E0;
     border-radius: 8px;
     padding: 2vh;
     margin-bottom: 2vh;
     display: flex;
     flex-direction: column;
     gap: 2vh;
-    /* Sombra leve para dar destaque igual ao da imagem */
     box-shadow: 0 2px 5px rgba(0,0,0,0.03); 
 }
 
-/* --- Cabeçalho: Imagem, Títulos e Botão --- */
 .cabecalhoItem {
     display: flex;
     justify-content: space-between;
@@ -186,7 +192,7 @@
 .gridInputsValores {
     display: grid;
     grid-template-columns: 0.7fr 1fr 1.3fr 1fr 1.3fr; 
-    gap: 0.475vw;
+    gap: 1.5vw;
     width: 100%;
     align-items: end; 
 }
@@ -214,4 +220,112 @@
     color: #495057;
     font-weight: bold;
     height: 4vh;
+}
+
+.containerResumoInfo {
+    display: flex;
+    gap: 2vw;
+    margin-bottom: 2vh;
+}
+
+.boxResumoInfo {
+    background-color: #FFE5D9;
+    border-radius: 8px;
+    padding: 1.5vh 1vw;
+    width: 50%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vh;
+}
+
+.tituloResumoInfo {
+    font-weight: bold;
+    color: #6D6875;
+    font-size: 0.9vw;
+    margin-bottom: 0.5vh;
+}
+
+.textoResumoInfo {
+    font-size: 0.8vw;
+    color: #6D6875;
+}
+
+.linhaResumoProduto {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1vh 0;
+    border-bottom: 1px solid #E9ECEF;
+}
+
+.linhaResumoProduto:last-child {
+    border-bottom: none;
+}
+
+.resumoIconeNome {
+    display: flex;
+    align-items: center;
+    gap: 0.8vw;
+}
+
+.iconeCaixa {
+    color: #F4ACB7;
+    font-size: 1.2vw;
+}
+
+.resumoNome {
+    font-weight: bold;
+    color: #495057;
+    font-size: 0.9vw;
+}
+
+.resumoDetalhe {
+    font-size: 0.75vw;
+    color: #ADB5BD;
+}
+
+.resumoValoresDireita {
+    text-align: right;
+    display: flex;
+    flex-direction: column;
+}
+
+.footerResumo {
+    display: flex;
+    gap: 1vw;
+    margin-top: 3vh;
+}
+
+.boxTotalRosa {
+    background-color: #F4ACB7;
+    color: white;
+    border-radius: 8px;
+    padding: 1.5vh 1vw;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.labelTotal {
+    font-size: 0.75vw;
+    opacity: 0.9;
+    margin-bottom: 0.5vh;
+}
+
+.valorTotal {
+    font-size: 1.2vw;
+    font-weight: bold;
+}
+
+.botaoConfirmarContainer {
+    display: flex;
+    justify-content: center;
+    margin-top: 3vh;
+    margin-bottom: 5vh;
+}
+
+.botaoConfirmarContainer .botaoConfirmar{
+    padding: 1.5vh 3vw; 
+    font-size: 1.1vw;
 }
