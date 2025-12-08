@@ -4,8 +4,11 @@ import { FaCircleUser } from "react-icons/fa6";
 import { PiShoppingCartSimple } from "react-icons/pi";
 import logo from '../assets/logoEncanto.png';
 
+import { Navigate, useLocation, useNavigate } from 'react-router-dom';
 
 function Navbar() {
+    const navigate = useNavigate();
+    const location = useLocation();
 
     return (
         <div style={{ backgroundColor: 'white', alignItems: 'center', width: '100vw', display: 'flex', position: 'fixed', justifyContent: 'center', justifySelf: 'center', top: '0%', height: '70px', gap: "40px", zIndex: "10", filter: "drop-shadow(0px 4px 4px rgba(0, 0, 0, 0.15))" }}>
@@ -18,8 +21,8 @@ function Navbar() {
 
                 {/* Opções da nav */}
                 <div style={{ fontSize: "100%" }}>Home</div>
-                <div style={{ fontSize: "100%" }}>Pedidos</div>
-                <div style={{ fontSize: "100%" }}>Financeiro</div>
+                <div style={{ fontSize: "100%" }} onClick={() => {navigate("/pedidos")}}>Pedidos</div>
+                <div style={{ fontSize: "100%" }} onClick={() => {navigate("/dashboard")}}>Financeiro</div>
                 <div style={{ fontSize: "100%" }}>Produtos</div>
                 <div style={{ fontSize: "100%" }}>Funcionários</div>
 
@@ -27,7 +30,7 @@ function Navbar() {
             </div>
 
             {/* Botão login e botão carrinho  */}
-            <div style={{ color: "#f4acacff", display:"flex", width: "fit-content", height: "fit-content", padding: "3px", scale: "2.5" }}><FaCircleUser /></div>
+            <div style={{ color: "#f4acacff", display:"flex", width: "fit-content", height: "fit-content", padding: "3px", scale: "2.5" }}onClick={() => {navigate("/login")}}><FaCircleUser /></div>
             <div style={{ backgroundColor: "#fbc9bbff", color:"grey", display:"flex", width: "fit-content", height: "fit-content", padding: "5px", scale: "1.6", borderRadius:"8px" }}><PiShoppingCartSimple /></div>
 
         </div>

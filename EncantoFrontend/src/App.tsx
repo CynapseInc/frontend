@@ -1,16 +1,13 @@
-import "./App.css";
-import { DashFinanceira } from "./components/dashboardFinanceira";
-import { CadastroPedidos } from "./components/kanbanPedidos/cadastroPedidos";
-import Navbar from './components/navbar';
+import { RouterProvider } from 'react-router-dom'
+import './App.css'
+import { route } from './provider/route'
 
 function App() {
 
   return (
-    <>
-    <Navbar/>
-    <CadastroPedidos/>
-    {/* <DashFinanceira/> */}
-    </>
+    <div>
+      <RouterProvider router={route}/>
+    </div>
   )
 }
 

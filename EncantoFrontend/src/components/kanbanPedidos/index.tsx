@@ -4,4 +4,4 @@ export function KanbanPedidos() {
   return (
     <div></div>
   )
-}
+} 

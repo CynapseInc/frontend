@@ -6,10 +6,14 @@ import { AiOutlineEye } from "react-icons/ai";
 import { AiOutlineEyeInvisible } from "react-icons/ai";
 import { useState } from 'react';
 
+import { useLocation, useNavigate } from 'react-router-dom';
+
 
 
 export default function Login() {
 
+  const navigate = useNavigate()
+  const location = useLocation()
   const [toggle, setToggle] = useState(true);
 
   return (
@@ -55,7 +59,7 @@ export default function Login() {
 
           <div style={{ color: '#fecad4', cursor:"pointer" }}>Esqueci minha senha</div>
         </div>
-        <div className={styles.buttonLogin} onMouseDown={()=>{}}>Entrar</div>
+        <div className={styles.buttonLogin} onMouseDown={()=>{}} onClick={() => navigate("/dashboard")}>Entrar</div>
 
         <div className={styles.aviso}>
           Acesso exclusivo para administradores
@@ -65,4 +69,4 @@ export default function Login() {
     </div>
   );
 
-}
+} 

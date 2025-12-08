@@ -12,6 +12,7 @@ import { DespesasPorCategoria } from "./despesasPorCategoria";
 import { GraficoVendasCategoria } from "./vendasPorCategoria";
 import { ProximosPagamentos } from "./proximosPagamentos";
 
+import { useLocation, useNavigate } from 'react-router-dom';
 
 export function DashFinanceira() {
   return (
@@ -28,26 +29,26 @@ export function DashFinanceira() {
           <Input classeCss={styles.filtros} />
         </div>
         <Button classeCss={styles.botaoFiltro}>Aplicar Filtros</Button>
-        
+
       </Card>
       <div className={styles.containerCards}>
-        <CardKPI icone={<LuDollarSign/>} classeIconeCor={styles.rosa} porcentagem='+12.5%' textoAbaixo='vs mês anterior' tipo='positivo' titulo='Receitas' valor='R$ 28.000,00' />
-        <CardKPI icone={<FiCreditCard/>} classeIconeCor={styles.rosaForte} porcentagem='-5.3%' textoAbaixo='vs mês anterior' tipo='negativo' titulo='Despesas' valor='R$ 12.000,00' />
-        <CardKPI icone={<TfiWallet/>} classeIconeCor={styles.marrom} porcentagem='+18.2%' textoAbaixo='vs mês anterior' tipo='positivo' titulo='Lucro' valor='R$ 16.000,00' />
-        <CardKPI icone={<IoAlertOutline/>} classeIconeCor={styles.rosaClaro} porcentagem='-8.7%' textoAbaixo='vs mês anterior' tipo='negativo' titulo='A Pagar' valor='R$ 7.950,00' />
+        <CardKPI icone={<LuDollarSign />} classeIconeCor={styles.rosa} porcentagem='+12.5%' textoAbaixo='vs mês anterior' tipo='positivo' titulo='Receitas' valor='R$ 28.000,00' />
+        <CardKPI icone={<FiCreditCard />} classeIconeCor={styles.rosaForte} porcentagem='-5.3%' textoAbaixo='vs mês anterior' tipo='negativo' titulo='Despesas' valor='R$ 12.000,00' />
+        <CardKPI icone={<TfiWallet />} classeIconeCor={styles.marrom} porcentagem='+18.2%' textoAbaixo='vs mês anterior' tipo='positivo' titulo='Lucro' valor='R$ 16.000,00' />
+        <CardKPI icone={<IoAlertOutline />} classeIconeCor={styles.rosaClaro} porcentagem='-8.7%' textoAbaixo='vs mês anterior' tipo='negativo' titulo='A Pagar' valor='R$ 7.950,00' />
       </div>
       <div className={styles.containerContentCharts}>
-        
+
         <div className={styles.containerCardGraficos}>
           <EvolucaoMensalGrafico />
-        
-          <DespesasPorCategoria/>
+
+          <DespesasPorCategoria />
         </div>
 
         <div className={styles.containerCardGraficos}>
-          <GraficoVendasCategoria/>
+          <GraficoVendasCategoria />
 
-          <ProximosPagamentos/>         
+          <ProximosPagamentos />
         </div>
 
       </div>

@@ -8,6 +8,8 @@ import { FiSearch, FiPackage } from "react-icons/fi";
 import { GoPeople } from "react-icons/go";
 import { CardProduto } from "./cardProdutos";
 
+import { useLocation, useNavigate } from 'react-router-dom';
+
 import CanecaBen10 from "../../../assets/canecaBen10.jpg";
 import CanecaSpiderman from "../../../assets/canecaSpiderman.jpg";
 import CadernoCorinthians from "../../../assets/cadernoCorinthians.jpg";
@@ -18,7 +20,7 @@ interface Produto {
   nome: string;
   imagem: string;
   desc: string;
-  preco: number;
+  preco: number; 
   peso: string;
 }
 
