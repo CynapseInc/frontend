@@ -1,5 +1,5 @@
 import { createBrowserRouter } from "react-router-dom"
-import { KanbanPedidos } from "../components/kanbanPedidos"
+import { CadastroPedidos } from "../components/kanbanPedidos/cadastroPedidos"
 import { DashFinanceira } from "../components/dashboardFinanceira"
 import Login from "../components/login"
 import Layout from "../components/Layout"
@@ -10,7 +10,7 @@ export const route = createBrowserRouter([
         path: "/",
         element: <Layout />,
         children: [
-            { path: "pedidos", element: <KanbanPedidos /> },
+            { path: "pedidos", element: <CadastroPedidos /> },
             { path: "dashboard", element: <DashFinanceira /> },
             { index: true, element: <DashFinanceira /> }
         ]
