@@ -4,6 +4,7 @@ import { DashFinanceira } from "../components/dashboardFinanceira"
 import {HomeCalendar} from '../components/home'
 import Login from "../components/login"
 import Layout from "../components/Layout"
+import Kanban from "../components/kanbanPedidos"
 
 export const route = createBrowserRouter([
     { path: "/login", element: <Login /> },
@@ -14,7 +15,8 @@ export const route = createBrowserRouter([
             { path: "pedidos", element: <CadastroPedidos /> },
             { path: "dashboard", element: <DashFinanceira /> },
             { index: true, element: <DashFinanceira /> },
-            { path: "home", element: <HomeCalendar /> }
+            { path: "home", element: <HomeCalendar /> },
+            { path: "kanban", element: <Kanban /> },
         ]
     }
 ])
