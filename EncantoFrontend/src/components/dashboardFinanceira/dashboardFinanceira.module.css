@@ -6,20 +6,20 @@
 .conteudo{
     display: flex;
     flex-direction: column;
-    margin-top: 15vh;
-    margin-bottom: 5vh;
-    width: 80vw;
-    height: 150vh;
+    max-width: 1600px;
+    margin: 0 auto;
+    padding: 2rem;
     gap: 3vh;
     /* background-color: green; */
 }
 
 .conteudo .cardConteudoFiltros{
     display: flex;
-    gap: 2vw;
-    padding: 1.2vw;
+    gap: 20px;
+    padding: 12px;
     flex-direction: row;
     align-items: flex-end;
+    justify-content: center;
 }
 
 .containerFiltro{
@@ -29,7 +29,7 @@
     width: 100%;
 }
 .tituloFiltro{
-    font-size: 0.9vw;
+    font-size: 14px;
     color: #6D6875;
     font-weight: 900;
 }
@@ -38,7 +38,7 @@
     border-color: #D8E2DC;
     border-style: solid;
     height: 5vh;
-    width: 31.3vw;
+    width: 200px;
 }
 .cardConteudoFiltros .botaoFiltro{
     padding: 0.8vw 1.6vw;
@@ -46,17 +46,20 @@
 }
 
 .containerCards{
-    display: flex;
-    gap: 0.925vw;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
 }
 
 .titulo{
-    font-size: 2.5vw;
+    font-size: 48px;
     color: #F4ACB7;
+    margin-bottom: 0.5rem;
 }
 .textoSecundario{
-    font-size: 1vw;
+    font-size: 16px;
     color: #9D8189;
+    margin-bottom: 2rem;
 }
 
 .containerCards .rosa{
@@ -77,11 +80,11 @@
 
 .containerCardGraficos{
     display: flex;
-    gap: 1.4vw;
+    gap: 14px;
 }
 
 .containerContentCharts{
     display: flex;
     flex-direction: column;
-    gap: 1.4vw;
+    gap: 14px;
 }

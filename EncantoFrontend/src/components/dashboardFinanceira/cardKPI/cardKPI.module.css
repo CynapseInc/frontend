@@ -1,10 +1,11 @@
 .cardBody {
     height: fit-content;
-    padding: 1.2vw;
+    padding: 20px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    gap: 1.5vh; /* Espaço entre a parte de cima e o rodapé */
+    gap: 15px; /* Espaço entre a parte de cima e o rodapé */
+    width: 100%;
 }
 
 /* Nova classe que segura (Texto + Valor) e (Ícone) */
@@ -12,24 +13,24 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start; /* Importante: Alinha tudo no topo */
-    width: 16.5vw;
+    width: 100%;
 }
 
 /* Coluna que empilha Título e Valor sem gap gigante */
 .infoEsquerda {
     display: flex;
     flex-direction: column;
-    gap: 2vh; /* O Título e o Valor ficam bem pertinho agora */
+    gap: 20px; /* O Título e o Valor ficam bem pertinho agora */
 }
 
 .titulo {
     color: #9D8189;
-    font-size: 0.9vw;
+    font-size: 14px;
     font-weight: 500;
 }
 
 .valorGigante {
-    font-size: 2vw;
+    font-size: 32px;
     font-weight: 700;
     color: #6D6875;
     line-height: 1.1; /* DICA: Reduz a altura da linha para ficar mais compacto */
@@ -40,12 +41,12 @@
     align-items: center;
     justify-content: center;
     /* Tamanhos ajustados */
-    width: 3vw; 
-    height: 3vw;
+    width: 48px; 
+    height: 48px;
     border-radius: 50%; /* Garante bolinha perfeita */
     color: #FFF;
     background-color: #FFCAD4;
-    font-size: 1.5vw;
+    font-size: 24px;
     
     /* Isso garante que o ícone não estique */
     flex-shrink: 0; 
@@ -54,15 +55,15 @@
 .rodape {
     display: flex;
     align-items: center;
-    font-size: 1vw;
-    gap: 0.75vw;
-    margin-top: 0.5vh; /* Um respiro extra acima do rodapé */
+    font-size: 16px;
+    gap: 12px;
+    margin-top: 5px; /* Um respiro extra acima do rodapé */
 }
 
 .verde, .vermelho {
     display: flex;
     align-items: center;
-    gap: 0.4vw;
+    gap: 6px;
     font-weight: 900;
 }
 
@@ -70,6 +71,6 @@
 .vermelho { color: #F44336; }
 
 .textoCinza {
-    font-size: 0.85vw;
+    font-size: 14px;
     color: #9D8189;
 }

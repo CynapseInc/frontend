@@ -1,9 +1,10 @@
 .containerGrafico {
-  height: 40vh; 
+  height: 400px; 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   padding: 1vh 2vw;
+  width: 100%;
 }
 
 .tituloGrafico {
@@ -15,7 +16,7 @@
 
 .areaGrafico {
   flex: 1; 
-  width: 43vw;
+  width: 100%;
   min-height: 0;
 }
 

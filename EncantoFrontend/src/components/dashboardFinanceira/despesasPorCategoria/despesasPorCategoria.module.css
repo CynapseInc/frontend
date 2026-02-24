@@ -19,7 +19,8 @@
   font-weight: bold;
 }
 .cardDespesas{
-    width: 27.775vw;
+    flex: 1;
+    height: 400px;
 }
 
 .porcentagem{

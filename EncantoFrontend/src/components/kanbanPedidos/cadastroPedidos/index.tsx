@@ -1,14 +1,10 @@
 import { useState } from "react";
-import Styles from "./CadastroPedidos.module.css";
-import { Card } from "../../genericos/card";
 import { Input } from "../../genericos/input";
 import { Button } from "../../genericos/button";
 import { FaArrowLeft, FaPlus } from "react-icons/fa6";
-import { FiSearch, FiPackage } from "react-icons/fi";
+import { FiSearch } from "react-icons/fi";
 import { GoPeople } from "react-icons/go";
 import { CardProduto } from "./cardProdutos";
-
-import { useLocation, useNavigate } from 'react-router-dom';
 
 import CanecaBen10 from "../../../assets/canecaBen10.jpg";
 import CanecaSpiderman from "../../../assets/canecaSpiderman.jpg";
@@ -49,18 +45,6 @@ export function CadastroPedidos() {
         }
     }
 
-    function handleAlterarQuantidade(id: number, novaQuantidade: string) {
-        const qtd = parseInt(novaQuantidade);
-        if (isNaN(qtd) || qtd < 1) return;
-
-        setProdutosSelecionados(prev => prev.map(item => {
-            if (item.id === id) {
-                return { ...item, quantidade: qtd };
-            }
-            return item;
-        }));
-    }
-
     const produtosFiltrados = produtosMock.filter((produto) => {
         const textoBusca = busca.toLowerCase();
         return produto.nome.toLowerCase().includes(textoBusca) || 
@@ -77,232 +61,149 @@ export function CadastroPedidos() {
     }, 0);
 
     return (
-        <div className={Styles.contentPage}>
-            <div className={Styles.voltarKanban}>
-                <FaArrowLeft/>
-                Voltar para Pedidos
-            </div>
-            <span className={Styles.tituloPage}>Novo Pedido</span>
-            <span className={Styles.textoSecundario}>Preencha as informações abaixo para cadastrar um novo pedido</span>
-            
-            <Card classeCss={Styles.sectionCard}>
-                <span className={Styles.tituloSectionCard}>Informações do Cliente</span>
-                <div className={Styles.containerInputs}>
-                    <div className={Styles.inputBox}>
-                        <span className={Styles.tituloInputLabel}>Cliente</span>
-                        <div className={Styles.inputRow}>
-                            <Input classeCss={Styles.inputCadastro}/>  
-                            <Button variante="rosa" classeCss={`${Styles.botao} ${Styles.corBotaoSecundario}`}>
-                                <GoPeople />
-                                Listar Clientes
-                            </Button>     
-                            <Button variante="rosa" classeCss={Styles.botao}>
-                                <FaPlus/>
-                                Novo Cliente
-                            </Button>     
-                        </div>
+        <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
+            <div className="max-w-[1600px] mx-auto px-8 py-8">
+                
+                {/* Cabeçalho */}
+                <div className="mb-8">
+                    <div className="flex items-center gap-3 mb-4">
+                        <button className="flex items-center gap-2 text-[#9D8189] hover:text-[#F4ACB7] transition-colors">
+                            <FaArrowLeft className="size-4" />
+                            Voltar para Pedidos
+                        </button>
                     </div>
-                    <div className={Styles.inputBox}>
-                        <span className={Styles.tituloInputLabel}>Endereço de Entrega</span>
-                        <Input classeCss={Styles.inputCadastro}/>  
-                    </div>
-                    <div className={Styles.inputBox}>
-                        <div className={Styles.inputRow}>
-                            <div className={Styles.inputDividida}>
-                                <span className={Styles.tituloInputLabel}>Endereço de Entrega</span>
-                                <Input multiLinha={true} placeholder="Ex: Cliente solicitou embalagem especial..." classeCss={`${Styles.inputCadastro} ${Styles.inputTextBox}`}/>  
-                            </div>
-                            <div className={Styles.inputDividida}>
-                                <span className={Styles.tituloInputLabel}>Status do Pedido</span>
-                                <Input multiLinha={true} classeCss={`${Styles.inputCadastro} ${Styles.inputTextBox}`}/>  
-                            </div>
-                        </div>
-                    </div>
+                    <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Novo Pedido</h1>
+                    <p className="text-[17px]" style={{ color: '#9D8189' }}>
+                        Preencha as informações abaixo para cadastrar um novo pedido
+                    </p>
                 </div>
-            </Card>
 
-            <Card classeCss={Styles.sectionCard}>
-                <span className={Styles.tituloSectionCard}>Selecionar Produtos</span>
-                <div className={Styles.containerInputs}>
-                    <div className={Styles.barraPesquisaContainer}>
-                        <FiSearch className={Styles.iconePesquisa} />
-                        <Input
-                            placeholder="Pesquisar produto por nome, categoria, tema ou item..." 
-                            classeCss={`${Styles.inputCadastro} ${Styles.inputPesquisa}`}
-                            value={busca}
-                            onChange={(e: any) => setBusca(e.target.value)} 
-                        />
+                <div className="grid grid-cols-[320px_1fr_400px] gap-6">
+                    
+                    {/* COLUNA ESQUERDA - Informações do Cliente */}
+                    <div className="space-y-6">
+                        <div className="bg-white rounded-lg p-5 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
+                            <h3 className="text-[18px] mb-4" style={{ color: '#F4ACB7' }}>
+                                <strong>Informações do Cliente</strong>
+                            </h3>
+                            <div className="space-y-4">
+                                <div>
+                                    <label className="block text-sm text-[#6D6875] font-bold mb-2">Cliente</label>
+                                    <div className="flex gap-2">
+                                        <Input classeCss="flex-1 border border-[#D8E2DC] rounded h-10" />
+                                        <Button classeCss="px-3 py-2 h-10">
+                                            <GoPeople className="size-4" />
+                                        </Button>
+                                        <Button classeCss="px-3 py-2 h-10">
+                                            <FaPlus className="size-4" />
+                                        </Button>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label className="block text-sm text-[#6D6875] font-bold mb-2">Endereço de Entrega</label>
+                                    <Input classeCss="w-full border border-[#D8E2DC] rounded h-10" />
+                                </div>
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm text-[#6D6875] font-bold mb-2">Observações</label>
+                                        <Input multiLinha={true} classeCss="w-full border border-[#D8E2DC] rounded h-20 resize-none" />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm text-[#6D6875] font-bold mb-2">Status</label>
+                                        <Input classeCss="w-full border border-[#D8E2DC] rounded h-10" />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
 
-                    <div className={Styles.gridProdutos}>
-                        {produtosFiltrados.map((produto) => {
-                            const isSelected = produtosSelecionados.some(sel => sel.id === produto.id);
-                            return (
-                                <CardProduto
-                                    key={produto.id}
-                                    titulo={produto.nome}
-                                    imagem={produto.imagem}
-                                    descricao={produto.desc}
-                                    preco={produto.preco}
-                                    peso={produto.peso}
-                                    selecionado={isSelected} 
-                                    onSelecionar={() => handleToggleProduto(produto)}
+                    {/* COLUNA CENTRAL - Seleção de Produtos */}
+                    <div>
+                        <div className="bg-white rounded-lg p-5 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
+                            <h3 className="text-[18px] mb-4" style={{ color: '#F4ACB7' }}>
+                                <strong>Selecionar Produtos</strong>
+                            </h3>
+                            <div className="mb-4 relative">
+                                <FiSearch className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4 text-[#9D8189]" />
+                                <Input
+                                    placeholder="Pesquisar produto..."
+                                    classeCss="w-full pl-10 border border-[#D8E2DC] rounded h-10"
+                                    value={busca}
+                                    onChange={(e: any) => setBusca(e.target.value)}
                                 />
-                            );
-                        })}
+                            </div>
+                            <div className="grid grid-cols-2 gap-4 max-h-96 overflow-y-auto">
+                                {produtosFiltrados.map((produto) => {
+                                    const isSelected = produtosSelecionados.some(sel => sel.id === produto.id);
+                                    return (
+                                        <CardProduto
+                                            key={produto.id}
+                                            titulo={produto.nome}
+                                            imagem={produto.imagem}
+                                            descricao={produto.desc}
+                                            preco={produto.preco}
+                                            peso={produto.peso}
+                                            selecionado={isSelected}
+                                            onSelecionar={() => handleToggleProduto(produto)}
+                                        />
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* COLUNA DIREITA - Produtos Selecionados e Resumo */}
+                    <div className="space-y-6">
+                        {produtosSelecionados.length > 0 && (
+                            <>
+                                <div className="bg-white rounded-lg p-5 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
+                                    <h3 className="text-[18px] mb-4" style={{ color: '#F4ACB7' }}>
+                                        <strong>Produtos Selecionados</strong>
+                                    </h3>
+                                    <div className="space-y-3 max-h-64 overflow-y-auto">
+                                        {produtosSelecionados.map((item) => (
+                                            <div key={item.id} className="flex items-center justify-between p-3 bg-[#F9F9F9] rounded">
+                                                <div className="flex items-center gap-3">
+                                                    <img src={item.imagem} alt={item.nome} className="w-12 h-12 rounded" />
+                                                    <div>
+                                                        <p className="text-sm font-bold text-[#6D6875]">{item.nome}</p>
+                                                        <p className="text-xs text-[#9D8189]">Qtd: {item.quantidade}</p>
+                                                    </div>
+                                                </div>
+                                                <button
+                                                    className="text-[#F44336] hover:text-[#D32F2F]"
+                                                    onClick={() => handleToggleProduto(item)}
+                                                >
+                                                    Remover
+                                                </button>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                <div className="bg-white rounded-lg p-5 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
+                                    <h3 className="text-[18px] mb-4" style={{ color: '#F4ACB7' }}>
+                                        <strong>Resumo do Pedido</strong>
+                                    </h3>
+                                    <div className="space-y-3">
+                                        <div className="flex justify-between">
+                                            <span className="text-sm text-[#6D6875]">Peso Total</span>
+                                            <span className="text-sm font-bold text-[#F4ACB7]">{pesoTotalGeral.toFixed(2)} kg</span>
+                                        </div>
+                                        <div className="flex justify-between">
+                                            <span className="text-sm text-[#6D6875]">Valor Total</span>
+                                            <span className="text-lg font-bold text-[#F4ACB7]">R$ {valorTotalGeral.toFixed(2)}</span>
+                                        </div>
+                                        <Button classeCss="w-full mt-4 px-6 py-3 text-lg">
+                                            Confirmar Pedido
+                                        </Button>
+                                    </div>
+                                </div>
+                            </>
+                        )}
                     </div>
                 </div>
-            </Card>
-
-            {produtosSelecionados.length > 0 && (
-                <>
-                    <Card classeCss={Styles.sectionCard}>
-                        <span className={Styles.tituloSectionCard} style={{color: '#F4ACB7', marginBottom: '1vh', display:'block'}}>
-                            Produtos Selecionados
-                        </span>
-                        
-                        <div className={Styles.containerInputs}>
-                            {produtosSelecionados.map((item) => {
-                                const precoTotal = item.preco * item.quantidade;
-                                const pesoNumerico = parseFloat(item.peso.replace('kg','').replace(',','.').trim());
-                                const pesoTotal = (pesoNumerico * item.quantidade).toFixed(2);
-
-                                return (
-                                    <div key={item.id} className={Styles.itemSelecionadoContainer}>
-                                        <div className={Styles.cabecalhoItem}>
-                                            <div className={Styles.dadosProdutoItem}>
-                                                <img src={item.imagem} alt={item.nome} className={Styles.thumbProdutoPequena}/>
-                                                <div className={Styles.textosProdutoItem}>
-                                                    <span className={Styles.tituloItem}>{item.nome}</span>
-                                                    <span className={Styles.descItem}>{item.desc}</span>
-                                                </div>
-                                            </div>
-                                            <button 
-                                                className={Styles.botaoRemover}
-                                                onClick={() => handleToggleProduto(item)}
-                                            >
-                                                Remover
-                                            </button>
-                                        </div>
-
-                                        <div className={Styles.gridInputsValores}>
-                                            <div>
-                                                <span className={Styles.labelInputPequeno}>Quantidade</span>
-                                                <Input 
-                                                    classeCss={Styles.inputEditavel} 
-                                                    type="number"
-                                                    value={item.quantidade.toString()}
-                                                    onChange={(e: any) => handleAlterarQuantidade(item.id, e.target.value)}
-                                                />
-                                            </div>
-                                            <div>
-                                                <span className={Styles.labelInputPequeno}>Preço Unitário</span>
-                                                <Input 
-                                                    classeCss={Styles.inputEditavel} 
-                                                    value={`R$ ${item.preco.toFixed(2)}`} 
-                                                    readOnly 
-                                                />
-                                            </div>
-                                            <div>
-                                                <span className={Styles.labelInputPequeno}>Preço Total</span>
-                                                <Input 
-                                                    classeCss={Styles.inputReadOnly} 
-                                                    value={`R$ ${precoTotal.toFixed(2)}`} 
-                                                    readOnly 
-                                                />
-                                            </div>
-                                            <div>
-                                                <span className={Styles.labelInputPequeno}>Peso Unit. (kg)</span>
-                                                <Input 
-                                                    classeCss={Styles.inputEditavel} 
-                                                    value={item.peso.replace('kg','').trim()} 
-                                                    readOnly
-                                                />
-                                            </div>
-                                            <div>
-                                                <span className={Styles.labelInputPequeno}>Peso Total (kg)</span>
-                                                <Input 
-                                                    classeCss={Styles.inputReadOnly} 
-                                                    value={`${pesoTotal} kg`} 
-                                                    readOnly 
-                                                />
-                                            </div>
-                                        </div>
-                                    </div>
-                                );
-                            })}
-                        </div>
-                    </Card>
-
-                    <Card classeCss={Styles.sectionCard}>
-                        <span className={Styles.tituloSectionCard} style={{color: '#F4ACB7', marginBottom:'2vh', display:'block'}}>
-                            Resumo do Pedido
-                        </span>
-
-                        <div className={Styles.containerInputs}>
-                            <div className={Styles.containerResumoInfo}>
-                                <div className={Styles.boxResumoInfo}>
-                                    <span className={Styles.tituloResumoInfo}>Cliente</span>
-                                    <span className={Styles.textoResumoInfo}>Maria Silva</span>
-                                    <span className={Styles.textoResumoInfo}>(11) 98765-4321</span>
-                                </div>
-                                <div className={Styles.boxResumoInfo}>
-                                    <span className={Styles.tituloResumoInfo}>Endereço de Entrega</span>
-                                    <span className={Styles.textoResumoInfo}>Av. Paulista, 1578 - Apto 501</span>
-                                    <span className={Styles.textoResumoInfo}>Bela Vista, São Paulo/SP</span>
-                                </div>
-                            </div>
-
-                            <span className={Styles.tituloInputLabel} style={{marginBottom: '1vh', display:'block'}}>Produtos</span>
-
-                            <div>
-                                {produtosSelecionados.map((item) => (
-                                    <div key={item.id} className={Styles.linhaResumoProduto}>
-                                        <div className={Styles.resumoIconeNome}>
-                                            <FiPackage className={Styles.iconeCaixa} />
-                                            <div style={{display:'flex', flexDirection:'column'}}>
-                                                <span className={Styles.resumoNome}>{item.nome}</span>
-                                                <span className={Styles.resumoDetalhe}>
-                                                    {item.quantidade} unidade{item.quantidade > 1 ? 's' : ''} x R$ {item.preco.toFixed(2)}
-                                                </span>
-                                            </div>
-                                        </div>
-                                        <div className={Styles.resumoValoresDireita}>
-                                            <span className={Styles.resumoNome}>
-                                                R$ {(item.preco * item.quantidade).toFixed(2)}
-                                            </span>
-                                            <span className={Styles.resumoDetalhe}>
-                                                {(parseFloat(item.peso.replace('kg','').replace(',','.')) * item.quantidade).toFixed(2)} kg
-                                            </span>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <div className={Styles.footerResumo}>
-                                <div className={Styles.boxTotalRosa}>
-                                    <span className={Styles.labelTotal}>Previsão de Entrega</span>
-                                    <span className={Styles.valorTotal}>19/12/2025</span>
-                                </div>
-                                <div className={Styles.boxTotalRosa}>
-                                    <span className={Styles.labelTotal}>Peso Total</span>
-                                    <span className={Styles.valorTotal}>{pesoTotalGeral.toFixed(2)} kg</span>
-                                </div>
-                                <div className={Styles.boxTotalRosa}>
-                                    <span className={Styles.labelTotal}>Valor Total</span>
-                                    <span className={Styles.valorTotal}>R$ {valorTotalGeral.toFixed(2)}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </Card>
-
-                    <div className={Styles.botaoConfirmarContainer}>
-                         <Button variante="rosa" classeCss={Styles.botaoConfirmar}>
-                            Confirmar Pedido
-                         </Button>
-                    </div>
-                </>
-            )}
+            </div>
         </div>
-    )
+    );
 }
