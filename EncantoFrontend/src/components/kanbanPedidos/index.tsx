@@ -7,9 +7,10 @@ import OrderDetailModal from './modals/OrderDetailModal';
 import StatusTypeModal from './modals/StatusTypeModal';
 import StatusTypeListModal from './modals/StatusTypeListModal';
 import DeleteStatusTypeDialog from './modals/DeleteStatusTypeDialog';
+import { Navigate ,useNavigate } from 'react-router-dom';
 
 import './index-kanban.css'
-import { useNavigate } from 'react-router-dom';
+
 
 interface Order {
   id: string;
@@ -38,6 +39,7 @@ const mockStatusTypes: StatusType[] = [
   { id: '3', name: 'Para Enviar', color: '#F4ACB7' },
   { id: '4', name: 'Enviados', color: '#D8E2DC' },
 ];
+
 
 const mockOrders: Order[] = [
   {
@@ -207,6 +209,14 @@ export default function Kanban() {
   const [editingStatusType, setEditingStatusType] = useState<StatusType | null>(null);
   const [deleteStatusType, setDeleteStatusType] = useState<StatusType | null>(null);
 
+  const navigate = useNavigate();
+
+const handleOnClickInSeeDetails = (orderId: string) => {
+  
+  navigate(`/pedidos/detalhes/${orderId}`);
+}
+
+
   const handleOrderDrop = (orderId: string, newStatusId: string) => {
     setOrders(orders.map(order => {
       if (order.id === orderId) {
@@ -265,7 +275,7 @@ export default function Kanban() {
   const getOrdersByStatus = (statusId: string) => {
     return orders.filter(order => order.statusId === statusId);
   };
-  const navigate = useNavigate();
+  
 
 
   return (
@@ -365,6 +375,7 @@ export default function Kanban() {
           order={selectedOrder}
           statusTypes={statusTypes}
           onUpdateStatus={handleUpdateOrderStatus}
+          onClickInSeeDetails={handleOnClickInSeeDetails}
         />
 
         <StatusTypeModal

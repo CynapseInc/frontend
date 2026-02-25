@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { ArrowLeft, Plus, Users, Package, Search } from 'lucide-react';
+import { ArrowLeft, Plus, Users, Package, Edit2, Trash2, Search } from 'lucide-react';
 import { Button } from '../ui/button';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import ClientListModal from '../modals-global/ClientListModal';
 import ClientFormModal from '../modals-global/ClientFormModal';
-import './index-cad-pedido.css'
+import AddProductModal from '../modals-global/AddProductModal';
 
 interface Client {
   id: string;
@@ -149,34 +149,85 @@ const mockStatusTypes: StatusType[] = [
   { id: '4', name: 'Enviados' },
 ];
 
+// Dados mockados do pedido existente
+const mockOrder = {
+  id: 'PED-001',
+  clientId: '1',
+  addressId: '1',
+  observations: 'Cliente pediu para caprichar na embalagem',
+  statusId: '2',
+  createdAt: '10/11/2025 14:30',
+  updatedAt: '13/11/2025 16:20',
+  products: [
+    {
+      product: mockProducts[0],
+      quantity: 2,
+      unitPrice: 35.00,
+      totalPrice: 70.00,
+      unitWeight: 0.35,
+      totalWeight: 0.70,
+    },
+  ],
+};
+
 export default function App() {
   const [clients, setClients] = useState<Client[]>(mockClients);
-  const [selectedClientId, setSelectedClientId] = useState('');
-  const [selectedAddressId, setSelectedAddressId] = useState('');
-  const [observations, setObservations] = useState('');
-  const [statusId, setStatusId] = useState('1');
-  const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
+  const [selectedClientId, setSelectedClientId] = useState(mockOrder.clientId);
+  const [selectedAddressId, setSelectedAddressId] = useState(mockOrder.addressId);
+  const [observations, setObservations] = useState(mockOrder.observations);
+  const [statusId, setStatusId] = useState(mockOrder.statusId);
+  const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>(mockOrder.products);
+  const [createdAt] = useState(mockOrder.createdAt);
+  const [updatedAt, setUpdatedAt] = useState(mockOrder.updatedAt);
   const [isClientListOpen, setIsClientListOpen] = useState(false);
   const [isClientFormOpen, setIsClientFormOpen] = useState(false);
+  const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Client | null>(null);
-  const [searchProduct, setSearchProduct] = useState('');
 
   const selectedClient = clients.find(c => c.id === selectedClientId);
   const selectedAddress = selectedClient?.addresses.find(a => a.id === selectedAddressId);
 
-  const filteredProducts = mockProducts.filter(product => {
-    const search = searchProduct.toLowerCase();
-    return (
-      product.title.toLowerCase().includes(search) ||
-      product.description.toLowerCase().includes(search) ||
-      product.category.toLowerCase().includes(search) ||
-      product.theme.toLowerCase().includes(search) ||
-      product.item.toLowerCase().includes(search)
-    );
-  });
+  const handleUpdateQuantity = (productId: string, quantity: number) => {
+    if (quantity < 1) return;
 
-  const handleSelectProduct = (product: Product) => {
-    // Verifica se já existe
+    setSelectedProducts(selectedProducts.map(sp => {
+      if (sp.product.id === productId) {
+        return {
+          ...sp,
+          quantity,
+          totalPrice: sp.unitPrice * quantity,
+          totalWeight: sp.unitWeight * quantity,
+        };
+      }
+      return sp;
+    }));
+    updateLastModified();
+  };
+
+  const handleUpdateUnitPrice = (productId: string, unitPrice: number) => {
+    if (unitPrice < 0) return;
+
+    setSelectedProducts(selectedProducts.map(sp => {
+      if (sp.product.id === productId) {
+        return {
+          ...sp,
+          unitPrice,
+          totalPrice: unitPrice * sp.quantity,
+        };
+      }
+      return sp;
+    }));
+    updateLastModified();
+  };
+
+  const handleRemoveProduct = (productId: string) => {
+    if (confirm('Deseja realmente remover este produto do pedido?')) {
+      setSelectedProducts(selectedProducts.filter(sp => sp.product.id !== productId));
+      updateLastModified();
+    }
+  };
+
+  const handleAddProduct = (product: Product) => {
     const exists = selectedProducts.find(sp => sp.product.id === product.id);
     if (exists) {
       alert('Produto já adicionado ao pedido');
@@ -193,41 +244,8 @@ export default function App() {
     };
 
     setSelectedProducts([...selectedProducts, newSelected]);
-  };
-
-  const handleUpdateQuantity = (productId: string, quantity: number) => {
-    if (quantity < 1) return;
-
-    setSelectedProducts(selectedProducts.map(sp => {
-      if (sp.product.id === productId) {
-        return {
-          ...sp,
-          quantity,
-          totalPrice: sp.unitPrice * quantity,
-          totalWeight: sp.unitWeight * quantity,
-        };
-      }
-      return sp;
-    }));
-  };
-
-  const handleUpdateUnitPrice = (productId: string, unitPrice: number) => {
-    if (unitPrice < 0) return;
-
-    setSelectedProducts(selectedProducts.map(sp => {
-      if (sp.product.id === productId) {
-        return {
-          ...sp,
-          unitPrice,
-          totalPrice: unitPrice * sp.quantity,
-        };
-      }
-      return sp;
-    }));
-  };
-
-  const handleRemoveProduct = (productId: string) => {
-    setSelectedProducts(selectedProducts.filter(sp => sp.product.id !== productId));
+    setIsAddProductModalOpen(false);
+    updateLastModified();
   };
 
   const calculateTotalPrice = () => {
@@ -248,7 +266,11 @@ export default function App() {
     return deliveryDate.toLocaleDateString('pt-BR');
   };
 
-  const handleConfirmOrder = () => {
+  const updateLastModified = () => {
+    setUpdatedAt(new Date().toLocaleString('pt-BR'));
+  };
+
+  const handleSaveChanges = () => {
     if (!selectedClientId) {
       alert('Por favor, selecione um cliente');
       return;
@@ -262,8 +284,10 @@ export default function App() {
       return;
     }
 
-    alert('Pedido confirmado com sucesso!');
+    updateLastModified();
+    alert('Alterações salvas com sucesso!');
     console.log({
+      orderId: mockOrder.id,
       client: selectedClient,
       address: selectedAddress,
       observations,
@@ -272,6 +296,7 @@ export default function App() {
       totalPrice: calculateTotalPrice(),
       totalWeight: calculateTotalWeight(),
       deliveryDate: calculateDeliveryDate(),
+      updatedAt,
     });
   };
 
@@ -291,9 +316,14 @@ export default function App() {
     setIsClientListOpen(false);
   };
 
-  const handleNewClient = () => {
-    setEditingClient(null);
-    setIsClientFormOpen(true);
+  const handleEditCurrentClient = () => {
+    if (selectedClient) {
+      handleEditClient(selectedClient);
+    }
+  };
+
+  const handleViewProduct = (productId: string) => {
+    alert(`Navegando para detalhes do produto ID: ${productId} (tela a ser implementada)`);
   };
 
   return (
@@ -313,8 +343,23 @@ export default function App() {
             <ArrowLeft className="size-5" />
             Voltar para Pedidos
           </button>
-          <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Novo Pedido</h1>
-          <p className="text-[17px]" style={{ color: '#9D8189' }}>Preencha as informações abaixo para cadastrar um novo pedido</p>
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Detalhes do Pedido</h1>
+              <p className="text-[17px]" style={{ color: '#9D8189' }}>
+                Código: <strong style={{ color: '#6D6875' }}>{mockOrder.id}</strong>
+              </p>
+            </div>
+            <div 
+              className="px-5 py-3 rounded-lg"
+              style={{ backgroundColor: '#FFE5D9', border: '1px solid #D8E2DC' }}
+            >
+              <p className="text-[13px] mb-1" style={{ color: '#9D8189' }}>Status Atual</p>
+              <p className="text-[18px]" style={{ color: '#6D6875' }}>
+                <strong>{mockStatusTypes.find(s => s.id === statusId)?.name}</strong>
+              </p>
+            </div>
+          </div>
         </div>
 
         {/* 1. Informações do Cliente */}
@@ -333,6 +378,7 @@ export default function App() {
                 onChange={(e) => {
                   setSelectedClientId(e.target.value);
                   setSelectedAddressId('');
+                  updateLastModified();
                 }}
                 className="w-full h-12 px-4 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]"
                 style={{
@@ -366,15 +412,16 @@ export default function App() {
 
             <div className="flex items-end">
               <Button
-                onClick={handleNewClient}
-                className="h-12 px-5 gap-2 text-[15px]"
+                onClick={handleEditCurrentClient}
+                disabled={!selectedClient}
+                className="h-12 px-5 gap-2 text-[15px] disabled:opacity-40"
                 style={{
                   backgroundColor: '#F4ACB7',
                   color: 'white'
                 }}
               >
-                <Plus className="size-4" />
-                Novo Cliente
+                <Edit2 className="size-4" />
+                Editar Cliente
               </Button>
             </div>
           </div>
@@ -387,7 +434,10 @@ export default function App() {
               </label>
               <select
                 value={selectedAddressId}
-                onChange={(e) => setSelectedAddressId(e.target.value)}
+                onChange={(e) => {
+                  setSelectedAddressId(e.target.value);
+                  updateLastModified();
+                }}
                 className="w-full h-12 px-4 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]"
                 style={{
                   backgroundColor: 'white',
@@ -405,14 +455,17 @@ export default function App() {
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-5">
+          <div className="grid grid-cols-2 gap-5 mb-5">
             <div>
               <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}>
                 <strong>Observações do Pedido</strong>
               </label>
               <textarea
                 value={observations}
-                onChange={(e) => setObservations(e.target.value)}
+                onChange={(e) => {
+                  setObservations(e.target.value);
+                  updateLastModified();
+                }}
                 placeholder="Ex: Cliente solicitou embalagem especial..."
                 rows={4}
                 className="w-full px-4 py-3 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7] resize-none"
@@ -430,7 +483,10 @@ export default function App() {
               </label>
               <select
                 value={statusId}
-                onChange={(e) => setStatusId(e.target.value)}
+                onChange={(e) => {
+                  setStatusId(e.target.value);
+                  updateLastModified();
+                }}
                 className="w-full h-12 px-4 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]"
                 style={{
                   backgroundColor: 'white',
@@ -446,94 +502,64 @@ export default function App() {
               </select>
             </div>
           </div>
-        </div>
 
-        {/* 2. Seleção de Produto */}
-        <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
-          <h2 className="text-[22px] mb-5" style={{ color: '#F4ACB7' }}>
-            <strong>Selecionar Produtos</strong>
-          </h2>
+          {/* Datas */}
+          <div className="grid grid-cols-2 gap-5">
+            <div 
+              className="p-4 rounded-lg"
+              style={{ backgroundColor: '#F9F9F9', border: '1px solid #D8E2DC' }}
+            >
+              <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}>
+                Data de Criação
+              </label>
+              <p className="text-[15px]" style={{ color: '#6D6875' }}>
+                <strong>{createdAt}</strong>
+              </p>
+            </div>
 
-          {/* Barra de Pesquisa */}
-          <div className="mb-5">
-            <div className="relative">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 size-5" style={{ color: '#9D8189' }} />
-              <input
-                type="text"
-                value={searchProduct}
-                onChange={(e) => setSearchProduct(e.target.value)}
-                placeholder="Pesquisar produto por nome, categoria, tema ou item..."
-                className="w-full h-12 pl-12 pr-4 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]"
-                style={{
-                  backgroundColor: 'white',
-                  borderColor: '#D8E2DC',
-                  color: '#6D6875'
-                }}
-              />
+            <div 
+              className="p-4 rounded-lg"
+              style={{ backgroundColor: '#FFE5D9', border: '1px solid #D8E2DC' }}
+            >
+              <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}>
+                Última Atualização
+              </label>
+              <p className="text-[15px]" style={{ color: '#6D6875' }}>
+                <strong>{updatedAt}</strong>
+              </p>
             </div>
           </div>
-
-          <div className="grid grid-cols-4 gap-4 max-h-[500px] overflow-y-auto pr-2">
-            {filteredProducts.map(product => (
-              <div
-                key={product.id}
-                className="border rounded-lg overflow-hidden transition-all hover:shadow-lg"
-                style={{ borderColor: '#D8E2DC' }}
-              >
-                <div className="aspect-square overflow-hidden">
-                  <ImageWithFallback
-                    src={product.imageUrl}
-                    alt={product.title}
-                    className="w-full h-full object-cover"
-                  />
-                </div>
-                <div className="p-4">
-                  <h3 className="text-[16px] mb-1" style={{ color: '#6D6875' }}>
-                    <strong>{product.title}</strong>
-                  </h3>
-                  <p className="text-[13px] mb-3 line-clamp-2" style={{ color: '#9D8189' }}>
-                    {product.description}
-                  </p>
-                  <div className="flex items-center justify-between mb-3">
-                    <span className="text-[15px]" style={{ color: '#6D6875' }}>
-                      <strong>R$ {product.unitPrice.toFixed(2)}</strong>
-                    </span>
-                    <span className="text-[12px]" style={{ color: '#9D8189' }}>
-                      {product.unitWeight}kg
-                    </span>
-                  </div>
-                  <Button
-                    onClick={() => handleSelectProduct(product)}
-                    disabled={selectedProducts.some(sp => sp.product.id === product.id)}
-                    className="w-full h-9 text-[14px] disabled:opacity-40"
-                    style={{
-                      backgroundColor: '#F4ACB7',
-                      color: 'white'
-                    }}
-                  >
-                    {selectedProducts.some(sp => sp.product.id === product.id) ? 'Selecionado' : 'Selecionar'}
-                  </Button>
-                </div>
-              </div>
-            ))}
-            
-            {filteredProducts.length === 0 && (
-              <div className="col-span-4 text-center py-12">
-                <p className="text-[16px]" style={{ color: '#9D8189' }}>
-                  Nenhum produto encontrado com "{searchProduct}"
-                </p>
-              </div>
-            )}
-          </div>
         </div>
 
-        {/* 3. Informações dos Produtos Selecionados */}
-        {selectedProducts.length > 0 && (
-          <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
-            <h2 className="text-[22px] mb-5" style={{ color: '#F4ACB7' }}>
-              <strong>Produtos Selecionados</strong>
+        {/* 2. Produtos do Pedido */}
+        <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
+          <div className="flex items-center justify-between mb-5">
+            <h2 className="text-[22px]" style={{ color: '#F4ACB7' }}>
+              <strong>Produtos do Pedido</strong>
             </h2>
+            <Button
+              onClick={() => setIsAddProductModalOpen(true)}
+              className="h-10 px-5 gap-2 text-[15px]"
+              style={{
+                backgroundColor: '#F4ACB7',
+                color: 'white'
+              }}
+            >
+              <Plus className="size-4" />
+              Adicionar Produto
+            </Button>
+          </div>
 
+          {selectedProducts.length === 0 ? (
+            <div 
+              className="text-center py-12 rounded-lg"
+              style={{ backgroundColor: '#F9F9F9', border: '1px solid #D8E2DC' }}
+            >
+              <p className="text-[16px]" style={{ color: '#9D8189' }}>
+                Nenhum produto adicionado ao pedido
+              </p>
+            </div>
+          ) : (
             <div className="space-y-4">
               {selectedProducts.map(sp => (
                 <div
@@ -557,17 +583,32 @@ export default function App() {
                         {sp.product.description}
                       </p>
                     </div>
-                    <Button
-                      onClick={() => handleRemoveProduct(sp.product.id)}
-                      className="h-9 px-4 text-[14px]"
-                      style={{
-                        backgroundColor: 'white',
-                        color: '#F4ACB7',
-                        border: '1px solid #F4ACB7'
-                      }}
-                    >
-                      Remover
-                    </Button>
+                    <div className="flex gap-2">
+                      <Button
+                        onClick={() => handleViewProduct(sp.product.id)}
+                        className="h-9 px-4 gap-2 text-[14px]"
+                        style={{
+                          backgroundColor: 'white',
+                          color: '#6D6875',
+                          border: '1px solid #D8E2DC'
+                        }}
+                      >
+                        <Edit2 className="size-3" />
+                        Ver Produto
+                      </Button>
+                      <Button
+                        onClick={() => handleRemoveProduct(sp.product.id)}
+                        className="h-9 px-4 gap-2 text-[14px]"
+                        style={{
+                          backgroundColor: 'white',
+                          color: '#F4ACB7',
+                          border: '1px solid #F4ACB7'
+                        }}
+                      >
+                        <Trash2 className="size-3" />
+                        Remover
+                      </Button>
+                    </div>
                   </div>
 
                   <div className="grid grid-cols-5 gap-4">
@@ -659,14 +700,14 @@ export default function App() {
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
-        {/* 4. Resumo Final */}
+        {/* 3. Resumo Geral do Pedido */}
         {selectedProducts.length > 0 && selectedClient && selectedAddress && (
           <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
             <h2 className="text-[22px] mb-5" style={{ color: '#F4ACB7' }}>
-              <strong>Resumo do Pedido</strong>
+              <strong>Resumo Geral do Pedido</strong>
             </h2>
 
             <div className="grid grid-cols-2 gap-6 mb-6">
@@ -683,8 +724,24 @@ export default function App() {
                 </p>
               </div>
 
-              {/* Endereço */}
+              {/* Status */}
               <div className="p-4 rounded-lg" style={{ backgroundColor: '#FFE5D9' }}>
+                <h3 className="text-[16px] mb-3" style={{ color: '#6D6875' }}>
+                  <strong>Status Atual</strong>
+                </h3>
+                <div 
+                  className="inline-flex items-center px-4 py-2 rounded-full text-[15px]"
+                  style={{
+                    backgroundColor: '#FFCAD4',
+                    color: '#6D6875'
+                  }}
+                >
+                  <strong>{mockStatusTypes.find(s => s.id === statusId)?.name}</strong>
+                </div>
+              </div>
+
+              {/* Endereço */}
+              <div className="p-4 rounded-lg col-span-2" style={{ backgroundColor: '#FFE5D9' }}>
                 <h3 className="text-[16px] mb-3" style={{ color: '#6D6875' }}>
                   <strong>Endereço de Entrega</strong>
                 </h3>
@@ -775,19 +832,30 @@ export default function App() {
           </div>
         )}
 
-        {/* Botão Confirmar */}
-        <div className="flex justify-center">
+        {/* Botões de Ação */}
+        <div className="flex justify-end gap-3">
           <Button
-            onClick={handleConfirmOrder}
+            onClick={() => window.history.back()}
+            className="px-8 py-3 h-12 text-[16px]"
+            style={{
+              backgroundColor: 'white',
+              color: '#9D8189',
+              border: '1px solid #D8E2DC'
+            }}
+          >
+            Cancelar
+          </Button>
+          <Button
+            onClick={handleSaveChanges}
             disabled={!selectedClientId || !selectedAddressId || selectedProducts.length === 0}
-            className="px-12 py-4 h-14 text-[17px] gap-3 disabled:opacity-40"
+            className="px-8 py-3 h-12 text-[16px] gap-3 disabled:opacity-40"
             style={{
               backgroundColor: '#F4ACB7',
               color: 'white'
             }}
           >
             <Package className="size-5" />
-            Confirmar Pedido
+            Salvar Alterações
           </Button>
         </div>
       </div>
@@ -808,6 +876,14 @@ export default function App() {
         }}
         onSave={handleSaveClient}
         client={editingClient}
+      />
+
+      <AddProductModal
+        isOpen={isAddProductModalOpen}
+        onClose={() => setIsAddProductModalOpen(false)}
+        products={mockProducts}
+        selectedProducts={selectedProducts}
+        onAddProduct={handleAddProduct}
       />
     </div>
   );

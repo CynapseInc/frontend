@@ -10,6 +10,7 @@ import CadastroFotosProduto from "../components/cadastroFotosProduto"
 import CadastroMovimentacao from "../components/cadastroMovimentacao"
 import ListaProdutos  from "../components/listaProdutos"
 import CadastroPedido from "../components/cadastroPedidos"
+import DetalhesPedido from "../components/detalhesPedido"
 
 export const route = createBrowserRouter([
     { path: "/login", element: <Login /> },
@@ -26,7 +27,10 @@ export const route = createBrowserRouter([
             { path: "produtos", element: <CadastroProdutos />},
              { path: "produtos/fotos", element: <CadastroFotosProduto /> },
              { path: "movimentacao", element: <CadastroMovimentacao /> },
-             {path: "pedidos/cadastro", element: <CadastroPedido/>}
+             {path: "pedidos/cadastro", element: <CadastroPedido/>},
+            //  url para detalhes do pedido, pode ser algo como /pedidos/detalhes/:id, onde :id é o identificador do pedido
+            
+             {path: "pedidos/detalhes/:id", element: <DetalhesPedido/>},
         ]
     }
 ])

@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { X, Plus, Trash2, Edit2 } from 'lucide-react';
-import { Button } from '../../ui/button';
-import { Input } from '../../ui/input';
+import { Button } from '../ui/button';
+import { Input } from '../ui/input';
 
 interface Address {
   id: string;

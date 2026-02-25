@@ -1,5 +1,5 @@
 import { X, Edit2 } from 'lucide-react';
-import { Button } from '../../ui/button';
+import { Button } from '../ui/button';
 
 interface Address {
   id: string;

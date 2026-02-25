@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { X, User, Phone, Package, Calendar, Clock, FileText } from 'lucide-react';
 import { Button } from '../../ui/button';
+// import { Navigate, useNavigate } from 'react-router-dom';
 
 interface Order {
   id: string;
@@ -29,9 +30,10 @@ interface OrderDetailModalProps {
   order: Order | null;
   statusTypes: StatusType[];
   onUpdateStatus: (orderId: string, newStatusId: string) => void;
+  onClickInSeeDetails: (orderId: string) => void;
 }
 
-export default function OrderDetailModal({ isOpen, onClose, order, statusTypes, onUpdateStatus }: OrderDetailModalProps) {
+export default function OrderDetailModal({ isOpen, onClose, order, statusTypes, onUpdateStatus, onClickInSeeDetails }: OrderDetailModalProps) {
   const [selectedStatusId, setSelectedStatusId] = useState('');
 
   useEffect(() => {
@@ -49,9 +51,16 @@ export default function OrderDetailModal({ isOpen, onClose, order, statusTypes, 
     onUpdateStatus(order.id, newStatusId);
   };
 
+  // const navigate = useNavigate();
+
   const handleViewProduct = () => {
-    alert('Navegando para detalhes do produto (tela a ser implementada)');
+    // navigate(`pedidos/detalhes/${order.id}`);
+    
   };
+
+  const handleViewOrderDetails = () => {
+    onClickInSeeDetails(order.id);
+  }
 
   return (
     <div 
@@ -262,6 +271,16 @@ export default function OrderDetailModal({ isOpen, onClose, order, statusTypes, 
           className="flex justify-end gap-3 p-6 border-t"
           style={{ borderColor: '#D8E2DC' }}
         >
+          <Button
+            onClick={handleViewOrderDetails}
+            className="px-6 py-2 h-11 text-[15px]"
+            style={{
+              backgroundColor: '#F4ACB7',
+              color: 'white'
+            }}
+          >
+            Ver Detalhes Do Pedido
+          </Button>
           <Button
             onClick={onClose}
             className="px-6 py-2 h-11 text-[15px]"
