@@ -8,6 +8,7 @@ import Kanban from "../components/kanbanPedidos"
 import CadastroProdutos from "../components/cadastroProdutos"
 import CadastroFotosProduto from "../components/cadastroFotosProduto"
 import CadastroMovimentacao from "../components/cadastroMovimentacao"
+import ListaProdutos  from "../components/listaProdutos"
 
 export const route = createBrowserRouter([
     { path: "/login", element: <Login /> },
@@ -20,8 +21,8 @@ export const route = createBrowserRouter([
             { index: true, element: <DashFinanceira /> },
             { path: "home", element: <HomeCalendar /> },
             { path: "kanban", element: <Kanban /> },
-            { path: "produtos", element: <CadastroProdutos />
-             },
+            {path: "lista-produtos", element: <ListaProdutos />},
+            { path: "produtos", element: <CadastroProdutos />},
              { path: "produtos/fotos", element: <CadastroFotosProduto /> },
              { path: "movimentacao", element: <CadastroMovimentacao /> },
         ]

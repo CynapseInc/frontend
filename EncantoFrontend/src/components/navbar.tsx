@@ -79,7 +79,7 @@ function Navbar() {
              <div onClick={() => navigate("/home")} className="text-[16px]" style={{ color: '#F4ACB7' }}>Home</div>
                <div onClick={() => navigate("/kanban")} className="text-[16px] text-[#9D8189] hover:text-[#F4ACB7] transition-colors">Pedidos</div>
                <div onClick={() => navigate("/dashboard")} className="text-[16px] text-[#9D8189] hover:text-[#F4ACB7] transition-colors">Financeiro</div>
-               <div onClick={() => navigate("/produtos")} className="text-[16px] text-[#9D8189] hover:text-[#F4ACB7] transition-colors">Cadastrar Produtos</div>
+               <div onClick={() => navigate("/lista-produtos")} className="text-[16px] text-[#9D8189] hover:text-[#F4ACB7] transition-colors">Produtos</div>
                <div onClick={() => navigate("/movimentacao")} className="text-[16px] text-[#9D8189] hover:text-[#F4ACB7] transition-colors">Movimentações</div>
             </nav>
             <button 
