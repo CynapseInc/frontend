@@ -4,6 +4,8 @@ import { X } from 'lucide-react';
 import { Input } from '../../ui/input';
 import { Button } from '../../ui/button';
 
+import '../index-cadastro.css'
+
 interface Item {
   id: string;
   description: string;

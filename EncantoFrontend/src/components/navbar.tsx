@@ -80,6 +80,7 @@ function Navbar() {
                <div onClick={() => navigate("/kanban")} className="text-[16px] text-[#9D8189] hover:text-[#F4ACB7] transition-colors">Pedidos</div>
                <div onClick={() => navigate("/dashboard")} className="text-[16px] text-[#9D8189] hover:text-[#F4ACB7] transition-colors">Financeiro</div>
                <div onClick={() => navigate("/produtos")} className="text-[16px] text-[#9D8189] hover:text-[#F4ACB7] transition-colors">Cadastrar Produtos</div>
+               <div onClick={() => navigate("/movimentacao")} className="text-[16px] text-[#9D8189] hover:text-[#F4ACB7] transition-colors">Movimentações</div>
             </nav>
             <button 
               className="px-6 py-2 rounded-md text-[15px] text-white transition-all hover:opacity-90"
