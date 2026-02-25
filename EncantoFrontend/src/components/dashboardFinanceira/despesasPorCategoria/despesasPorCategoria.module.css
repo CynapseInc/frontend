@@ -18,9 +18,12 @@
   margin-top: 1vh;
   font-weight: bold;
 }
-.cardDespesas{
-    flex: 1;
-    height: 400px;
+.cardDespesas {
+    width: 100% !important;
+    height: 100% !important;
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
 }
 
 .porcentagem{

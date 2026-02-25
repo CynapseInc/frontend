@@ -1,11 +1,12 @@
-html, body{
-  display: flex;
-  flex-direction: column;
-  font-family: "Arimo";
-  /* justify-content: center; */
-  align-items: center;
+/* No App.css ou index.css */
+html, body {
   margin: 0;
+  padding: 0;
+  width: 100%;
+  min-height: 100vh;
+  display: block; 
   background-color: #F9F9F9;
+  font-family: "Arimo", sans-serif;
 }
 /* 
 .bgApp{

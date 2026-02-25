@@ -1,4 +1,4 @@
-:root{
+/* :root{
     width: 100vw;
     overflow-x: hidden;
 }
@@ -10,7 +10,6 @@
     margin: 0 auto;
     padding: 2rem;
     gap: 3vh;
-    /* background-color: green; */
 }
 
 .conteudo .cardConteudoFiltros{
@@ -87,4 +86,98 @@
     display: flex;
     flex-direction: column;
     gap: 14px;
+}
+ */
+ :root {
+    width: 100vw;
+    overflow-x: hidden;
+}
+
+/* Estilo para os inputs de data */
+.inputFiltro {
+    width: 38vw; /* Define uma largura que cresce com a tela */
+    height: 5vh; /* Altura proporcional */
+    border: 1px solid #D8E2DC;
+    border-radius: 0.5vw;
+    padding: 0 1vw; /* Espaço interno para o texto não colar na borda */
+    font-size: 0.9vw;
+    color: #6D6875;
+    box-sizing: border-box;
+    outline: none;
+}
+
+/* Estilo para o botão acompanhar o tamanho dos inputs */
+.botaoFiltro {
+    height: 5vh;
+    padding: 0 2vw;
+    font-size: 0.9vw;
+    border-radius: 0.5vw;
+    cursor: pointer;
+}
+
+.conteudo {
+    display: flex;
+    flex-direction: column;
+    width: 100vw;
+    min-height: 100vh;
+    padding: 4vh 4vw;
+    gap: 3vh;
+    background-color: #F9F9F9;
+    box-sizing: border-box;
+}
+
+/* Cabeçalho */
+.cabecalho {
+    margin-bottom: 2vh;
+}
+
+.titulo {
+    font-size: 2.5vw; /* Usando vw para a fonte crescer com o ecrã */
+    color: #F4ACB7;
+    margin-bottom: 1vh;
+    font-weight: bold;
+}
+
+.textoSecundario {
+    font-size: 1vw;
+    color: #9D8189;
+}
+
+/* Filtros */
+.cardConteudoFiltros {
+    display: flex;
+    gap: 2vw;
+    padding: 2vh 2vw;
+    align-items: flex-end;
+    justify-content: center;
+    background-color: white;
+    border: 1px solid #D8E2DC;
+    border-radius: 0.5vw;
+}
+
+.containerFiltro {
+    display: flex;
+    flex-direction: column;
+    gap: 1vh;
+}
+
+.tituloFiltro {
+    font-size: 0.8vw;
+    color: #6D6875;
+    font-weight: 900;
+}
+
+/* Cards KPI */
+.containerCards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr); /* 4 colunas iguais */
+    gap: 1.5vw;
+    width: 100%;
+}
+
+/* Gráficos */
+.containerCardGraficos {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Divide a meio por padrão */
+    gap: 2vw;
 }

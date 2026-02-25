@@ -1,8 +1,9 @@
 .containerGrafico {
     display: flex;
     flex-direction: column;
-    height: 400px; 
-    padding: 0.5vw 1.5vw 1.5vw 1.5vw;
+    width: 100% !important;
+    height: 100% !important;
+    padding: 2vh 1.5vw; /* Ajustei o padding para usar vh/vw de forma mais consistente */
     gap: 2vh;
     box-sizing: border-box;
 }
