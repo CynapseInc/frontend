@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Search, Pencil, Plus, Filter } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import { ImageWithFallback } from './figma/ImageWithFallback';
+import { ImageWithFallback } from '../figma/ImageWithFallback';
 import {Navigate, useNavigate} from 'react-router-dom';
 import './index-lista-produtos.css'
 

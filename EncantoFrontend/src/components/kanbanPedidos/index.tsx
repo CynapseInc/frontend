@@ -9,6 +9,7 @@ import StatusTypeListModal from './modals/StatusTypeListModal';
 import DeleteStatusTypeDialog from './modals/DeleteStatusTypeDialog';
 
 import './index-kanban.css'
+import { useNavigate } from 'react-router-dom';
 
 interface Order {
   id: string;
@@ -264,6 +265,8 @@ export default function Kanban() {
   const getOrdersByStatus = (statusId: string) => {
     return orders.filter(order => order.statusId === statusId);
   };
+  const navigate = useNavigate();
+
 
   return (
     <DndProvider backend={HTML5Backend}>
@@ -308,7 +311,7 @@ export default function Kanban() {
           {/* Botões de ação */}
           <div className="flex gap-3 mb-8">
             <Button 
-              onClick={() => alert('Tela de cadastro de pedido (a ser implementada)')}
+              onClick={() => navigate("/pedidos/cadastro")}
               className="gap-2 h-11 px-5 text-[15px]"
               style={{ backgroundColor: '#F4ACB7', color: 'white' }}
             >

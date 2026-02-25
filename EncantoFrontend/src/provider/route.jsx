@@ -9,6 +9,7 @@ import CadastroProdutos from "../components/cadastroProdutos"
 import CadastroFotosProduto from "../components/cadastroFotosProduto"
 import CadastroMovimentacao from "../components/cadastroMovimentacao"
 import ListaProdutos  from "../components/listaProdutos"
+import CadastroPedido from "../components/cadastroPedidos"
 
 export const route = createBrowserRouter([
     { path: "/login", element: <Login /> },
@@ -25,6 +26,7 @@ export const route = createBrowserRouter([
             { path: "produtos", element: <CadastroProdutos />},
              { path: "produtos/fotos", element: <CadastroFotosProduto /> },
              { path: "movimentacao", element: <CadastroMovimentacao /> },
+             {path: "pedidos/cadastro", element: <CadastroPedido/>}
         ]
     }
 ])
