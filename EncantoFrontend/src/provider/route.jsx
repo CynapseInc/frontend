@@ -16,6 +16,8 @@ import PesquisaProdutosClient from "../components/pesquisaProdutosClient"
 import DetalheProdutoClient from "../components/detalheProdutoClient"
 import Carrinho from "../components/carrinho"
 import Funcionarios from "../components/funcionarios"
+import DashGestao from "../components/dashboardGestao"
+
 export const route = createBrowserRouter([
     { path: "/login", element: <Login /> },
     {
@@ -40,6 +42,7 @@ export const route = createBrowserRouter([
              {path: "detalhe-produto/:id", element: <DetalheProdutoClient /> },
              {path: "carrinho", element: <Carrinho />},
              {path: "funcionarios", element: <Funcionarios />},
+             {path: "dashboard-gestao", element: <DashGestao />},
              
         ]
     }
