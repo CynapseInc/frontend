@@ -11,6 +11,7 @@ import CadastroMovimentacao from "../components/cadastroMovimentacao"
 import ListaProdutos  from "../components/listaProdutos"
 import CadastroPedido from "../components/cadastroPedidos"
 import DetalhesPedido from "../components/detalhesPedido"
+import HomeClient from "../components/homeClient"
 
 export const route = createBrowserRouter([
     { path: "/login", element: <Login /> },
@@ -31,6 +32,7 @@ export const route = createBrowserRouter([
             //  url para detalhes do pedido, pode ser algo como /pedidos/detalhes/:id, onde :id é o identificador do pedido
             
              {path: "pedidos/detalhes/:id", element: <DetalhesPedido/>},
+             { path: "catalogo", element: <HomeClient /> }
         ]
     }
 ])
