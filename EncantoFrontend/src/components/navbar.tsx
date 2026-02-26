@@ -81,7 +81,7 @@ function Navbar() {
      <div onClick={() => navigate("/home")} style={{ color: '#F4ACB7', cursor: 'pointer' }}>Home</div>
      <div onClick={() => navigate("/kanban")} style={{ color: '#9D8189', cursor: 'pointer' }}>Pedidos</div>
      <div onClick={() => navigate("/dashboard")} style={{ color: '#9D8189', cursor: 'pointer' }}>Financeiro</div>
-     <div onClick={() => navigate("/produtos")} style={{ color: '#9D8189', cursor: 'pointer' }}>Produtos</div>
+     <div onClick={() => navigate("/lista-produtos")} style={{ color: '#9D8189', cursor: 'pointer' }}>Produtos</div>
      <div onClick={() => navigate("/movimentacao")} style={{ color: '#9D8189', cursor: 'pointer' }}>Movimentação</div>
      <div onClick={() => navigate("/funcionarios")} style={{ color: '#9D8189', cursor: 'pointer' }}>Funcionários</div>
      <div onClick={() => navigate("/dashboard-gestao")} style={{ color: '#9D8189', cursor: 'pointer' }}>Dashboard Gestão</div>
