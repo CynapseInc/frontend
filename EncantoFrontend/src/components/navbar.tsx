@@ -83,7 +83,7 @@ function Navbar() {
      <div onClick={() => navigate("/dashboard")} style={{ color: '#9D8189', cursor: 'pointer' }}>Financeiro</div>
      <div onClick={() => navigate("/produtos")} style={{ color: '#9D8189', cursor: 'pointer' }}>Produtos</div>
      <div onClick={() => navigate("/movimentacao")} style={{ color: '#9D8189', cursor: 'pointer' }}>Movimentação</div>
-     {/* ... outros links ... */}
+     <div onClick={() => navigate("/funcionarios")} style={{ color: '#9D8189', cursor: 'pointer' }}>Funcionários</div>
   </nav>
 
   {/* Lado Direito: Botão Login */}
