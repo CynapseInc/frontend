@@ -1,15 +1,36 @@
-/* No App.css ou index.css */
-html, body {
+/* Remove qualquer margem que o navegador coloque por padrão e previne o scroll horizontal */
+body, html {
   margin: 0;
   padding: 0;
-  width: 100%;
-  min-height: 100vh;
-  display: block; 
-  background-color: #F9F9F9;
-  font-family: "Arimo", sans-serif;
+  width: 100vw;
+  overflow-x: hidden;
+  background-color: #F9F9F9; /* Fundo padrão do sistema */
 }
-/* 
-.bgApp{
 
-} */
+/* O container principal que segura a Navbar e o Conteúdo */
+.layout-global {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  width: 100vw;
+}
 
+/* O espaço onde as suas páginas vão ser renderizadas */
+.conteudo-padrao {
+  width: 100vw;
+  padding: 4vh 4vw; /* O seu padrão de respiro! 4% nas laterais, 4% no topo/fundo */
+  box-sizing: border-box;
+  flex: 1; /* Faz o conteúdo esticar para preencher a tela */
+}
+
+/* O padrão da sua Navbar */
+.navbar-padrao {
+  width: 100vw;
+  padding: 2vh 4vw; /* Mesmos 4vw nas laterais para alinhar perfeitamente com o conteúdo */
+  box-sizing: border-box;
+  background-color: white;
+  border-bottom: 1px solid #D8E2DC;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}

@@ -203,7 +203,7 @@ export  function HomeCalendar() {
         </div>
       </header> */}
 
-      <div className="max-w-[1600px] mx-auto px-8 py-8">
+      <div className="w-full px-[3vw] py-[4vh] box-border">
         
         {/* Cabeçalho */}
         <div className="mb-8">
@@ -567,7 +567,6 @@ export  function HomeCalendar() {
         </div>
       )}
 
-      {/* Botão Flutuante - Adicionar Pedido */}
       <button
         onClick={() => alert('Navegando para o Kanban de Pedidos')}
         className="fixed bottom-8 right-8 size-16 rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 z-40"

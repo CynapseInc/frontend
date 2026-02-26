@@ -143,7 +143,7 @@ export default function App() {
       {/* Navbar */}
       
 
-      <div className="max-w-[1400px] mx-auto px-8 py-12">
+      <div className="w-full px-[4vw] py-[4vh] box-border">
         
         {/* Cabeçalho */}
         <div className="mb-10">

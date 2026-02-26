@@ -1,6 +1,7 @@
 import React from 'react'
 import { Outlet, useLocation } from 'react-router-dom'
 import Navbar from './navbar'
+import '../index.css'
 import NavbarClient from './navbarclient'
 
 export default function Layout() {
@@ -11,12 +12,12 @@ export default function Layout() {
   const shouldHideNavbar = hiddenNavbarPages.includes(location.pathname) || location.pathname.startsWith('/detalhe-produto/');
 
   return (
-    <>
-      {!shouldHideNavbar && <Navbar />}
+    <div className="layout-global">
+       {!shouldHideNavbar && <Navbar />}
       {shouldHideNavbar && <NavbarClient />}
-      <main style={{ paddingTop: shouldHideNavbar ? '0px' : '70px' }}>
+      <main className="conteudo-padrao">
         <Outlet />
       </main>
-    </>
+    </div>
   )
 }

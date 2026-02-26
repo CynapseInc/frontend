@@ -88,10 +88,6 @@
     gap: 14px;
 }
  */
- :root {
-    width: 100vw;
-    overflow-x: hidden;
-}
 
 /* Estilo para os inputs de data */
 .inputFiltro {
@@ -118,11 +114,8 @@
 .conteudo {
     display: flex;
     flex-direction: column;
-    width: 100vw;
-    min-height: 100vh;
-    padding: 4vh 4vw;
+    width: 100%; /* Agora ele simplesmente preenche o espaço que o Layout.tsx deixou livre */
     gap: 3vh;
-    background-color: #F9F9F9;
     box-sizing: border-box;
 }
 
