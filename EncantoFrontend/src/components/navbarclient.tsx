@@ -29,15 +29,15 @@ function Navbar() {
 
             {/* Menu */}
             <div className="hidden md:flex items-center gap-12">
-              <a href="#home" className="text-[#6D6875] hover:text-[#F4ACB7] transition-colors text-lg">
+              <div onClick={() => navigate('/catalogo')} className="text-[#6D6875] hover:text-[#F4ACB7] transition-colors text-lg">
                 Home
-              </a>
-              <a href="#produtos" className="text-[#6D6875] hover:text-[#F4ACB7] transition-colors text-lg">
+              </div>
+              <div onClick={() => navigate('/pesquisa-produtos')} className="text-[#6D6875] hover:text-[#F4ACB7] transition-colors text-lg">
                 Produtos
-              </a>
-              <a href="#contato" className="text-[#6D6875] hover:text-[#F4ACB7] transition-colors text-lg">
+              </div>
+              <div onClick={() => navigate('/catalogo#contato')} className="text-[#6D6875] hover:text-[#F4ACB7] transition-colors text-lg">
                 Contato
-              </a>
+              </div>
             </div>
 
             {/* Cart */}

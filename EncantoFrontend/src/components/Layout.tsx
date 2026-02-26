@@ -7,7 +7,7 @@ export default function Layout() {
   const location = useLocation();
   
   // Páginas onde a navbar não deve aparecer
-  const hiddenNavbarPages = ['/catalogo', '/login'];
+  const hiddenNavbarPages = ['/catalogo', '/login', '/pesquisa-produtos'];
   const shouldHideNavbar = hiddenNavbarPages.includes(location.pathname);
 
   return (
