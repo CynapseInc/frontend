@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ShoppingCart, Heart, Star, ChevronLeft, ChevronRight, Search, X, Filter, Grid, List, ChevronDown, Eye, Sparkles, TrendingUp, DollarSign, Tag } from 'lucide-react';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
+import {Navigate, useNavigate} from 'react-router-dom'
 import './pesquisa-index.css'
 
 export default function App() {
@@ -20,7 +21,11 @@ export default function App() {
   const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
   const [cartCount] = useState(3);
 
-  
+  const navigate = useNavigate();
+
+  const handlePecaJaClick = (productId: number) => {
+    navigate(`/detalhe-produto/${productId}`);
+  };
 
   const categories = [
     { name: 'Eventos Corporativos', count: 45 },
@@ -205,7 +210,7 @@ export default function App() {
 
       {/* Page Header */}
       <div className="bg-gradient-to-br from-[#FFE5D9] to-[#F9F9F9] py-12 border-b-2 border-[#D8E2DC]">
-        <div className="max-w-[1920px] mx-auto px-8">
+        <div className="w-full px-8">
           <div className="flex items-center justify-between">
             <div>
               <h2 className="text-[#6D6875] mb-2">Catálogo de Produtos</h2>
@@ -225,10 +230,15 @@ export default function App() {
       </div>
 
       {/* Main Content */}
-      <div className="max-w-[1920px] mx-auto px-8 py-8">
+      <div className="w-full px-8 py-8">
         <div className="flex gap-8">
           {/* Left Column - Filters */}
-          <aside className={`${showFilters ? 'block' : 'hidden'} md:block w-full md:w-80 shrink-0`}>
+           {/* filtros ocupavam 100% da largura quando `showFilters` ativado em telas pequenas
+             isso empurrava os produtos para baixo. Agora forçamos largura fixa menor
+             de 9rem (w-36) para que o painel fique à esquerda e deixe mais espaço
+             para a coluna de produtos. A visibilidade ainda é controlada por
+             `showFilters` e o botão de exibição. */}
+           <aside className={`${showFilters ? 'block' : 'hidden'} md:block w-36 shrink-0`}>
             <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-[#D8E2DC] sticky top-24">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-[#6D6875]">Filtros</h3>
@@ -423,7 +433,7 @@ export default function App() {
           {/* Right Column - Products */}
           <div className="flex-1">
             {/* Results Header */}
-            <div className="bg-white rounded-2xl p-6 mb-6 shadow-lg border-2 border-[#D8E2DC]">
+            <div className="bg-white rounded-2xl p-6 mb-6 w-70 shadow-lg border-2 border-[#D8E2DC]">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
                   <p className="text-[#6D6875]">
@@ -583,7 +593,9 @@ export default function App() {
                           </span>
                         </div>
 
-                        <button className="w-full bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white py-3 rounded-xl hover:shadow-lg transition-all">
+                        <button 
+                          onClick={() => handlePecaJaClick(product.id)}
+                          className="w-full bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white py-3 rounded-xl hover:shadow-lg transition-all">
                           Peça já
                         </button>
                       </div>

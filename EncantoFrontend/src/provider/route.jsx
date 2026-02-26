@@ -13,6 +13,8 @@ import CadastroPedido from "../components/cadastroPedidos"
 import DetalhesPedido from "../components/detalhesPedido"
 import HomeClient from "../components/homeClient"
 import PesquisaProdutosClient from "../components/pesquisaProdutosClient"
+import DetalheProdutoClient from "../components/detalheProdutoClient"
+import Carrinho from "../components/carrinho"
 
 export const route = createBrowserRouter([
     { path: "/login", element: <Login /> },
@@ -34,7 +36,10 @@ export const route = createBrowserRouter([
             
              {path: "pedidos/detalhes/:id", element: <DetalhesPedido/>},
              { path: "catalogo", element: <HomeClient /> },
-             {path: "pesquisa-produtos", element: <PesquisaProdutosClient /> }
+             {path: "pesquisa-produtos", element: <PesquisaProdutosClient /> },
+             {path: "detalhe-produto/:id", element: <DetalheProdutoClient /> },
+             {path: "carrinho", element: <Carrinho />},
+             
         ]
     }
 ])

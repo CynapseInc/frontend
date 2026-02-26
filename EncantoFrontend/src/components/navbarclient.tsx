@@ -41,7 +41,7 @@ function Navbar() {
             </div>
 
             {/* Cart */}
-            <button className="relative p-4 bg-[#FFE5D9] rounded-2xl hover:bg-[#FFCAD4] transition-all shadow-md hover:shadow-lg">
+            <button onClick={() => navigate("/carrinho")} className="relative p-4 bg-[#FFE5D9] rounded-2xl hover:bg-[#FFCAD4] transition-all shadow-md hover:shadow-lg">
               <ShoppingCart className="w-6 h-6 text-[#6D6875]" />
               {cartCount > 0 && (
                 <span className="absolute -top-2 -right-2 bg-[#F4ACB7] text-white w-7 h-7 rounded-full flex items-center justify-center shadow-lg">
