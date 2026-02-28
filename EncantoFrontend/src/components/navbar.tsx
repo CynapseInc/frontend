@@ -39,6 +39,8 @@ export default function Navbar() {
          <div onClick={() => navigate("/dashboard")} style={getEstiloLink("/dashboard")}>Financeiro</div>
          <div onClick={() => navigate("/lista-produtos")} style={getEstiloLink("/lista-produtos")}>Produtos</div>
          <div onClick={() => navigate("/movimentacao")} style={getEstiloLink("/movimentacao")}>Movimentações</div>
+         <div onClick={() => navigate("/funcionarios")} style={getEstiloLink("/funcionarios")}>Funcionários</div>
+         <div onClick={() => navigate("/dashboard-gestao")} style={getEstiloLink("/dashboard-gestao")}>Dashboard Gestão</div>
       </nav>
 
       {/* Lado Direito: Botão Login */}

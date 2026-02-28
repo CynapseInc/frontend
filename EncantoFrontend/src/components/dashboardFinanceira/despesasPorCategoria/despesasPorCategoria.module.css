@@ -18,13 +18,6 @@
   margin-top: 1vh;
   font-weight: bold;
 }
-.cardDespesas {
-    width: 100% !important;
-    height: 100% !important;
-    display: flex;
-    flex-direction: column;
-    box-sizing: border-box;
-}
 
 .porcentagem{
     color: #9D8189;
@@ -33,4 +26,64 @@
 .headerContainer{
     display: flex;
     justify-content: space-between;
+}
+.cardDespesas {
+    width: 100% !important;
+    height: 100% !important;
+    /* ADICIONE ESTA LINHA: Define um limite máximo de altura */
+    max-height: 54vh; /* Ajuste este valor se quiser maior ou menor (ex: 38vh ou 45vh) */
+    
+    display: flex;
+    flex-direction: column;
+    box-sizing: border-box;
+    overflow: hidden; /* Garante que o que passar de 40vh fique escondido (e role dentro da área certa) */
+}
+
+.tituloGrafico {
+    color: #FF9BB5; 
+    font-size: 1.2vw;
+    margin-bottom: 2vh;
+    font-weight: bold;
+    flex-shrink: 0;
+}
+
+.scrollArea {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 0.5vw;
+    min-height: 0;
+}
+
+.scrollArea::-webkit-scrollbar {
+    width: 0.3vw;
+}
+.scrollArea::-webkit-scrollbar-track {
+    background: transparent;
+}
+.scrollArea::-webkit-scrollbar-thumb {
+    background-color: #D8E2DC;
+    border-radius: 10px;
+}
+
+.itemContainer {
+    display: flex;
+    flex-direction: column;
+    /* gap: 0.3vh; */
+    margin-bottom: 2.5vh;
+}
+
+.headerContainer {
+    display: flex;
+    justify-content: space-between;
+}
+
+.headerTxt {
+    color: #6D6875; 
+    font-size: 0.9vw;
+    font-weight: bold;
+}
+
+.porcentagem {
+    color: #9D8189;
+    font-size: 0.8vw;
 }
