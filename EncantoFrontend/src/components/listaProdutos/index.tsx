@@ -3,7 +3,7 @@ import { Search, Pencil, Plus, Filter } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
-import {Navigate, useNavigate} from 'react-router-dom';
+import { Navigate, useNavigate } from 'react-router-dom';
 import './index-lista-produtos.css'
 
 interface Product {
@@ -141,10 +141,10 @@ export default function App() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
       {/* Navbar */}
-      
+
 
       <div className="w-full px-[4vw] py-[4vh] box-border">
-        
+
         {/* Cabeçalho */}
         <div className="mb-10">
           <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Produtos</h1>
@@ -155,8 +155,21 @@ export default function App() {
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
           <div className="flex items-center justify-between gap-6 mb-5">
             {/* Pesquisa */}
+            {/* Bloco de Pesquisa - Lista de Produtos */}
             <div className="flex-1 max-w-md relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-5" style={{ color: '#9D8189' }} />
+              {/* Ícone da Lupa (Posição absoluta proporcional) */}
+              <Search
+                className="absolute top-1/2 -translate-y-1/2"
+                style={{
+                  color: '#9D8189',
+                  left: '1vw',      /* Encostado na esquerda */
+                  width: '1.2vw',   /* Tamanho proporcional */
+                  height: '1.2vw',
+                  pointerEvents: 'none' /* O clique passa direto para o input */
+                }}
+              />
+
+              {/* Input (Sem a classe pl-10) */}
               <Input
                 placeholder="Buscar produto por nome..."
                 value={searchTerm}
@@ -164,17 +177,18 @@ export default function App() {
                   setSearchTerm(e.target.value);
                   setCurrentPage(1);
                 }}
-                className="pl-10 h-11 text-[15px]"
-                style={{ 
+                className="h-11 text-[0.9vw]"
+                style={{
+                  paddingLeft: '3.5vw', /* <--- AUMENTEI PARA 3.5vw (Garante espaço para a lupa) */
                   borderColor: '#D8E2DC',
                   backgroundColor: '#F9F9F9',
                   color: '#6D6875'
                 }}
               />
             </div>
-            
+
             {/* Botão Cadastrar */}
-            <Button 
+            <Button
               onClick={handleAddProduct}
               className="gap-2 h-11 px-6 text-[15px]"
               style={{ backgroundColor: '#F4ACB7', color: 'white' }}
@@ -188,7 +202,7 @@ export default function App() {
           <div className="flex items-center gap-4">
             <Filter className="size-4" style={{ color: '#9D8189' }} />
             <span className="text-[15px]" style={{ color: '#9D8189' }}>Filtrar por:</span>
-            
+
             {/* Categoria */}
             <div className="flex items-center gap-2">
               <label className="text-[14px]" style={{ color: '#9D8189' }}>Categoria:</label>
@@ -284,16 +298,16 @@ export default function App() {
             </thead>
             <tbody>
               {currentProducts.map((product, index) => (
-                <tr 
+                <tr
                   key={product.id}
                   className="border-b transition-colors hover:bg-opacity-50"
-                  style={{ 
+                  style={{
                     borderColor: '#D8E2DC',
                     backgroundColor: index % 2 === 0 ? 'white' : '#F9F9F9'
                   }}
                 >
                   <td className="px-6 py-4">
-                    <div 
+                    <div
                       className="size-16 rounded-lg overflow-hidden border"
                       style={{ borderColor: '#D8E2DC' }}
                     >
@@ -310,7 +324,7 @@ export default function App() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span 
+                    <span
                       className="inline-flex items-center px-3 py-1 rounded-full text-[14px]"
                       style={{
                         backgroundColor: '#FFCAD4',
@@ -326,7 +340,7 @@ export default function App() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span 
+                    <span
                       className="inline-flex items-center px-3 py-1 rounded-full text-[14px]"
                       style={{
                         backgroundColor: '#D8E2DC',
@@ -359,7 +373,7 @@ export default function App() {
           <p className="text-[15px]" style={{ color: '#9D8189' }}>
             Mostrando {startIndex + 1} a {Math.min(endIndex, filteredProducts.length)} de {filteredProducts.length} produtos
           </p>
-          
+
           {totalPages > 1 && (
             <div className="flex items-center gap-2">
               <button
@@ -374,7 +388,7 @@ export default function App() {
               >
                 Anterior
               </button>
-              
+
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                 <button
                   key={page}
@@ -389,7 +403,7 @@ export default function App() {
                   {page}
                 </button>
               ))}
-              
+
               <button
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}

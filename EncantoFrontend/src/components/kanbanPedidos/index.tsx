@@ -7,7 +7,7 @@ import OrderDetailModal from './modals/OrderDetailModal';
 import StatusTypeModal from './modals/StatusTypeModal';
 import StatusTypeListModal from './modals/StatusTypeListModal';
 import DeleteStatusTypeDialog from './modals/DeleteStatusTypeDialog';
-import { Navigate ,useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 import './index-kanban.css'
 
@@ -116,7 +116,7 @@ function OrderCard({ order, onClick }: OrderCardProps) {
 
   return (
     <div
-      ref={drag}
+      ref={drag as any}
       onClick={() => onClick(order)}
       className="p-4 rounded-lg shadow-sm cursor-pointer transition-all hover:shadow-md"
       style={{
@@ -166,11 +166,11 @@ function KanbanColumn({ status, orders, onDrop, onOrderClick }: KanbanColumnProp
     collect: (monitor) => ({
       isOver: monitor.isOver(),
     }),
-  }));
+  }), [onDrop, status.id]); // <--- CORREÇÃO 1: Adicionamos dependências para o drop saber sempre o estado atual
 
   return (
     <div
-      ref={drop}
+      ref={drop as any}
       className="flex-1 rounded-lg p-4 min-h-[600px] min-w-[280px]"
       style={{
         backgroundColor: isOver ? '#FFE5D9' : status.color,
@@ -211,14 +211,13 @@ export default function Kanban() {
 
   const navigate = useNavigate();
 
-const handleOnClickInSeeDetails = (orderId: string) => {
-  
-  navigate(`/pedidos/detalhes/${orderId}`);
-}
+  const handleOnClickInSeeDetails = (orderId: string) => {
+    navigate(`/pedidos/detalhes/${orderId}`);
+  }
 
-
+  // <--- CORREÇÃO 2: Usamos 'setOrders(prev => ...)' para garantir que pegamos a lista MAIS RECENTE
   const handleOrderDrop = (orderId: string, newStatusId: string) => {
-    setOrders(orders.map(order => {
+    setOrders(prevOrders => prevOrders.map(order => {
       if (order.id === orderId) {
         return {
           ...order,
@@ -235,8 +234,9 @@ const handleOnClickInSeeDetails = (orderId: string) => {
     setIsOrderDetailOpen(true);
   };
 
+  // <--- CORREÇÃO 3: Mesma correção aqui para garantir consistência
   const handleUpdateOrderStatus = (orderId: string, newStatusId: string) => {
-    setOrders(orders.map(order => {
+    setOrders(prevOrders => prevOrders.map(order => {
       if (order.id === orderId) {
         return {
           ...order,
@@ -276,41 +276,9 @@ const handleOnClickInSeeDetails = (orderId: string) => {
     return orders.filter(order => order.statusId === statusId);
   };
   
-
-
   return (
     <DndProvider backend={HTML5Backend}>
       <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
-        {/* Navbar */}
-        {/* <header className="bg-white border-b shadow-sm" style={{ borderColor: '#D8E2DC' }}>
-          <div className="max-w-[1920px] mx-auto px-8 py-5">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="size-12 rounded-full flex items-center justify-center" style={{ backgroundColor: '#F4ACB7' }}>
-                  <span className="text-white text-[18px]">OE</span>
-                </div>
-                <div className="flex flex-col">
-                  <span className="text-[20px]" style={{ color: '#F4ACB7' }}>O Encanto</span>
-                  <span className="text-[12px]" style={{ color: '#9D8189' }}>personalizados</span>
-                </div>
-              </div>
-              <nav className="flex gap-8">
-                <a href="#" className="text-[16px] text-[#9D8189] hover:text-[#F4ACB7] transition-colors">Home</a>
-                <a href="#" className="text-[16px]" style={{ color: '#F4ACB7' }}>Pedidos</a>
-                <a href="#" className="text-[16px] text-[#9D8189] hover:text-[#F4ACB7] transition-colors">Financeiro</a>
-                <a href="#" className="text-[16px] text-[#9D8189] hover:text-[#F4ACB7] transition-colors">Produtos</a>
-                <a href="#" className="text-[16px] text-[#9D8189] hover:text-[#F4ACB7] transition-colors">Funcionários</a>
-              </nav>
-              <button 
-                className="px-6 py-2 rounded-md text-[15px] text-white transition-all hover:opacity-90"
-                style={{ backgroundColor: '#6D6875' }}
-              >
-                Login
-              </button>
-            </div>
-          </div>
-        </header> */}
-
         <div className="max-w-[1920px] mx-auto px-8 py-8">
           {/* Cabeçalho */}
           <div className="mb-10">
@@ -352,7 +320,7 @@ const handleOnClickInSeeDetails = (orderId: string) => {
           </div>
 
           {/* Kanban Board */}
-          <div className="flex gap-6">
+          <div className="flex gap-6 overflow-x-auto pb-4">
             {statusTypes.map(status => (
               <KanbanColumn
                 key={status.id}

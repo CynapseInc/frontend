@@ -173,25 +173,35 @@ export default function App() {
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
           <div className="flex items-center justify-between gap-6 mb-5">
             {/* Pesquisa */}
-            <div className="flex-1 max-w-md relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-5" style={{ color: '#9D8189' }} />
-              <Input
-                placeholder="Buscar por nome ou e-mail..."
-                value={searchTerm}
-                onChange={(e) => {
-                  setSearchTerm(e.target.value);
-                  setCurrentPage(1);
-                }}
-                className="pl-10 h-11 text-[15px]"
-                style={{ 
-                  borderColor: '#D8E2DC',
-                  backgroundColor: '#F9F9F9',
-                  color: '#6D6875'
-                }}
-              />
-            </div>
+            {/* Bloco de Pesquisa - Funcionários */}
+<div className="flex-1 max-w-md relative">
+  <Search 
+    className="absolute top-1/2 -translate-y-1/2" 
+    style={{ 
+      color: '#9D8189', 
+      left: '1vw', 
+      width: '1.2vw', 
+      height: '1.2vw',
+      pointerEvents: 'none'
+    }} 
+  />
+  <Input
+    placeholder="Buscar por nome ou e-mail..."
+    value={searchTerm}
+    onChange={(e) => {
+      setSearchTerm(e.target.value);
+      setCurrentPage(1);
+    }}
+    className="h-11 text-[0.9vw]"
+    style={{ 
+      paddingLeft: '3.5vw', 
+      borderColor: '#D8E2DC',
+      backgroundColor: '#F9F9F9',
+      color: '#6D6875'
+    }}
+  />
+</div>
             
-            {/* Botão Adicionar */}
             <Button 
               onClick={openAddModal}
               className="gap-2 h-11 px-6 text-[15px]"
@@ -202,7 +212,6 @@ export default function App() {
             </Button>
           </div>
 
-          {/* Filtros */}
           <div className="flex items-center gap-3">
             <Filter className="size-4" style={{ color: '#9D8189' }} />
             <span className="text-[15px]" style={{ color: '#9D8189' }}>Filtrar por cargo:</span>
