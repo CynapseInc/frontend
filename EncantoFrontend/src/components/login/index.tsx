@@ -47,8 +47,8 @@ export default function App() {
   };
 
   return (
-    <div  className="border min-h-screen w-full   bg-gradient-to-br from-[#FFE5D9] via-[#F9F9F9] to-[#D8E2DC] flex items-center justify-center p-4 relative">
-      {/* Decorative Elements */}
+    <div className="min-h-screen w-screen bg-gradient-to-br from-[#FFE5D9] via-[#F9F9F9] to-[#D8E2DC] flex items-center justify-center p-4 relative overflow-x-hidden">
+
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute top-20 left-10 w-32 h-32 bg-[#FFCAD4] rounded-full opacity-20 blur-3xl"></div>
         <div className="absolute bottom-20 right-10 w-40 h-40 bg-[#F4ACB7] rounded-full opacity-20 blur-3xl"></div>
@@ -98,7 +98,7 @@ export default function App() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   placeholder="seu@email.com"
-                  className="w-full pl-12 pr-4 py-3 border-2 border-[#D8E2DC] rounded-xl focus:border-[#F4ACB7] focus:outline-none transition-colors bg-white text-[#6D6875] placeholder:text-[#9D8189]/50"
+                  className="w-full-percent pl-12 pr-4 py-3 border-2 border-[#D8E2DC] rounded-xl focus:border-[#F4ACB7] focus:outline-none transition-colors bg-white text-[#6D6875] placeholder:text-[#9D8189]/50"
                   disabled={isLoading}
                 />
               </div>
@@ -119,7 +119,7 @@ export default function App() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full pl-12 pr-12 py-3 border-2 border-[#D8E2DC] rounded-xl focus:border-[#F4ACB7] focus:outline-none transition-colors bg-white text-[#6D6875]"
+                  className="w-full-percent pl-12 pr-12 py-3 border-2 border-[#D8E2DC] rounded-xl focus:border-[#F4ACB7] focus:outline-none transition-colors bg-white text-[#6D6875]"
                   disabled={isLoading}
                 />
                 <button
@@ -184,7 +184,7 @@ export default function App() {
             <button
               type="submit"
               disabled={isLoading}
-              className="w-full bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white py-4 rounded-xl hover:shadow-2xl transition-all flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:shadow-lg mt-8"
+              className="w-full-percent bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white py-4 rounded-xl hover:shadow-2xl transition-all flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:shadow-lg mt-8"
             >
               {isLoading ? (
                 <>

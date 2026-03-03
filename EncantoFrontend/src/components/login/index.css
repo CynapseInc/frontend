@@ -581,6 +581,14 @@
   }
 
   .w-full {
+    width: 100vw;
+  }
+
+  .w-screen {
+    width: 100vw;
+  }
+
+  .w-full-percent {
     width: 100%;
   }
 
