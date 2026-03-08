@@ -1,108 +1,29 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Plus, Settings } from 'lucide-react';
 import { Button } from '../ui/button';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
+import { useNavigate } from 'react-router-dom';
+
+// Modais
 import OrderDetailModal from './modals/OrderDetailModal';
 import StatusTypeModal from './modals/StatusTypeModal';
 import StatusTypeListModal from './modals/StatusTypeListModal';
 import DeleteStatusTypeDialog from './modals/DeleteStatusTypeDialog';
-import { useNavigate } from 'react-router-dom';
 
-import './index-kanban.css'
+// Serviços e Interfaces Reais
+import { pedidoService } from '../../services/PedidoService';
+import { statusPedidoService } from '../../services/StatusPedidoService';
+import type { PedidoResponse, StatusPedidoResponse } from '../../interfaces/Pedido';
 
+import './index-kanban.css';
 
-interface Order {
-  id: string;
-  customerName: string;
-  productName: string;
-  deliveryDate: string;
-  orderCode: string;
-  statusId: string;
-  phone: string;
-  description: string;
-  observations: string;
-  createdAt: string;
-  updatedAt: string;
-  deliveryDeadline: string;
-}
-
-interface StatusType {
-  id: string;
-  name: string;
-  color: string;
-}
-
-const mockStatusTypes: StatusType[] = [
-  { id: '1', name: 'A Fazer', color: '#FFE5D9' },
-  { id: '2', name: 'Em Andamento', color: '#FFCAD4' },
-  { id: '3', name: 'Para Enviar', color: '#F4ACB7' },
-  { id: '4', name: 'Enviados', color: '#D8E2DC' },
-];
-
-
-const mockOrders: Order[] = [
-  {
-    id: '1',
-    customerName: 'Maria Silva',
-    productName: 'Caneca do Ben 10',
-    deliveryDate: '15/11/2025',
-    orderCode: 'PED-001',
-    statusId: '1',
-    phone: '(11) 98765-4321',
-    description: 'Caneca personalizada com estampa do Ben 10',
-    observations: 'Cliente pediu para caprichar na embalagem',
-    createdAt: '10/11/2025 14:30',
-    updatedAt: '10/11/2025 14:30',
-    deliveryDeadline: '15/11/2025',
-  },
-  {
-    id: '2',
-    customerName: 'João Santos',
-    productName: 'Caderno da Frozen',
-    deliveryDate: '18/11/2025',
-    orderCode: 'PED-002',
-    statusId: '2',
-    phone: '(11) 91234-5678',
-    description: 'Caderno universitário com capa da Frozen',
-    observations: 'Presente de aniversário',
-    createdAt: '11/11/2025 10:15',
-    updatedAt: '13/11/2025 16:20',
-    deliveryDeadline: '18/11/2025',
-  },
-  {
-    id: '3',
-    customerName: 'Ana Costa',
-    productName: 'Caneca do Spider-Man',
-    deliveryDate: '16/11/2025',
-    orderCode: 'PED-003',
-    statusId: '3',
-    phone: '(11) 99876-5432',
-    description: 'Caneca personalizada com estampa do Spider-Man',
-    observations: '',
-    createdAt: '09/11/2025 09:00',
-    updatedAt: '14/11/2025 11:45',
-    deliveryDeadline: '16/11/2025',
-  },
-  {
-    id: '4',
-    customerName: 'Pedro Oliveira',
-    productName: 'Caderno do Corinthians',
-    deliveryDate: '12/11/2025',
-    orderCode: 'PED-004',
-    statusId: '4',
-    phone: '(11) 98888-7777',
-    description: 'Caderno escolar com tema do Corinthians',
-    observations: 'Entregue com sucesso!',
-    createdAt: '05/11/2025 13:20',
-    updatedAt: '12/11/2025 10:30',
-    deliveryDeadline: '12/11/2025',
-  },
-];
-
+// ==========================================
+// COMPONENTE DO CARTÃO DO PEDIDO
+// ==========================================
 interface OrderCardProps {
-  order: Order;
-  onClick: (order: Order) => void;
+  order: PedidoResponse;
+  onClick: (order: PedidoResponse) => void;
 }
 
 function OrderCard({ order, onClick }: OrderCardProps) {
@@ -113,6 +34,11 @@ function OrderCard({ order, onClick }: OrderCardProps) {
       isDragging: monitor.isDragging(),
     }),
   }));
+
+  // Formatar a data limite para um formato amigável (DD/MM/YYYY)
+  const dataLimiteFormatada = order.dataLimite 
+    ? new Date(order.dataLimite).toLocaleDateString('pt-BR') 
+    : 'Sem data';
 
   return (
     <div
@@ -127,60 +53,66 @@ function OrderCard({ order, onClick }: OrderCardProps) {
     >
       <div className="flex items-center justify-between mb-2">
         <span className="text-[13px] px-2 py-0.5 rounded" style={{ backgroundColor: '#FFE5D9', color: '#6D6875' }}>
-          {order.orderCode}
+          PED-{order.id.toString().padStart(3, '0')}
         </span>
-        <span className="text-[13px]" style={{ color: '#9D8189' }}>
-          {order.deliveryDate}
+        <span className="text-[13px] font-bold" style={{ color: '#4CAF50' }}>
+          R$ {order.precoTotal?.toFixed(2) || '0.00'}
         </span>
       </div>
       
-      <h3 className="text-[16px] mb-1" style={{ color: '#6D6875' }}>
-        <strong>{order.customerName}</strong>
+      <h3 className="text-[16px] mb-1 truncate" style={{ color: '#6D6875' }}>
+        <strong>{order.cliente?.nome || 'Cliente não informado'}</strong>
       </h3>
       
-      <p className="text-[14px] mb-2" style={{ color: '#9D8189' }}>
-        {order.productName}
+      <p className="text-[13px] mb-2" style={{ color: '#9D8189' }}>
+        {order.produtos?.length || 0} produto(s) no pedido
       </p>
       
       <div className="flex items-center gap-1 text-[12px]" style={{ color: '#9D8189' }}>
         <span>📅</span>
-        <span>Entrega: {order.deliveryDate}</span>
+        <span>Entrega: {dataLimiteFormatada}</span>
       </div>
     </div>
   );
 }
 
+// ==========================================
+// COMPONENTE DA COLUNA DO KANBAN
+// ==========================================
 interface KanbanColumnProps {
-  status: StatusType;
-  orders: Order[];
-  onDrop: (orderId: string, newStatusId: string) => void;
-  onOrderClick: (order: Order) => void;
+  status: StatusPedidoResponse;
+  orders: PedidoResponse[];
+  onDrop: (orderId: number, newStatusId: number) => void;
+  onOrderClick: (order: PedidoResponse) => void;
 }
 
 function KanbanColumn({ status, orders, onDrop, onOrderClick }: KanbanColumnProps) {
   const [{ isOver }, drop] = useDrop(() => ({
     accept: 'ORDER',
-    drop: (item: { orderId: string }) => {
+    drop: (item: { orderId: number }) => {
       onDrop(item.orderId, status.id);
     },
     collect: (monitor) => ({
       isOver: monitor.isOver(),
     }),
-  }), [onDrop, status.id]); // <--- CORREÇÃO 1: Adicionamos dependências para o drop saber sempre o estado atual
+  }), [onDrop, status.id]); 
+
+  // Fallback de cor caso o status não tenha cor definida no banco
+  const columnColor = status.cor || '#F9F9F9';
 
   return (
     <div
       ref={drop as any}
       className="flex-1 rounded-lg p-4 min-h-[600px] min-w-[280px]"
       style={{
-        backgroundColor: isOver ? '#FFE5D9' : status.color,
+        backgroundColor: isOver ? '#FFE5D9' : columnColor,
         border: '1px solid #D8E2DC',
         transition: 'background-color 0.2s ease',
       }}
     >
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-[20px]" style={{ color: '#6D6875' }}>
-          <strong>{status.name}</strong>
+          <strong>{status.status}</strong>
         </h2>
         <span
           className="size-7 rounded-full flex items-center justify-center text-[14px]"
@@ -199,81 +131,126 @@ function KanbanColumn({ status, orders, onDrop, onOrderClick }: KanbanColumnProp
   );
 }
 
+// ==========================================
+// COMPONENTE PRINCIPAL KANBAN
+// ==========================================
 export default function Kanban() {
-  const [orders, setOrders] = useState<Order[]>(mockOrders);
-  const [statusTypes, setStatusTypes] = useState<StatusType[]>(mockStatusTypes);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const [orders, setOrders] = useState<PedidoResponse[]>([]);
+  const [statusTypes, setStatusTypes] = useState<StatusPedidoResponse[]>([]);
+  
+  const [selectedOrder, setSelectedOrder] = useState<any | null>(null); // any temporário até arrumarmos o modal
+  
   const [isOrderDetailOpen, setIsOrderDetailOpen] = useState(false);
   const [isStatusTypeModalOpen, setIsStatusTypeModalOpen] = useState(false);
   const [isStatusTypeListOpen, setIsStatusTypeListOpen] = useState(false);
-  const [editingStatusType, setEditingStatusType] = useState<StatusType | null>(null);
-  const [deleteStatusType, setDeleteStatusType] = useState<StatusType | null>(null);
+  
+  const [editingStatusType, setEditingStatusType] = useState<StatusPedidoResponse | null>(null);
+  const [deleteStatusType, setDeleteStatusType] = useState<StatusPedidoResponse | null>(null);
 
   const navigate = useNavigate();
 
-  const handleOnClickInSeeDetails = (orderId: string) => {
+  // 1. CARREGAR DADOS INICIAIS DA API
+  useEffect(() => {
+    const fetchKanbanData = async () => {
+      try {
+        const [statusData, pedidosData] = await Promise.all([
+          statusPedidoService.listarTodos(),
+          pedidoService.listarTodos()
+        ]);
+
+        // Ordenar as colunas pela ordem do Kanban definida no banco
+        const statusOrdenados = statusData.sort((a: any, b: any) => a.ordemKanban - b.ordemKanban);
+        
+        setStatusTypes(statusOrdenados);
+        setOrders(pedidosData);
+      } catch (error) {
+        console.error("Erro ao carregar dados do Kanban:", error);
+      }
+    };
+
+    fetchKanbanData();
+  }, []);
+
+  const handleOnClickInSeeDetails = (orderId: number) => {
     navigate(`/pedidos/detalhes/${orderId}`);
   }
 
-  // <--- CORREÇÃO 2: Usamos 'setOrders(prev => ...)' para garantir que pegamos a lista MAIS RECENTE
-  const handleOrderDrop = (orderId: string, newStatusId: string) => {
-    setOrders(prevOrders => prevOrders.map(order => {
-      if (order.id === orderId) {
-        return {
-          ...order,
-          statusId: newStatusId,
-          updatedAt: new Date().toLocaleString('pt-BR'),
-        };
-      }
-      return order;
-    }));
+  // 2. LÓGICA DE DRAG & DROP REAL
+  const handleOrderDrop = async (orderId: number, newStatusId: number) => {
+    try {
+      // Chamada à API para atualizar o status do pedido
+      await pedidoService.mudarStatus(orderId, newStatusId);
+
+      // Atualizar o estado local para o cartão mover instantaneamente na tela
+      setOrders(prevOrders => prevOrders.map(order => {
+        if (order.id === orderId) {
+          const newStatusObj = statusTypes.find(s => s.id === newStatusId);
+          if (newStatusObj) {
+            return {
+              ...order,
+              statusAtual: {
+                ...order.statusAtual,
+                status: newStatusObj
+              }
+            };
+          }
+        }
+        return order;
+      }));
+    } catch (error) {
+      console.error("Erro ao mover pedido:", error);
+      alert("Ocorreu um erro ao mover o pedido.");
+    }
   };
 
-  const handleOrderClick = (order: Order) => {
+  const handleOrderClick = (order: PedidoResponse) => {
     setSelectedOrder(order);
     setIsOrderDetailOpen(true);
   };
 
-  // <--- CORREÇÃO 3: Mesma correção aqui para garantir consistência
-  const handleUpdateOrderStatus = (orderId: string, newStatusId: string) => {
-    setOrders(prevOrders => prevOrders.map(order => {
-      if (order.id === orderId) {
-        return {
-          ...order,
-          statusId: newStatusId,
-          updatedAt: new Date().toLocaleString('pt-BR'),
-        };
-      }
-      return order;
-    }));
-  };
-
-  const handleAddStatusType = (statusType: StatusType) => {
-    setStatusTypes([...statusTypes, { ...statusType, id: Date.now().toString() }]);
-    setIsStatusTypeModalOpen(false);
-  };
-
-  const handleEditStatusType = (statusType: StatusType) => {
-    setStatusTypes(statusTypes.map(st => st.id === statusType.id ? statusType : st));
-    setIsStatusTypeModalOpen(false);
-    setEditingStatusType(null);
-  };
-
-  const handleDeleteStatusType = () => {
-    if (deleteStatusType) {
-      setStatusTypes(statusTypes.filter(st => st.id !== deleteStatusType.id));
-      setDeleteStatusType(null);
+  // 3. GERENCIAR STATUS (COLUNAS)
+  const handleAddStatusType = async (statusType: any) => {
+    try {
+      const novoStatus = await statusPedidoService.criar(statusType.name); // Ajuste conforme seu backend pede a cor/nome
+      setStatusTypes([...statusTypes, novoStatus]);
+      setIsStatusTypeModalOpen(false);
+    } catch (error) {
+      console.error("Erro ao criar status", error);
     }
   };
 
-  const openEditStatusTypeModal = (statusType: StatusType) => {
+  const handleEditStatusType = async (statusType: any) => {
+    try {
+      const statusAtualizado = await statusPedidoService.atualizar(statusType.id, statusType.name);
+      setStatusTypes(statusTypes.map(st => st.id === statusAtualizado.id ? statusAtualizado : st));
+      setIsStatusTypeModalOpen(false);
+      setEditingStatusType(null);
+    } catch (error) {
+       console.error("Erro ao atualizar status", error);
+    }
+  };
+
+  const handleDeleteStatusType = async () => {
+    if (deleteStatusType) {
+      try {
+        await statusPedidoService.desativar(deleteStatusType.id);
+        setStatusTypes(statusTypes.filter(st => st.id !== deleteStatusType.id));
+        setDeleteStatusType(null);
+      } catch (error) {
+        console.error("Erro ao deletar status", error);
+      }
+    }
+  };
+
+  const openEditStatusTypeModal = (statusType: any) => {
     setEditingStatusType(statusType);
     setIsStatusTypeModalOpen(true);
     setIsStatusTypeListOpen(false);
   };
 
-  const getOrdersByStatus = (statusId: string) => {
-    return orders.filter(order => order.statusId === statusId);
+  // Filtrar pedidos por status (Lembrando que o DTO tem statusAtual -> status -> id)
+  const getOrdersByStatus = (statusId: number) => {
+    return orders.filter(order => order.statusAtual?.status?.id === statusId);
   };
   
   return (
@@ -330,21 +307,29 @@ export default function Kanban() {
                 onOrderClick={handleOrderClick}
               />
             ))}
+            
+            {statusTypes.length === 0 && (
+               <div className="w-full text-center py-10" style={{ color: '#9D8189' }}>
+                 Nenhum status cadastrado. Crie um "Novo Status" para montar o seu Kanban!
+               </div>
+            )}
           </div>
         </div>
 
-        {/* Modals */}
-        <OrderDetailModal
-          isOpen={isOrderDetailOpen}
-          onClose={() => {
-            setIsOrderDetailOpen(false);
-            setSelectedOrder(null);
-          }}
-          order={selectedOrder}
-          statusTypes={statusTypes}
-          onUpdateStatus={handleUpdateOrderStatus}
-          onClickInSeeDetails={handleOnClickInSeeDetails}
-        />
+        {/* Modals - Temporariamente com "any" no selectedOrder até os adaptarmos ao novo modelo no próximo passo */}
+        {selectedOrder && (
+          <OrderDetailModal
+            isOpen={isOrderDetailOpen}
+            onClose={() => {
+              setIsOrderDetailOpen(false);
+              setSelectedOrder(null);
+            }}
+            order={selectedOrder}
+            statusTypes={statusTypes as any}
+            onUpdateStatus={(orderId: any, newStatusId: any) => handleOrderDrop(orderId, newStatusId)}
+            onClickInSeeDetails={handleOnClickInSeeDetails}
+          />
+        )}
 
         <StatusTypeModal
           isOpen={isStatusTypeModalOpen}
@@ -353,13 +338,13 @@ export default function Kanban() {
             setEditingStatusType(null);
           }}
           onSave={editingStatusType ? handleEditStatusType : handleAddStatusType}
-          statusType={editingStatusType}
+          statusType={editingStatusType} // Removido o as any
         />
 
         <StatusTypeListModal
           isOpen={isStatusTypeListOpen}
           onClose={() => setIsStatusTypeListOpen(false)}
-          statusTypes={statusTypes}
+          statusTypes={statusTypes} // Removido o as any
           onEdit={openEditStatusTypeModal}
           onDelete={(statusType) => setDeleteStatusType(statusType)}
         />
@@ -368,7 +353,7 @@ export default function Kanban() {
           isOpen={!!deleteStatusType}
           onClose={() => setDeleteStatusType(null)}
           onConfirm={handleDeleteStatusType}
-          statusTypeName={deleteStatusType?.name || ''}
+          statusTypeName={deleteStatusType?.status || ''}
         />
       </div>
     </DndProvider>

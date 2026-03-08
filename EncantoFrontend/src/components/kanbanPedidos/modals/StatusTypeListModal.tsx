@@ -1,18 +1,12 @@
-import { X, Edit2, Trash2 } from 'lucide-react';
-import { Button } from '../../ui/button';
-
-interface StatusType {
-  id: string;
-  name: string;
-  color: string;
-}
+import { X, Pencil, Trash2 } from 'lucide-react';
+import type { StatusPedidoResponse } from '../../../interfaces/Pedido';
 
 interface StatusTypeListModalProps {
   isOpen: boolean;
   onClose: () => void;
-  statusTypes: StatusType[];
-  onEdit: (statusType: StatusType) => void;
-  onDelete: (statusType: StatusType) => void;
+  statusTypes: StatusPedidoResponse[];
+  onEdit: (status: StatusPedidoResponse) => void;
+  onDelete: (status: StatusPedidoResponse) => void;
 }
 
 export default function StatusTypeListModal({ isOpen, onClose, statusTypes, onEdit, onDelete }: StatusTypeListModalProps) {
@@ -25,114 +19,66 @@ export default function StatusTypeListModal({ isOpen, onClose, statusTypes, onEd
       onClick={onClose}
     >
       <div 
-        className="bg-white rounded-lg shadow-xl w-full max-w-[700px] max-h-[80vh] overflow-y-auto"
+        className="bg-white rounded-lg shadow-xl w-full max-w-[600px] max-h-[90vh] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
-        <div 
-          className="flex items-center justify-between p-6 border-b sticky top-0 bg-white"
-          style={{ borderColor: '#D8E2DC' }}
-        >
+        <div className="flex items-center justify-between p-6 border-b" style={{ borderColor: '#D8E2DC' }}>
           <div>
             <h2 className="text-[24px]" style={{ color: '#F4ACB7' }}>
-              <strong>Gerenciar Tipos de Status</strong>
+              <strong>Gerenciar Status</strong>
             </h2>
             <p className="text-[14px] mt-1" style={{ color: '#9D8189' }}>
-              {statusTypes.length} {statusTypes.length === 1 ? 'status cadastrado' : 'status cadastrados'}
+              Visualize, edite ou remova as colunas do seu Kanban
             </p>
           </div>
-          <button 
-            onClick={onClose}
-            className="p-2 rounded-md hover:bg-gray-100 transition-colors"
-          >
+          <button onClick={onClose} className="p-2 rounded-md hover:bg-gray-100 transition-colors">
             <X className="size-6" style={{ color: '#9D8189' }} />
           </button>
         </div>
 
-        {/* Content */}
-        <div className="p-6">
-          {statusTypes.length === 0 ? (
-            <div className="text-center py-12">
-              <p className="text-[16px]" style={{ color: '#9D8189' }}>
-                Nenhum tipo de status cadastrado.
-              </p>
-            </div>
-          ) : (
-            <div className="space-y-3">
-              {statusTypes.map(statusType => (
-                <div
-                  key={statusType.id}
-                  className="flex items-center justify-between p-4 rounded-lg border"
-                  style={{ 
-                    borderColor: '#D8E2DC',
-                    backgroundColor: statusType.color
-                  }}
-                >
-                  <div className="flex items-center gap-4">
-                    <div
-                      className="size-12 rounded-full border"
-                      style={{
-                        backgroundColor: statusType.color,
-                        borderColor: '#D8E2DC'
-                      }}
-                    />
-                    <div>
-                      <p className="text-[17px]" style={{ color: '#6D6875' }}>
-                        <strong>{statusType.name}</strong>
-                      </p>
-                      <p className="text-[13px]" style={{ color: '#9D8189' }}>
-                        Cor: {statusType.color}
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    <Button
-                      onClick={() => onEdit(statusType)}
-                      className="px-4 py-2 h-9 gap-2 text-[14px]"
-                      style={{
-                        backgroundColor: 'white',
-                        color: '#6D6875',
-                        border: '1px solid #D8E2DC'
-                      }}
-                    >
-                      <Edit2 className="size-4" />
-                      Editar
-                    </Button>
-                    <Button
-                      onClick={() => onDelete(statusType)}
-                      className="px-4 py-2 h-9 gap-2 text-[14px]"
-                      style={{
-                        backgroundColor: 'white',
-                        color: '#F4ACB7',
-                        border: '1px solid #F4ACB7'
-                      }}
-                    >
-                      <Trash2 className="size-4" />
-                      Excluir
-                    </Button>
-                  </div>
+        <div className="p-6 overflow-y-auto">
+          <div className="space-y-3">
+            {statusTypes.map(status => (
+              <div
+                key={status.id}
+                className="flex items-center justify-between p-4 rounded-lg border transition-all hover:shadow-sm"
+                style={{ borderColor: '#D8E2DC', backgroundColor: 'white' }}
+              >
+                <div className="flex items-center gap-4">
+                  <div 
+                    className="size-6 rounded-full border"
+                    style={{ backgroundColor: status.cor || '#F9F9F9', borderColor: '#D8E2DC' }}
+                  />
+                  <span className="text-[16px]" style={{ color: '#6D6875' }}>
+                    <strong>{status.status}</strong>
+                  </span>
                 </div>
-              ))}
-            </div>
-          )}
-        </div>
 
-        {/* Footer */}
-        <div 
-          className="flex justify-end p-6 border-t"
-          style={{ borderColor: '#D8E2DC' }}
-        >
-          <Button
-            onClick={onClose}
-            className="px-6 py-2 h-11 text-[15px]"
-            style={{
-              backgroundColor: '#F4ACB7',
-              color: 'white'
-            }}
-          >
-            Fechar
-          </Button>
+                <div className="flex gap-2">
+                  <button
+                    onClick={() => onEdit(status)}
+                    className="p-2 rounded-md transition-colors hover:bg-gray-100"
+                    title="Editar Status"
+                  >
+                    <Pencil className="size-4" style={{ color: '#9D8189' }} />
+                  </button>
+                  <button
+                    onClick={() => onDelete(status)}
+                    className="p-2 rounded-md transition-colors hover:bg-red-50"
+                    title="Excluir Status"
+                  >
+                    <Trash2 className="size-4 text-red-400" />
+                  </button>
+                </div>
+              </div>
+            ))}
+
+            {statusTypes.length === 0 && (
+              <div className="text-center py-8">
+                <p className="text-[15px]" style={{ color: '#9D8189' }}>Nenhum status cadastrado.</p>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>
