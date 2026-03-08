@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 // import { FormEvent } from 'react';
 import { Heart, Lock, Mail, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -8,6 +8,9 @@ import './index.css';
 
 export default function App() {
   const navigate = useNavigate();
+  useEffect(() => {
+    sessionStorage.removeItem('authToken');
+  }, []);
   
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

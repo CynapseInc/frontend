@@ -29,20 +29,19 @@ export const route = createBrowserRouter([
             { index: true, element: <Login /> },
             { path: "home", element: <HomeCalendar /> },
             { path: "kanban", element: <Kanban /> },
-            {path: "lista-produtos", element: <ListaProdutos />},
+            { path: "lista-produtos", element: <ListaProdutos />},
             { path: "produtos", element: <CadastroProdutos />},
-             { path: "produtos/fotos", element: <CadastroFotosProduto /> },
-             { path: "movimentacao", element: <CadastroMovimentacao /> },
-             {path: "pedidos/cadastro", element: <CadastroPedido/>},
-            
-             {path: "pedidos/detalhes/:id", element: <DetalhesPedido/>},
-             { path: "catalogo", element: <HomeClient /> },
-             {path: "pesquisa-produtos", element: <PesquisaProdutosClient /> },
-             {path: "detalhe-produto/:id", element: <DetalheProdutoClient /> },
-             {path: "carrinho", element: <Carrinho />},
-             {path: "funcionarios", element: <Funcionarios />},
-             {path: "dashboard-gestao", element: <DashGestao />},
-             
+            { path: "produtos/editar/:id", element: <CadastroProdutos /> }, 
+            { path: "produtos/fotos", element: <CadastroFotosProduto /> },
+            { path: "movimentacao", element: <CadastroMovimentacao /> },
+            { path: "pedidos/cadastro", element: <CadastroPedido/>},
+            { path: "pedidos/detalhes/:id", element: <DetalhesPedido/>},
+            { path: "catalogo", element: <HomeClient /> },
+            { path: "pesquisa-produtos", element: <PesquisaProdutosClient /> },
+            { path: "detalhe-produto/:id", element: <DetalheProdutoClient /> },
+            { path: "carrinho", element: <Carrinho />},
+            { path: "funcionarios", element: <Funcionarios />},
+            { path: "dashboard-gestao", element: <DashGestao />},
         ]
     }
 ])
