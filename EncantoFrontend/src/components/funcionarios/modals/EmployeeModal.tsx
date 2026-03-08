@@ -2,36 +2,26 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../../ui/dialog';
 import { X, Upload } from 'lucide-react';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
-
-interface Employee {
-  id: string;
-  name: string;
-  cpf: string;
-  birthDate: string;
-  email: string;
-  password: string;
-  position: string;
-  status: 'Ativo' | 'Inativo';
-  image?: string;
-}
+import type { Funcionario } from '../../../interfaces/Funcionario'; // Importando a interface correta
 
 interface EmployeeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (employee: Employee) => void;
-  employee?: Employee | null;
+  onSave: (employee: Funcionario) => void;
+  employee?: Funcionario | null;
 }
 
 export default function EmployeeModal({ isOpen, onClose, onSave, employee }: EmployeeModalProps) {
-  const [formData, setFormData] = useState<Partial<Employee>>({
+  // Atualizando os campos para bater com a interface Funcionario
+  const [formData, setFormData] = useState<Partial<Funcionario>>({
     name: '',
     cpf: '',
-    birthDate: '',
+    dataNasc: '', 
     email: '',
-    password: '',
-    position: 'Social Media',
+    senha: '', 
+    cargo: 'Social Media', 
     status: 'Ativo',
-    image: undefined,
+    foto: undefined, 
   });
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
@@ -39,17 +29,18 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
   useEffect(() => {
     if (employee) {
       setFormData(employee);
-      setConfirmPassword(employee.password);
+      // Backend geralmente não devolve a senha, então deixamos vazio na edição até que ele digite uma nova
+      setConfirmPassword(''); 
     } else {
       setFormData({
         name: '',
         cpf: '',
-        birthDate: '',
+        dataNasc: '',
         email: '',
-        password: '',
-        position: 'Social Media',
+        senha: '',
+        cargo: 'Social Media',
         status: 'Ativo',
-        image: undefined,
+        foto: undefined,
       });
       setConfirmPassword('');
     }
@@ -61,7 +52,7 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
     if (file) {
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData({ ...formData, image: reader.result as string });
+        setFormData({ ...formData, foto: reader.result as string }); // Atualizado para 'foto'
       };
       reader.readAsDataURL(file);
     }
@@ -71,22 +62,27 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
     e.preventDefault();
     
     // Validar senhas
-    if (formData.password !== confirmPassword) {
+    if (formData.senha !== confirmPassword) { // Atualizado para 'senha'
       setPasswordError('As senhas não coincidem');
       return;
     }
     
-    if (formData.name && formData.cpf && formData.email && formData.password) {
-      onSave(formData as Employee);
+    // Na edição, a senha pode ser opcional. Na criação, é obrigatória.
+    const isEditing = !!employee?.id;
+    const hasRequiredFields = formData.name && formData.cpf && formData.email;
+    const hasPasswordIfNew = isEditing || formData.senha;
+    
+    if (hasRequiredFields && hasPasswordIfNew) {
+      onSave(formData as Funcionario);
       setFormData({
         name: '',
         cpf: '',
-        birthDate: '',
+        dataNasc: '',
         email: '',
-        password: '',
-        position: 'Social Media',
+        senha: '',
+        cargo: 'Social Media',
         status: 'Ativo',
-        image: undefined,
+        foto: undefined,
       });
       setConfirmPassword('');
       setPasswordError('');
@@ -135,12 +131,12 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
                     className="size-28 rounded-full flex items-center justify-center overflow-hidden border-2 transition-all group-hover:border-[#F4ACB7]"
                     style={{ 
                       backgroundColor: '#FFE5D9',
-                      borderColor: formData.image ? '#F4ACB7' : '#D8E2DC'
+                      borderColor: formData.foto ? '#F4ACB7' : '#D8E2DC' // Atualizado para 'foto'
                     }}
                   >
-                    {formData.image ? (
+                    {formData.foto ? ( // Atualizado para 'foto'
                       <ImageWithFallback 
-                        src={formData.image} 
+                        src={formData.foto} 
                         alt="Preview" 
                         className="size-full object-cover"
                       />
@@ -149,7 +145,7 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
                     )}
                   </div>
                   <span className="mt-2 text-[14px]" style={{ color: '#9D8189' }}>
-                    {formData.image ? 'Alterar foto' : 'Adicionar foto'}
+                    {formData.foto ? 'Alterar foto' : 'Adicionar foto'} 
                   </span>
                 </div>
               </label>
@@ -210,8 +206,8 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
                 </label>
                 <input
                   type="date"
-                  value={formData.birthDate}
-                  onChange={(e) => setFormData({ ...formData, birthDate: e.target.value })}
+                  value={formData.dataNasc} // Atualizado para 'dataNasc'
+                  onChange={(e) => setFormData({ ...formData, dataNasc: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-md border text-[15px] focus:outline-none focus:border-[#F4ACB7] transition-colors"
                   style={{ 
                     backgroundColor: '#F9F9F9', 
@@ -247,8 +243,8 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
                   Cargo
                 </label>
                 <select
-                  value={formData.position}
-                  onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                  value={formData.cargo} // Atualizado para 'cargo'
+                  onChange={(e) => setFormData({ ...formData, cargo: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-md border text-[15px] focus:outline-none focus:border-[#F4ACB7] transition-colors"
                   style={{ 
                     backgroundColor: '#F9F9F9', 
@@ -265,14 +261,14 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
               {/* Senha */}
               <div>
                 <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
-                  Senha
+                  {employee ? 'Nova Senha (opcional)' : 'Senha'}
                 </label>
                 <input
                   type="password"
                   placeholder="Mínimo 8 caracteres"
-                  value={formData.password}
+                  value={formData.senha} // Atualizado para 'senha'
                   onChange={(e) => {
-                    setFormData({ ...formData, password: e.target.value });
+                    setFormData({ ...formData, senha: e.target.value });
                     setPasswordError('');
                   }}
                   className="w-full px-4 py-2.5 rounded-md border text-[15px] focus:outline-none focus:border-[#F4ACB7] transition-colors"
@@ -281,7 +277,7 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
                     borderColor: passwordError ? '#F4ACB7' : '#D8E2DC',
                     color: '#6D6875'
                   }}
-                  required
+                  required={!employee} // Obrigatório apenas se estiver criando um novo
                 />
               </div>
 
@@ -304,7 +300,7 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
                     borderColor: passwordError ? '#F4ACB7' : '#D8E2DC',
                     color: '#6D6875'
                   }}
-                  required
+                  required={!employee || !!formData.senha} // Obrigatório se for novo ou se tiver preenchido a nova senha
                 />
               </div>
 

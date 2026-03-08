@@ -1,8 +1,14 @@
 import React, { useState } from 'react';
+// import { FormEvent } from 'react';
 import { Heart, Lock, Mail, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
-import './index.css'
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import api from '../../provider/api';
+import './index.css';
 
 export default function App() {
+  const navigate = useNavigate();
+  
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
@@ -10,41 +16,54 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: any) => {
     e.preventDefault();
     setError('');
     
-    // Validation
     if (!email) {
       setError('Por favor, digite seu e-mail');
       return;
     }
-    
     if (!password) {
       setError('Por favor, digite sua senha');
       return;
     }
 
-    if (!email.includes('@')) {
-      setError('Por favor, digite um e-mail válido');
-      return;
-    }
-
     setIsLoading(true);
 
-    // Simulate API call
+    try {
+    const response = await api.post('/login', {
+      email: email,
+      password: password
+    });
+
+    const data = response.data;
+    
+    sessionStorage.setItem('authToken', data.token);
+    
+    alert('Login realizado com sucesso!');
     setTimeout(() => {
-      setIsLoading(false);
-      // Here you would validate credentials
-      console.log('Login attempt:', { email, password, rememberMe });
-      // For demo: show error if not admin@encanto.com
-      if (email !== 'admin@encanto.com' || password !== 'admin123') {
+          navigate('/home');
+    }, 1000); 
+
+  } catch (err: any) {
+    if (err.response) {
+      if (err.response.status === 404 || err.response.status === 401) {
         setError('E-mail ou senha incorretos');
       } else {
-        alert('Login realizado com sucesso!');
+        setError('Erro no servidor. Tente novamente mais tarde.');
       }
-    }, 1500);
+    } else if (err.request) {
+      setError('Erro de conexão: O servidor está rodando na porta 8080?');
+    } else {
+      setError('Erro ao configurar a requisição.');
+    }
+    console.error('Erro detalhado:', err);
+  } finally {
+    setIsLoading(false);
+  }
   };
+
 
   return (
     <div className="min-h-screen w-screen bg-gradient-to-br from-[#FFE5D9] via-[#F9F9F9] to-[#D8E2DC] flex items-center justify-center p-4 relative overflow-x-hidden">
@@ -59,7 +78,7 @@ export default function App() {
       <div className="max-w-md w-full mx-auto">
         <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-[#D8E2DC] p-8 md:p-12">
           {/* Logo */}
-          <div className="flex flex-col items-center mb-8">
+          <div className="flex flex-col items-center mb-6">
             <div className="w-20 h-20 bg-gradient-to-br from-[#FFCAD4] to-[#F4ACB7] rounded-3xl flex items-center justify-center shadow-xl mb-4 transform hover:scale-105 transition-transform">
               <Heart className="w-10 h-10 text-white fill-white" />
             </div>
@@ -137,7 +156,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between">
               <label className="flex items-center gap-2 cursor-pointer group">
                 <div className="relative">
@@ -180,7 +198,6 @@ export default function App() {
               </button>
             </div>
 
-            {/* Submit Button */}
             <button
               type="submit"
               disabled={isLoading}

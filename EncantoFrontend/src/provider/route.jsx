@@ -26,7 +26,7 @@ export const route = createBrowserRouter([
         children: [
             { path: "pedidos", element: <CadastroPedidos /> },
             { path: "dashboard", element: <DashFinanceira /> },
-            { index: true, element: <DashFinanceira /> },
+            { index: true, element: <Login /> },
             { path: "home", element: <HomeCalendar /> },
             { path: "kanban", element: <Kanban /> },
             {path: "lista-produtos", element: <ListaProdutos />},
@@ -34,7 +34,6 @@ export const route = createBrowserRouter([
              { path: "produtos/fotos", element: <CadastroFotosProduto /> },
              { path: "movimentacao", element: <CadastroMovimentacao /> },
              {path: "pedidos/cadastro", element: <CadastroPedido/>},
-            //  url para detalhes do pedido, pode ser algo como /pedidos/detalhes/:id, onde :id é o identificador do pedido
             
              {path: "pedidos/detalhes/:id", element: <DetalhesPedido/>},
              { path: "catalogo", element: <HomeClient /> },

@@ -45,7 +45,7 @@ export default function Navbar() {
 
       {/* Lado Direito: Botão Login */}
       <button style={{ backgroundColor: '#6D6875', color: 'white', padding: '1vh 2vw', border: 'none', borderRadius: '0.5vw', cursor: 'pointer', fontSize: '1vw' }}>
-        Login
+        {sessionStorage.getItem('token') ? sessionStorage.getItem('usuarioNome') : 'Login'}
       </button>
       
     </header>
