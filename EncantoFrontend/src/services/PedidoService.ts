@@ -20,7 +20,10 @@ export const pedidoService = {
   },
 
   mudarStatus: async (pedidoId: number, statusId: number) => {
-    const { data } = await api.patch('/pedidos/mudar-status', { idPedido: pedidoId, idStatus: statusId });
+    const { data } = await api.patch('/pedidos/mudar-status', { 
+      idPedido: pedidoId, 
+      idStatusPedido: statusId 
+    });
     return data;
   },
   

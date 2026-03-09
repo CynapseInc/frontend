@@ -182,18 +182,16 @@ export default function Kanban() {
       await pedidoService.mudarStatus(orderId, newStatusId);
 
       // Atualizar o estado local para o cartão mover instantaneamente na tela
+      // Atualizar o estado local para o cartão mover instantaneamente na tela
       setOrders(prevOrders => prevOrders.map(order => {
         if (order.id === orderId) {
-          const newStatusObj = statusTypes.find(s => s.id === newStatusId);
-          if (newStatusObj) {
-            return {
-              ...order,
-              statusAtual: {
-                ...order.statusAtual,
-                status: newStatusObj
-              }
-            };
-          }
+          return {
+            ...order,
+            statusAtual: {
+              ...order.statusAtual,
+              idStatusPedido: newStatusId // MUDANÇA AQUI
+            }
+          };
         }
         return order;
       }));
@@ -211,7 +209,8 @@ export default function Kanban() {
   // 3. GERENCIAR STATUS (COLUNAS)
   const handleAddStatusType = async (statusType: any) => {
     try {
-      const novoStatus = await statusPedidoService.criar(statusType.name); // Ajuste conforme seu backend pede a cor/nome
+      // MUDANÇA AQUI: Passamos o statusType.name e statusType.color
+      const novoStatus = await statusPedidoService.criar(statusType.name, statusType.color); 
       setStatusTypes([...statusTypes, novoStatus]);
       setIsStatusTypeModalOpen(false);
     } catch (error) {
@@ -221,7 +220,8 @@ export default function Kanban() {
 
   const handleEditStatusType = async (statusType: any) => {
     try {
-      const statusAtualizado = await statusPedidoService.atualizar(statusType.id, statusType.name);
+      // MUDANÇA AQUI: Passamos também a cor na atualização
+      const statusAtualizado = await statusPedidoService.atualizar(statusType.id, statusType.name, statusType.color);
       setStatusTypes(statusTypes.map(st => st.id === statusAtualizado.id ? statusAtualizado : st));
       setIsStatusTypeModalOpen(false);
       setEditingStatusType(null);
@@ -248,9 +248,9 @@ export default function Kanban() {
     setIsStatusTypeListOpen(false);
   };
 
-  // Filtrar pedidos por status (Lembrando que o DTO tem statusAtual -> status -> id)
+// Filtrar pedidos por status usando a chave correta: idStatusPedido
   const getOrdersByStatus = (statusId: number) => {
-    return orders.filter(order => order.statusAtual?.status?.id === statusId);
+    return orders.filter(order => order.statusAtual?.idStatusPedido === statusId);
   };
   
   return (

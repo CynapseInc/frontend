@@ -24,14 +24,16 @@ export interface ProdutosPedidoResponse {
   updatedAt?: string;
 }
 
-// Interface auxiliar baseada na estrutura do PedidoStatusPedidoResponseDto 
-// (que guarda o histórico e qual o status do pedido naquele momento)
+// Substitua o bloco antigo por este:
 export interface PedidoStatusPedidoResponse {
+  status: any;
   id?: number;
-  status: StatusPedidoResponse; // O status em si (A Fazer, Em Andamento...)
-  dataMudanca?: string;
+  idPedido?: number;
+  idStatusPedido: number; // MUDANÇA: Agora lemos o ID direto que vem do Java
+  statusAtual?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
-
 // Espelha o PedidoResponseDto do Java
 export interface PedidoResponse {
   id: number;
