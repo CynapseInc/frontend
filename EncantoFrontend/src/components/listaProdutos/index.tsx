@@ -5,11 +5,11 @@ import { Input } from '../ui/input';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { useNavigate } from 'react-router-dom';
 import { produtoService } from '../../services/ProdutoService';
-import type { ProdutoFrontend } from '../../interfaces/Produto';
+import type { Produto } from '../../interfaces/Produto'; // Atualizado para a interface correta
 import './index-lista-produtos.css';
 
 export default function App() {
-  const [products, setProducts] = useState<ProdutoFrontend[]>([]);
+  const [products, setProducts] = useState<Produto[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [selectedTheme, setSelectedTheme] = useState('Todos');
@@ -20,7 +20,7 @@ export default function App() {
   // Opções dinâmicas baseadas nos produtos
   const [themes, setThemes] = useState<string[]>(['Todos']);
   const [items, setItems] = useState<string[]>(['Todos']);
-  const [categories] = useState<string[]>(['Todos', 'Diversos']);
+  const [categories, setCategories] = useState<string[]>(['Todos']); // Agora é dinâmico também!
 
   const itemsPerPage = 8;
 
@@ -34,30 +34,17 @@ export default function App() {
           return;
         }
 
-        const produtosFormatados: ProdutoFrontend[] = dados.map((produto: any) => {
-          let fotoUrl = '';
-          if (produto.fotos && produto.fotos.length > 0 && produto.fotos[0].foto) {
-             fotoUrl = produto.fotos[0].foto;
-          }
+        // Não precisamos mais de mapear para outro formato, o estado recebe o DTO original!
+        setProducts(dados);
 
-          return {
-            id: produto.id?.toString() || '',
-            name: produto.titulo || 'Produto sem nome',
-            category: 'Diversos', 
-            theme: produto.tema?.descricao || 'Sem tema',
-            item: produto.item?.descricao || 'Sem item',
-            imageUrl: fotoUrl,
-          };
-        });
-
-        setProducts(produtosFormatados);
-
-        // Preenche os selects dinamicamente
-        const uniqueThemes = Array.from(new Set(produtosFormatados.map(p => p.theme)));
-        const uniqueItems = Array.from(new Set(produtosFormatados.map(p => p.item)));
+        // Preenche os selects dinamicamente com base nos dados do backend
+        const uniqueThemes = Array.from(new Set(dados.map(p => p.tema?.descricao || 'Sem tema')));
+        const uniqueItems = Array.from(new Set(dados.map(p => p.item?.descricao || 'Sem item')));
+        const uniqueCategories = Array.from(new Set(dados.map(p => p.tema?.categoriaTema?.titulo || 'Sem Categoria')));
         
         setThemes(['Todos', ...uniqueThemes]);
         setItems(['Todos', ...uniqueItems]);
+        setCategories(['Todos', ...uniqueCategories]);
 
       } catch (error) {
         console.error("Erro ao buscar produtos:", error);
@@ -67,11 +54,18 @@ export default function App() {
     fetchProdutos();
   }, []);
 
+  // Lógica de filtro adaptada para ler as chaves reais do Java
   const filteredProducts = products.filter(product => {
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'Todos' || product.category === selectedCategory;
-    const matchesTheme = selectedTheme === 'Todos' || product.theme === selectedTheme;
-    const matchesItem = selectedItem === 'Todos' || product.item === selectedItem;
+    const nome = product.titulo || '';
+    const categoria = product.tema?.categoriaTema?.titulo || 'Sem Categoria';
+    const tema = product.tema?.descricao || 'Sem tema';
+    const item = product.item?.descricao || 'Sem item';
+
+    const matchesSearch = nome.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'Todos' || categoria === selectedCategory;
+    const matchesTheme = selectedTheme === 'Todos' || tema === selectedTheme;
+    const matchesItem = selectedItem === 'Todos' || item === selectedItem;
+    
     return matchesSearch && matchesCategory && matchesTheme && matchesItem;
   });
 
@@ -80,8 +74,8 @@ export default function App() {
   const endIndex = startIndex + itemsPerPage;
   const currentProducts = filteredProducts.slice(startIndex, endIndex);
 
-  const handleEditProduct = (productId: string) => {
-    navigate(`/produtos/editar/${productId}`); // Assumindo que você terá uma rota assim
+  const handleEditProduct = (productId: number) => {
+    navigate(`/produtos/editar/${productId}`); 
   };
 
   const handleAddProduct = () => {
@@ -97,6 +91,7 @@ export default function App() {
           <p className="text-[17px]" style={{ color: '#9D8189' }}>Gerencie todos os produtos personalizados do seu catálogo</p>
         </div>
 
+        {/* Filtros */}
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
           <div className="flex items-center justify-between gap-6 mb-5">
             <div className="flex-1 max-w-md relative">
@@ -168,6 +163,7 @@ export default function App() {
           </div>
         </div>
 
+        {/* Tabela */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden" style={{ border: '1px solid #D8E2DC' }}>
           <table className="w-full">
             <thead>
@@ -181,38 +177,53 @@ export default function App() {
               </tr>
             </thead>
             <tbody>
-              {currentProducts.map((product, index) => (
-                <tr
-                  key={product.id}
-                  className="border-b transition-colors hover:bg-opacity-50"
-                  style={{ borderColor: '#D8E2DC', backgroundColor: index % 2 === 0 ? 'white' : '#F9F9F9' }}
-                >
-                  <td className="px-6 py-4">
-                    <div className="size-16 rounded-lg overflow-hidden border" style={{ borderColor: '#D8E2DC' }}>
-                      {product.imageUrl ? (
-                        <ImageWithFallback src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 text-xs">Sem Foto</div>
-                      )}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4"><span className="text-[16px]" style={{ color: '#6D6875' }}>{product.name}</span></td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-[14px]" style={{ backgroundColor: '#FFCAD4', color: '#6D6875' }}>{product.category}</span>
-                  </td>
-                  <td className="px-6 py-4"><span className="text-[15px]" style={{ color: '#9D8189' }}>{product.theme}</span></td>
-                  <td className="px-6 py-4">
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-[14px]" style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}>{product.item}</span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <div className="flex justify-end">
-                      <button onClick={() => handleEditProduct(product.id)} className="p-2 rounded-md transition-all hover:bg-opacity-80" style={{ backgroundColor: '#D8E2DC' }} title="Editar">
-                        <Pencil className="size-4" style={{ color: '#6D6875' }} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {currentProducts.map((product, index) => {
+                // Pegar a foto principal de forma segura
+                const fotoUrl = product.fotos && product.fotos.length > 0 ? product.fotos[0].foto : '';
+
+                return (
+                  <tr
+                    key={product.id}
+                    className="border-b transition-colors hover:bg-opacity-50"
+                    style={{ borderColor: '#D8E2DC', backgroundColor: index % 2 === 0 ? 'white' : '#F9F9F9' }}
+                  >
+                    <td className="px-6 py-4">
+                      <div className="size-16 rounded-lg overflow-hidden border" style={{ borderColor: '#D8E2DC' }}>
+                        {fotoUrl ? (
+                          <ImageWithFallback src={fotoUrl} alt={product.titulo} className="w-full h-full object-cover" />
+                        ) : (
+                          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 text-xs">Sem Foto</div>
+                        )}
+                      </div>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-[16px]" style={{ color: '#6D6875' }}>{product.titulo}</span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[14px]" style={{ backgroundColor: '#FFCAD4', color: '#6D6875' }}>
+                        {product.tema?.categoriaTema?.titulo || 'Sem Categoria'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="text-[15px]" style={{ color: '#9D8189' }}>
+                        {product.tema?.descricao || 'Sem tema'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[14px]" style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}>
+                        {product.item?.descricao || 'Sem item'}
+                      </span>
+                    </td>
+                    <td className="px-6 py-4">
+                      <div className="flex justify-end">
+                        <button onClick={() => handleEditProduct(product.id)} className="p-2 rounded-md transition-all hover:bg-opacity-80" style={{ backgroundColor: '#D8E2DC' }} title="Editar">
+                          <Pencil className="size-4" style={{ color: '#6D6875' }} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
               
               {currentProducts.length === 0 && (
                 <tr>
@@ -228,7 +239,6 @@ export default function App() {
             Mostrando {startIndex + 1} a {Math.min(endIndex, filteredProducts.length)} de {filteredProducts.length} produtos
           </p>
           {totalPages > 1 && (
-             // ... controlos de paginação inalterados (podem ser os mesmos que já estavam lá)
              <div className="flex items-center gap-2">
               <button onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1} className="px-4 py-2 rounded-md text-[15px] border transition-all disabled:opacity-40" style={{ backgroundColor: 'white', color: '#6D6875', borderColor: '#D8E2DC' }}>Anterior</button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (

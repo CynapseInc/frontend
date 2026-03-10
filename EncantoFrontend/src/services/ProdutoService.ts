@@ -2,7 +2,8 @@ import api from '../provider/api';
 import type { ProdutoResponse, ProdutoRequest } from '../interfaces/Produto';
 
 export const produtoService = {
-  listarTodos: async () => {
+  // Retorna um array de ProdutoResponse
+  listarTodos: async (): Promise<ProdutoResponse[]> => {
     const { data } = await api.get('/produtos');
     
     if (data && data.content && Array.isArray(data.content)) {
@@ -22,8 +23,8 @@ export const produtoService = {
     return data;
   },
   
-
-  atualizar: async (id: string | number, dados: any): Promise<any> => {
+  // Tipado com ProdutoRequest e ProdutoResponse
+  atualizar: async (id: string | number, dados: ProdutoRequest): Promise<ProdutoResponse> => {
     const { data } = await api.put(`/produtos/${id}`, dados);
     return data;
   },

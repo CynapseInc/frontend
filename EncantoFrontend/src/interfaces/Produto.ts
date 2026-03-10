@@ -1,41 +1,57 @@
+// src/interfaces/Produto.ts
+
+export interface CategoriaTema {
+  id: number;
+  titulo: string;
+}
+
 export interface TemaProduto {
-  id?: number;
+  id: number;
   descricao: string;
+  categoriaTema?: CategoriaTema;
 }
 
 export interface ItemProduto {
-  id?: number;
+  id: number;
   descricao: string;
-  precoVenda?: number;
-  peso?: number;
+  precoVenda: number;
+  custoProducao: number;
+  prazoProducao: number;
+  largura: number;
+  altura: number;
+  peso: number;
+  comprimento: number;
+  material: string;
+  precoPromocional: number;
 }
 
 export interface FotoProduto {
-  foto: string; 
+  id: number;
+  foto: string;
 }
 
-export interface ProdutoResponse {
+export interface Produto {
   id: number;
   titulo: string;
   descricao: string;
-  fotos: FotoProduto[];
-  tema: TemaProduto;
-  item: ItemProduto;
+  tema?: TemaProduto;
+  item?: ItemProduto;
+  fotos?: FotoProduto[];
+  ativo?: boolean;
 }
 
+// ==========================================
+// ADICIONADO: Tipagens para o Service
+// ==========================================
+
+// O Response que vem do Java é exatamente o nosso Produto completo
+export type ProdutoResponse = Produto;
+
+// O Request que enviamos para o Java ao criar/editar um produto
 export interface ProdutoRequest {
   titulo: string;
   descricao: string;
   temaId: number;
   itemId: number;
-  fotos: FotoProduto[];
-}
-
-export interface ProdutoFrontend {
-  id: string;
-  name: string;
-  category: string;
-  theme: string;
-  item: string;
-  imageUrl: string;
+  fotos?: any[];
 }

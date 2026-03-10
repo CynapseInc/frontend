@@ -1,8 +1,14 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Package, Calendar, Eye, Send, Search, X } from 'lucide-react';
 import { Button } from '../ui/button';
+import { useNavigate } from 'react-router-dom';
+
+// Serviços
+import { pedidoService } from '../../services/PedidoService';
+import { produtoService } from '../../services/ProdutoService';
+import { statusPedidoService } from '../../services/StatusPedidoService';
+
 import './index.css';
-// import styles from '../../styles/index.css'
 
 interface Order {
   id: string;
@@ -15,17 +21,6 @@ interface Order {
   theme: string;
 }
 
-const mockOrders: Order[] = [
-  { id: 'PED-001', clientName: 'Maria Silva', products: ['Caneca Ben 10', 'Caderno Frozen'], quantity: 3, deliveryDate: '2025-11-18', status: 'Para Enviar', category: 'Herói', theme: 'Ben 10' },
-  { id: 'PED-002', clientName: 'João Santos', products: ['Mochila Spider-Man'], quantity: 2, deliveryDate: '2025-11-18', status: 'Para Enviar', category: 'Herói', theme: 'Spider-Man' },
-  { id: 'PED-003', clientName: 'Ana Costa', products: ['Almofada Frozen'], quantity: 5, deliveryDate: '2025-11-20', status: 'Para Enviar', category: 'Princesa', theme: 'Frozen' },
-  { id: 'PED-004', clientName: 'Pedro Lima', products: ['Caneca Corinthians'], quantity: 1, deliveryDate: '2025-11-22', status: 'Para Enviar', category: 'Time', theme: 'Corinthians' },
-  { id: 'PED-005', clientName: 'Carla Souza', products: ['Caderno Naruto'], quantity: 4, deliveryDate: '2025-11-25', status: 'Para Enviar', category: 'Nerd', theme: 'Naruto' },
-  { id: 'PED-006', clientName: 'Lucas Oliveira', products: ['Mochila Batman'], quantity: 2, deliveryDate: '2025-11-10', status: 'Para Enviar', category: 'Herói', theme: 'Batman' },
-  { id: 'PED-007', clientName: 'Juliana Matos', products: ['Caneca Harry Potter'], quantity: 3, deliveryDate: '2025-12-05', status: 'Para Enviar', category: 'Nerd', theme: 'Harry Potter' },
-  { id: 'PED-008', clientName: 'Roberto Dias', products: ['Almofada Elsa'], quantity: 2, deliveryDate: '2025-12-15', status: 'Para Enviar', category: 'Princesa', theme: 'Frozen' },
-];
-
 const monthNames = [
   'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
   'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
@@ -33,12 +28,85 @@ const monthNames = [
 
 const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
-export  function HomeCalendar() {
-  const [currentYear, setCurrentYear] = useState(2025);
-  const [currentMonth, setCurrentMonth] = useState(10); // Novembro (0-indexed)
+export function HomeCalendar() {
+  const navigate = useNavigate();
+  
+  // Data real de hoje
+  const todayObj = new Date();
+  const todayStr = `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, '0')}-${String(todayObj.getDate()).padStart(2, '0')}`;
+
+  const [currentYear, setCurrentYear] = useState(todayObj.getFullYear());
+  const [currentMonth, setCurrentMonth] = useState(todayObj.getMonth());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [itemFilter, setItemFilter] = useState('');
+  
+  // Estado para guardar os pedidos reais da API
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+
+  // ==========================================
+  // BUSCAR DADOS INICIAIS DA API
+  // ==========================================
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      setIsLoading(true);
+      try {
+        const [pedidosData, produtosData, statusData] = await Promise.all([
+          pedidoService.listarTodos(),
+          produtoService.listarTodos(),
+          statusPedidoService.listarTodos()
+        ]);
+
+        const mappedOrders: Order[] = pedidosData.map((p: any) => {
+          // 1. Cruzar produtos do pedido com o catálogo para ter os nomes
+          const nomesProdutos = p.produtos?.map((prod: any) => {
+            const catalogoProd = produtosData.find((cat: any) => cat.id === prod.idProduto);
+            return catalogoProd ? catalogoProd.titulo : `Produto #${prod.idProduto}`;
+          }) || [];
+
+          // 2. Pegar a categoria e tema baseados no primeiro produto (ou definir como Diversos)
+          const primeiroProdCatalogo = p.produtos && p.produtos.length > 0 
+            ? produtosData.find((cat: any) => cat.id === p.produtos[0].idProduto) 
+            : null;
+            
+          const category = primeiroProdCatalogo?.tema?.categoriaTema?.titulo || 'Diversos';
+          const theme = primeiroProdCatalogo?.tema?.descricao || 'Diversos';
+
+          // 3. Cruzar o ID do status com a lista de status
+          const statusObj = statusData.find((s: any) => s.id === p.statusAtual?.idStatusPedido);
+          const statusName = statusObj ? statusObj.status : 'Desconhecido';
+
+          // 4. Formatar a data limite (vem como YYYY-MM-DDTHH:mm:ss)
+          const dataLimiteDate = p.dataLimite ? p.dataLimite.split('T')[0] : '';
+
+          // 5. Somar quantidade total de itens no pedido
+          const totalQty = p.produtos?.reduce((acc: number, curr: any) => acc + curr.quantidade, 0) || 0;
+
+          return {
+            id: p.id.toString(),
+            clientName: p.cliente?.nome || 'Cliente não informado',
+            products: nomesProdutos,
+            quantity: totalQty,
+            deliveryDate: dataLimiteDate,
+            status: statusName,
+            category: category,
+            theme: theme
+          };
+        });
+
+        // Filtrar apenas pedidos que têm data de entrega definida
+        setOrders(mappedOrders.filter(o => o.deliveryDate !== ''));
+
+      } catch (error) {
+        console.error("Erro ao carregar dados do calendário:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
 
   const getDaysInMonth = (year: number, month: number) => {
     return new Date(year, month + 1, 0).getDate();
@@ -49,12 +117,12 @@ export  function HomeCalendar() {
   };
 
   const getOrdersForDate = (date: string) => {
-    return mockOrders.filter(order => order.deliveryDate === date);
+    return orders.filter(order => order.deliveryDate === date);
   };
 
   const getOrdersForMonth = (year: number, month: number) => {
     const monthStr = String(month + 1).padStart(2, '0');
-    return mockOrders.filter(order => 
+    return orders.filter(order => 
       order.deliveryDate.startsWith(`${year}-${monthStr}`)
     ).length;
   };
@@ -64,19 +132,19 @@ export  function HomeCalendar() {
     const firstDay = getFirstDayOfMonth(currentYear, currentMonth);
     const days = [];
 
-    // Empty cells for days before the first day of the month
+    // Células vazias antes do primeiro dia do mês
     for (let i = 0; i < firstDay; i++) {
       days.push(
         <div key={`empty-${i}`} className="aspect-square" />
       );
     }
 
-    // Days of the month
+    // Dias do mês
     for (let day = 1; day <= daysInMonth; day++) {
       const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
       const ordersForDay = getOrdersForDate(dateStr);
       const hasOrders = ordersForDay.length > 0;
-      const isToday = dateStr === '2025-11-15'; // Mock today
+      const isToday = dateStr === todayStr;
 
       days.push(
         <button
@@ -88,7 +156,7 @@ export  function HomeCalendar() {
             }
           }}
           className={`aspect-square rounded-lg transition-all relative ${
-            hasOrders ? 'cursor-pointer hover:shadow-lg' : ''
+            hasOrders ? 'cursor-pointer hover:shadow-lg hover:-translate-y-1' : ''
           }`}
           style={{
             backgroundColor: hasOrders ? '#FFE5D9' : 'white',
@@ -108,7 +176,7 @@ export  function HomeCalendar() {
             </span>
             {hasOrders && (
               <div 
-                className="size-6 rounded-full flex items-center justify-center text-[11px] text-white"
+                className="size-6 rounded-full flex items-center justify-center text-[11px] text-white shadow-sm"
                 style={{ backgroundColor: '#F4ACB7' }}
               >
                 <strong>{ordersForDay.length}</strong>
@@ -123,20 +191,23 @@ export  function HomeCalendar() {
   };
 
   const handleMarkAsSent = (orderId: string) => {
-    alert(`Pedido ${orderId} marcado como enviado!`);
+    // Aqui no futuro poderá integrar com a API para mudar diretamente para o status de 'Enviado'
+    alert(`O pedido PED-${orderId.padStart(3, '0')} deve ser movido no Kanban!`);
+    navigate('/kanban');
   };
 
   const handleViewDetails = (orderId: string) => {
-    alert(`Navegando para detalhes do pedido ${orderId}`);
+    navigate(`/pedidos/detalhes/${orderId}`);
   };
 
-  const filteredOrders = mockOrders.filter(order => {
+  const filteredOrders = orders.filter(order => {
     if (!itemFilter) return true;
     const searchTerm = itemFilter.toLowerCase();
     return (
       order.products.some(p => p.toLowerCase().includes(searchTerm)) ||
       order.category.toLowerCase().includes(searchTerm) ||
-      order.theme.toLowerCase().includes(searchTerm)
+      order.theme.toLowerCase().includes(searchTerm) ||
+      order.clientName.toLowerCase().includes(searchTerm)
     );
   });
 
@@ -145,7 +216,7 @@ export  function HomeCalendar() {
   });
 
   const getDaysUntilDelivery = (date: string) => {
-    const today = new Date('2025-11-15');
+    const today = new Date(todayStr);
     const deliveryDate = new Date(date);
     const diffTime = deliveryDate.getTime() - today.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -154,7 +225,8 @@ export  function HomeCalendar() {
 
   const formatDeliveryDate = (date: string) => {
     const daysUntil = getDaysUntilDelivery(date);
-    const formattedDate = new Date(date).toLocaleDateString('pt-BR');
+    // Adiciona "T00:00:00" para evitar problemas de fuso horário no JS
+    const formattedDate = new Date(date + 'T00:00:00').toLocaleDateString('pt-BR');
     
     if (daysUntil < 0) {
       return { text: `Atrasado há ${Math.abs(daysUntil)} dias`, color: '#F44336', bg: '#FFEBEE' };
@@ -171,38 +243,17 @@ export  function HomeCalendar() {
 
   const selectedOrders = selectedDate ? getOrdersForDate(selectedDate) : [];
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#F9F9F9] flex flex-col items-center justify-center">
+        <div className="w-16 h-16 border-4 border-[#FFCAD4] border-t-[#F4ACB7] rounded-full animate-spin mb-4"></div>
+        <p className="text-[#9D8189]">A carregar a sua agenda de envios...</p>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
-      {/* Navbar */}
-      {/* <header className="bg-white border-b shadow-sm" style={{ borderColor: '#D8E2DC' }}>
-        <div className="max-w-[1600px] mx-auto px-8 py-5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="size-12 rounded-full flex items-center justify-center" style={{ backgroundColor: '#F4ACB7' }}>
-                <span className="text-white text-[18px]">OE</span>
-              </div>
-              <div className="flex flex-col">
-                <span className="text-[20px]" style={{ color: '#F4ACB7' }}>O Encanto</span>
-                <span className="text-[12px]" style={{ color: '#9D8189' }}>personalizados</span>
-              </div>
-            </div>
-            <nav className="flex gap-8">
-              <a href="#" className="text-[16px]" style={{ color: '#F4ACB7' }}>Home</a>
-              <a href="#" className="text-[16px] text-[#9D8189] hover:text-[#F4ACB7] transition-colors">Pedidos</a>
-              <a href="#" className="text-[16px] text-[#9D8189] hover:text-[#F4ACB7] transition-colors">Financeiro</a>
-              <a href="#" className="text-[16px] text-[#9D8189] hover:text-[#F4ACB7] transition-colors">Produtos</a>
-              <a href="#" className="text-[16px] text-[#9D8189] hover:text-[#F4ACB7] transition-colors">Funcionários</a>
-            </nav>
-            <button 
-              className="px-6 py-2 rounded-md text-[15px] text-white transition-all hover:opacity-90"
-              style={{ backgroundColor: '#6D6875' }}
-            >
-              Login
-            </button>
-          </div>
-        </div>
-      </header> */}
-
       <div className="w-full px-[3vw] py-[4vh] box-border">
         
         {/* Cabeçalho */}
@@ -293,7 +344,7 @@ export  function HomeCalendar() {
                 <div className="flex items-center gap-2">
                   <Calendar className="size-5" style={{ color: '#F4ACB7' }} />
                   <span className="text-[15px]" style={{ color: '#9D8189' }}>
-                    {getOrdersForMonth(currentYear, currentMonth)} pedidos este mês
+                    {getOrdersForMonth(currentYear, currentMonth)} pedidos com entrega neste mês
                   </span>
                 </div>
               </div>
@@ -334,13 +385,13 @@ export  function HomeCalendar() {
           <div>
             <div className="bg-white rounded-lg p-5 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
               <h2 className="text-[22px] mb-4" style={{ color: '#F4ACB7' }}>
-                <strong>Pendências</strong>
+                <strong>Próximas Entregas</strong>
               </h2>
 
               {/* Filtro de Itens */}
               <div className="mb-4">
                 <label className="block text-[13px] mb-2" style={{ color: '#6D6875' }}>
-                  <strong>Filtrar por Item</strong>
+                  <strong>Buscar por Cliente ou Produto</strong>
                 </label>
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 size-4" style={{ color: '#9D8189' }} />
@@ -411,18 +462,7 @@ export  function HomeCalendar() {
                           }}
                         >
                           <Send className="size-3" />
-                          <strong>Enviado</strong>
-                        </button>
-                        <button
-                          onClick={() => handleViewDetails(order.id)}
-                          className="h-8 px-3 rounded-md text-[13px] flex items-center justify-center transition-all hover:opacity-90"
-                          style={{
-                            backgroundColor: 'white',
-                            color: '#6D6875',
-                            border: '1px solid #D8E2DC'
-                          }}
-                        >
-                          <Eye className="size-3" />
+                          <strong>Atualizar no Kanban</strong>
                         </button>
                       </div>
                     </div>
@@ -432,7 +472,7 @@ export  function HomeCalendar() {
                 {sortedPendingOrders.length === 0 && (
                   <div className="text-center py-8">
                     <p className="text-[14px]" style={{ color: '#9D8189' }}>
-                      Nenhum pedido encontrado
+                      Nenhum pedido encontrado.
                     </p>
                   </div>
                 )}
@@ -499,7 +539,7 @@ export  function HomeCalendar() {
                         </p>
                       </div>
                       <div 
-                        className="px-3 py-1 rounded-full text-[13px]"
+                        className="px-3 py-1 rounded-full text-[13px] text-center"
                         style={{ backgroundColor: '#FFE5D9', color: '#F4ACB7' }}
                       >
                         <strong>{order.status}</strong>
@@ -513,7 +553,7 @@ export  function HomeCalendar() {
                       </div>
                       <div className="flex items-center gap-2">
                         <Calendar className="size-4" style={{ color: '#F4ACB7' }} />
-                        <span>{new Date(order.deliveryDate).toLocaleDateString('pt-BR')}</span>
+                        <span>{new Date(order.deliveryDate + 'T00:00:00').toLocaleDateString('pt-BR')}</span>
                       </div>
                     </div>
 
@@ -521,25 +561,18 @@ export  function HomeCalendar() {
                       <Button
                         onClick={() => handleMarkAsSent(order.id)}
                         className="flex-1 h-10 gap-2 text-[14px]"
-                        style={{
-                          backgroundColor: '#F4ACB7',
-                          color: 'white'
-                        }}
+                        style={{ backgroundColor: '#F4ACB7', color: 'white' }}
                       >
                         <Send className="size-4" />
-                        <strong>Marcar como Enviado</strong>
+                        <strong>Mover no Kanban</strong>
                       </Button>
                       <Button
                         onClick={() => handleViewDetails(order.id)}
                         className="h-10 px-4 gap-2 text-[14px]"
-                        style={{
-                          backgroundColor: 'white',
-                          color: '#6D6875',
-                          border: '1px solid #D8E2DC'
-                        }}
+                        style={{ backgroundColor: 'white', color: '#6D6875', border: '1px solid #D8E2DC' }}
                       >
                         <Eye className="size-4" />
-                        Ver Detalhes
+                        Detalhes do Pedido
                       </Button>
                     </div>
                   </div>
@@ -547,7 +580,6 @@ export  function HomeCalendar() {
               </div>
             </div>
 
-            {/* Footer */}
             <div 
               className="flex justify-end p-6 border-t"
               style={{ borderColor: '#D8E2DC' }}
@@ -555,10 +587,7 @@ export  function HomeCalendar() {
               <Button
                 onClick={() => setIsModalOpen(false)}
                 className="px-6 py-2 h-11 text-[15px]"
-                style={{
-                  backgroundColor: '#F4ACB7',
-                  color: 'white'
-                }}
+                style={{ backgroundColor: '#F4ACB7', color: 'white' }}
               >
                 Fechar
               </Button>
@@ -568,9 +597,10 @@ export  function HomeCalendar() {
       )}
 
       <button
-        onClick={() => alert('Navegando para o Kanban de Pedidos')}
+        onClick={() => navigate('/pedidos/cadastro')}
         className="fixed bottom-8 right-8 size-16 rounded-full shadow-2xl flex items-center justify-center transition-all hover:scale-110 z-40"
         style={{ backgroundColor: '#F4ACB7' }}
+        title="Cadastrar Novo Pedido"
       >
         <Plus className="size-8" style={{ color: 'white' }} />
       </button>
