@@ -30,7 +30,7 @@ export const route = createBrowserRouter([
             { path: "lista-produtos", element: <ListaProdutos />},
             { path: "produtos", element: <CadastroProdutos />},
             { path: "produtos/editar/:id", element: <CadastroProdutos /> }, 
-            { path: "produtos/fotos", element: <CadastroFotosProduto /> },
+            { path: "produtos/fotos/:id", element: <CadastroFotosProduto /> },
             { path: "movimentacao", element: <CadastroMovimentacao /> },
             { path: "pedidos/cadastro", element: <CadastroPedido/>},
             { path: "pedidos/detalhes/:id", element: <DetalhesPedido/>},

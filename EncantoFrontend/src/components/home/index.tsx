@@ -1,6 +1,5 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Plus, Package, Calendar, Eye, Send, Search, X } from 'lucide-react';
-import { Button } from '../ui/button';
+import { ChevronLeft, ChevronRight, Plus, Package, Calendar, Eye, Send, Search, X, Trash2 } from 'lucide-react';import { Button } from '../ui/button';
 import { useNavigate } from 'react-router-dom';
 
 // Serviços
@@ -198,6 +197,23 @@ export function HomeCalendar() {
 
   const handleViewDetails = (orderId: string) => {
     navigate(`/pedidos/detalhes/${orderId}`);
+  };
+
+  const handleDeleteOrder = async (orderId: string) => {
+    if (window.confirm('Tem a certeza que deseja arquivar/excluir este pedido? Ele sairá do calendário e do Kanban.')) {
+      try {
+        await pedidoService.mudarEstado(orderId);
+        setOrders(orders.filter(order => order.id !== orderId));
+        alert('Pedido arquivado com sucesso!');
+        
+        if (selectedOrders.length <= 1) {
+          setIsModalOpen(false);
+        }
+      } catch (error) {
+        console.error("Erro ao arquivar pedido:", error);
+        alert('Ocorreu um erro ao tentar arquivar o pedido.');
+      }
+    }
   };
 
   const filteredOrders = orders.filter(order => {
@@ -483,7 +499,6 @@ export function HomeCalendar() {
         </div>
       </div>
 
-      {/* Modal - Pedidos do Dia */}
       {isModalOpen && (
         <div 
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -494,7 +509,6 @@ export function HomeCalendar() {
             className="bg-white rounded-lg shadow-xl w-full max-w-[700px] max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            {/* Header */}
             <div 
               className="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10"
               style={{ borderColor: '#D8E2DC' }}
@@ -574,6 +588,14 @@ export function HomeCalendar() {
                         <Eye className="size-4" />
                         Detalhes do Pedido
                       </Button>
+                      <button
+                        onClick={() => handleDeleteOrder(order.id)}
+                        className="h-10 px-4 rounded-md flex items-center justify-center transition-all hover:bg-red-50 group"
+                        style={{ backgroundColor: 'white', border: '1px solid #ffcdd2' }}
+                        title="Arquivar/Excluir Pedido"
+                      >
+                        <Trash2 className="size-5 text-red-400 group-hover:text-red-600 transition-colors" />
+                      </button>
                     </div>
                   </div>
                 ))}

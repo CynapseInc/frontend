@@ -261,9 +261,15 @@ export default function App() {
   // ==========================================
   // SUBMISSÃO DO PRODUTO (CRIAR / EDITAR)
   // ==========================================
+  // ==========================================
+  // SUBMISSÃO DO PRODUTO (CRIAR / EDITAR)
+  // ==========================================
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!selectedThemeId || !selectedItemId) { alert("Por favor, selecione um Tema e um Item."); return; }
+    if (!selectedThemeId || !selectedItemId) { 
+      alert("Por favor, selecione um Tema e um Item."); 
+      return; 
+    }
     
     try {
       const dadosBackend = {
@@ -275,17 +281,22 @@ export default function App() {
       };
 
       if (isEditingProduct && id) {
-        // Fluxo de Atualização
-        // (Certifique-se de que o produtoService.atualizar existe e aponta para o PUT /produtos/{id})
+        // FLUXO DE EDIÇÃO
         await produtoService.atualizar(id, dadosBackend as any);
         alert('Produto atualizado com sucesso!');
+        
+        // Na edição, volta para a lista de produtos
+        navigate('/lista-produtos'); 
+        
       } else {
-        // Fluxo de Criação
-        await produtoService.criar(dadosBackend as any);
-        alert('Produto cadastrado com sucesso!');
+        // FLUXO DE CRIAÇÃO
+        const novoProduto = await produtoService.criar(dadosBackend as any);
+        alert('Produto cadastrado! Vamos adicionar as imagens agora.');
+        
+        // Na criação, VAI PARA A TELA DE FOTOS com o novo ID!
+        navigate(`/produtos/fotos/${novoProduto.id}`); 
       }
 
-      navigate('/lista-produtos'); // Redireciona de volta para a lista (pode alterar para as fotos se quiser)
     } catch (error) {
       console.error('Erro ao salvar produto:', error);
       alert('Erro ao salvar produto. Verifique se preencheu tudo corretamente.');

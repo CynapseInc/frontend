@@ -19,6 +19,11 @@ export const pedidoService = {
     return data;
   },
 
+  atualizar: async (id: string | number, payload: any) => {
+    const { data } = await api.put(`/pedidos/${id}`, payload);
+    return data;
+  },
+
   mudarStatus: async (pedidoId: number, statusId: number) => {
     const { data } = await api.patch('/pedidos/mudar-status', { 
       idPedido: pedidoId, 

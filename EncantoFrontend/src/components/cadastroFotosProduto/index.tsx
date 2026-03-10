@@ -1,270 +1,206 @@
-import { useState, useRef } from 'react';
-import { ArrowLeft, Upload, X, Image as ImageIcon } from 'lucide-react';
-import { Button } from '../ui/button';
-import {Navigate, useNavigate} from 'react-router-dom';
-import './index-fotos.css'
-interface ProductPhoto {
-  id: string;
-  url: string;
-  file: File;
-}
+import React, { useState, useRef, useEffect } from 'react';
+import { Upload, X, ArrowLeft, Check, Trash2 } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
+import { fotoProdutoService } from '../../services/FotoProdutoService';
+import { produtoService } from '../../services/ProdutoService';
+import { ImageWithFallback } from '../figma/ImageWithFallback';
+import './index-fotos.css';
 
-// Mock data do produto (viria da tela anterior)
-const mockProduct = {
-  title: 'Caneca do Ben 10',
-  description: 'Caneca personalizada com estampa do Ben 10, em cerâmica de alta qualidade. Ideal para presentes e uso diário.',
-  category: 'Herói',
-  theme: 'Ben 10',
-  item: 'Caneca',
-};
-
-export default function App() {
-
-  const navigate = useNavigate();  
-  const [photos, setPhotos] = useState<ProductPhoto[]>([]);
+export default function CadastroFotosProduto() {
+  const { id } = useParams();
+  const navigate = useNavigate();
+  
+  const [existingPhotos, setExistingPhotos] = useState<any[]>([]);
+  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+  const [previewUrls, setPreviewUrls] = useState<string[]>([]);
+  const [isUploading, setIsUploading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleAddPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
-
-    const newPhotos: ProductPhoto[] = [];
-    
-    Array.from(files).forEach(file => {
-      if (file.type.startsWith('image/')) {
-        const photoUrl = URL.createObjectURL(file);
-        newPhotos.push({
-          id: Date.now().toString() + Math.random(),
-          url: photoUrl,
-          file: file,
-        });
+  // 1. CARREGAR AS FOTOS QUE JÁ EXISTEM NO BANCO
+  useEffect(() => {
+    const fetchExistingPhotos = async () => {
+      if (!id) return;
+      try {
+        const produto = await produtoService.buscarPorId(id);
+        if (produto.fotos) {
+          setExistingPhotos(produto.fotos);
+        }
+      } catch (error) {
+        console.error("Erro ao carregar fotos do produto:", error);
+      } finally {
+        setIsLoading(false);
       }
-    });
+    };
+    fetchExistingPhotos();
+  }, [id]);
 
-    setPhotos([...photos, ...newPhotos]);
-  };
-
-  const handleRemovePhoto = (photoId: string) => {
-    const photoToRemove = photos.find(p => p.id === photoId);
-    if (photoToRemove) {
-      URL.revokeObjectURL(photoToRemove.url);
+  // 2. EXCLUIR FOTO QUE JÁ ESTÁ NO BANCO
+  const handleDeleteExistingPhoto = async (fotoId: number) => {
+    if (!confirm('Tem a certeza que deseja excluir esta foto permanentemente?')) return;
+    try {
+      await fotoProdutoService.deletarFoto(fotoId);
+      // Remove da tela sem precisar recarregar a página
+      setExistingPhotos(prev => prev.filter(f => f.id !== fotoId));
+      alert('Foto excluída com sucesso!');
+    } catch (error) {
+      console.error("Erro ao excluir foto:", error);
+      alert('Erro ao excluir foto.');
     }
-    setPhotos(photos.filter(p => p.id !== photoId));
   };
 
-  const handleUploadClick = () => {
-    fileInputRef.current?.click();
+  const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      const filesArray = Array.from(e.target.files);
+      setSelectedFiles(prev => [...prev, ...filesArray]);
+      const newPreviews = filesArray.map(file => URL.createObjectURL(file));
+      setPreviewUrls(prev => [...prev, ...newPreviews]);
+    }
   };
 
-  const handleSave = () => {
-    console.log('Fotos salvas:', photos);
-    alert(`${photos.length} foto(s) cadastrada(s) com sucesso! Produto finalizado.`);
+  const removeNewFile = (index: number) => {
+    setSelectedFiles(prev => prev.filter((_, i) => i !== index));
+    setPreviewUrls(prev => prev.filter((_, i) => i !== index));
   };
+
+  const handleUpload = async () => {
+    if (selectedFiles.length === 0) {
+      navigate('/lista-produtos'); // Se não tiver foto nova pra subir, só volta pra lista
+      return;
+    }
+    
+    if (!id) return;
+
+    setIsUploading(true);
+    try {
+      for (const file of selectedFiles) {
+        await fotoProdutoService.uploadFoto(id, file);
+      }
+      alert("Novas fotos adicionadas com sucesso!");
+      navigate('/lista-produtos');
+    } catch (error) {
+      console.error("Erro no upload:", error);
+      alert("Erro ao enviar as fotos. Verifique o console.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#F9F9F9] flex flex-col items-center justify-center">
+        <div className="w-16 h-16 border-4 border-[#FFCAD4] border-t-[#F4ACB7] rounded-full animate-spin mb-4"></div>
+        <p className="text-[#9D8189]">Carregando galeria do produto...</p>
+      </div>
+    );
+  }
 
   return (
-    <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
-      {/* Navbar */}
-      
-
-      <div className="max-w-[1400px] mx-auto px-8 py-12">
-        
-        {/* Cabeçalho */}
+    <div className="min-h-screen bg-[#F9F9F9]">
+      <div className="max-w-[1200px] mx-auto px-8 py-12">
         <div className="mb-10">
           <button 
-            className="flex items-center gap-2 mb-4 text-[15px] transition-colors hover:opacity-80"
-            style={{ color: '#9D8189' }}
-            onClick={() => window.history.back()}
+            onClick={() => navigate('/lista-produtos')}
+            className="flex items-center gap-2 mb-4 text-[#9D8189] hover:text-[#F4ACB7] transition-colors"
           >
-            <ArrowLeft className="size-5" />
-            Voltar
+            <ArrowLeft className="w-5 h-5" /> Voltar para Produtos
           </button>
-          <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Fotos do Produto</h1>
-          <p className="text-[17px]" style={{ color: '#9D8189' }}>Adicione as fotos do produto para finalizar o cadastro</p>
+          <h1 className="text-[48px] text-[#F4ACB7] mb-2">Gerenciar Fotos</h1>
+          <p className="text-[#9D8189] text-[17px]">
+            Adicione ou remova imagens do seu produto
+          </p>
         </div>
 
-        {/* Resumo do Produto */}
-        <div className="bg-white rounded-lg p-6 mb-8 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
-          <h2 className="text-[22px] mb-4" style={{ color: '#F4ACB7' }}>
-            <strong>Informações do Produto</strong>
-          </h2>
+        <div className="bg-white rounded-2xl p-8 shadow-sm border border-[#D8E2DC]">
           
-          <div className="grid grid-cols-2 gap-6">
-            <div>
-              <label className="block text-[14px] mb-1" style={{ color: '#9D8189' }}>
-                Título do Produto
-              </label>
-              <p className="text-[17px]" style={{ color: '#6D6875' }}>
-                <strong>{mockProduct.title}</strong>
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-[14px] mb-1" style={{ color: '#9D8189' }}>
-                Item
-              </label>
-              <div 
-                className="inline-flex items-center px-3 py-1 rounded-full text-[14px]"
-                style={{
-                  backgroundColor: '#D8E2DC',
-                  color: '#6D6875'
-                }}
-              >
-                {mockProduct.item}
-              </div>
-            </div>
-
-            <div className="col-span-2">
-              <label className="block text-[14px] mb-1" style={{ color: '#9D8189' }}>
-                Descrição
-              </label>
-              <p className="text-[15px]" style={{ color: '#6D6875' }}>
-                {mockProduct.description}
-              </p>
-            </div>
-
-            <div>
-              <label className="block text-[14px] mb-1" style={{ color: '#9D8189' }}>
-                Categoria
-              </label>
-              <div 
-                className="inline-flex items-center px-3 py-1 rounded-full text-[14px]"
-                style={{
-                  backgroundColor: '#FFCAD4',
-                  color: '#6D6875'
-                }}
-              >
-                {mockProduct.category}
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-[14px] mb-1" style={{ color: '#9D8189' }}>
-                Tema
-              </label>
-              <p className="text-[15px]" style={{ color: '#6D6875' }}>
-                {mockProduct.theme}
-              </p>
-            </div>
-          </div>
-        </div>
-
-        {/* Galeria de Fotos */}
-        <div className="bg-white rounded-lg p-8 shadow-sm mb-6" style={{ border: '1px solid #D8E2DC' }}>
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-[22px]" style={{ color: '#F4ACB7' }}>
-              <strong>Galeria de Fotos</strong>
-            </h2>
-            <span className="text-[15px]" style={{ color: '#9D8189' }}>
-              {photos.length} {photos.length === 1 ? 'foto adicionada' : 'fotos adicionadas'}
-            </span>
-          </div>
-
-          {/* Grid de fotos */}
-          <div className="grid grid-cols-4 gap-6">
-            
-            {/* Botão Adicionar Foto */}
-            <button
-              onClick={handleUploadClick}
-              className="aspect-square rounded-lg border-2 border-dashed flex flex-col items-center justify-center gap-3 transition-all hover:bg-opacity-50 cursor-pointer"
-              style={{
-                borderColor: '#D8E2DC',
-                backgroundColor: '#F9F9F9',
-                color: '#9D8189'
-              }}
-            >
-              <Upload className="size-10" style={{ color: '#F4ACB7' }} />
-              <span className="text-[15px]" style={{ color: '#6D6875' }}>
-                Adicionar Foto
-              </span>
-            </button>
-
-            {/* Fotos adicionadas */}
-            {photos.map(photo => (
-              <div
-                key={photo.id}
-                className="aspect-square rounded-lg overflow-hidden border relative group"
-                style={{ borderColor: '#D8E2DC' }}
-              >
-                <img
-                  src={photo.url}
-                  alt="Foto do produto"
-                  className="w-full h-full object-cover"
-                />
-                <button
-                  onClick={() => handleRemovePhoto(photo.id)}
-                  className="absolute top-2 right-2 p-1.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity"
-                  style={{
-                    backgroundColor: '#FFCAD4',
-                  }}
-                  title="Remover foto"
-                >
-                  <X className="size-4" style={{ color: '#6D6875' }} />
-                </button>
-              </div>
-            ))}
-
-            {/* Cards vazios quando não há fotos */}
-            {photos.length === 0 && (
-              <>
-                {[1, 2, 3].map(index => (
-                  <div
-                    key={index}
-                    className="aspect-square rounded-lg border flex items-center justify-center"
-                    style={{
-                      borderColor: '#D8E2DC',
-                      backgroundColor: '#F9F9F9'
-                    }}
-                  >
-                    <ImageIcon className="size-12" style={{ color: '#D8E2DC' }} />
+          {/* FOTOS JÁ EXISTENTES NO BANCO */}
+          {existingPhotos.length > 0 && (
+            <div className="mb-10 pb-10 border-b border-[#D8E2DC]">
+              <h3 className="text-[#6D6875] text-[18px] mb-4"><strong>Fotos Atuais ({existingPhotos.length})</strong></h3>
+              <div className="grid grid-cols-4 gap-6">
+                {existingPhotos.map((foto) => (
+                  <div key={foto.id} className="relative aspect-square rounded-xl overflow-hidden border-2 border-[#D8E2DC] group">
+                    <ImageWithFallback src={foto.foto} alt="Foto do produto" className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                      <button 
+                        onClick={() => handleDeleteExistingPhoto(foto.id)}
+                        className="bg-white p-3 rounded-full text-red-500 hover:scale-110 transition-transform shadow-lg"
+                        title="Excluir Foto"
+                      >
+                        <Trash2 className="w-5 h-5" />
+                      </button>
+                    </div>
                   </div>
                 ))}
-              </>
-            )}
+              </div>
+            </div>
+          )}
+
+          {/* ÁREA DE NOVAS FOTOS */}
+          <h3 className="text-[#6D6875] text-[18px] mb-4"><strong>Adicionar Novas Fotos</strong></h3>
+          <div 
+            className="border-2 border-dashed border-[#D8E2DC] rounded-2xl p-12 text-center hover:bg-[#F9F9F9] transition-colors cursor-pointer mb-8 bg-[#F9F9F9]"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <div className="w-16 h-16 bg-[#FFE5D9] rounded-full flex items-center justify-center mx-auto mb-4">
+              <Upload className="w-8 h-8 text-[#F4ACB7]" />
+            </div>
+            <h3 className="text-[#6D6875] text-[18px] mb-2">Clique para selecionar novas imagens</h3>
+            <p className="text-[#9D8189] text-[14px]">Formatos suportados: JPG, PNG, WEBP</p>
+            <input 
+              type="file" 
+              multiple 
+              accept="image/*"
+              className="hidden" 
+              ref={fileInputRef}
+              onChange={handleFileSelect}
+            />
           </div>
 
-          {/* Input de arquivo oculto */}
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleAddPhoto}
-            className="hidden"
-          />
+          {/* PREVIEWS DAS FOTOS QUE VÃO SUBIR */}
+          {previewUrls.length > 0 && (
+            <div className="mb-8 p-6 bg-[#FFE5D9]/30 rounded-xl border border-[#FFCAD4]">
+              <h3 className="text-[#6D6875] text-[16px] mb-4"><strong>Prontas para Envio ({previewUrls.length})</strong></h3>
+              <div className="grid grid-cols-5 gap-4">
+                {previewUrls.map((url, index) => (
+                  <div key={index} className="relative aspect-square rounded-xl overflow-hidden border-2 border-[#F4ACB7] group shadow-sm">
+                    <img src={url} alt={`Preview ${index}`} className="w-full h-full object-cover" />
+                    <div className="absolute top-2 right-2">
+                      <button 
+                        onClick={() => removeNewFile(index)}
+                        className="bg-white p-1.5 rounded-full text-red-500 shadow-md hover:scale-110 transition-transform"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
 
-          {/* Dica */}
-          <div className="mt-6 p-4 rounded-lg" style={{ backgroundColor: '#FFE5D9' }}>
-            <p className="text-[14px]" style={{ color: '#9D8189' }}>
-              💡 <strong style={{ color: '#6D6875' }}>Dica:</strong> Adicione fotos de diferentes ângulos para que seus clientes possam visualizar melhor o produto. Você pode adicionar várias fotos de uma vez.
-            </p>
+          {/* BOTÕES DE AÇÃO */}
+          <div className="flex justify-end gap-4 border-t border-[#D8E2DC] pt-8">
+            <button 
+              onClick={() => navigate('/lista-produtos')}
+              className="px-8 py-3 rounded-xl text-[#9D8189] border border-[#D8E2DC] hover:bg-[#F9F9F9] transition-colors font-medium"
+            >
+              Cancelar
+            </button>
+            <button 
+              onClick={handleUpload}
+              disabled={isUploading || selectedFiles.length === 0}
+              className="px-8 py-3 rounded-xl bg-[#F4ACB7] text-white flex items-center gap-2 hover:opacity-90 transition-opacity disabled:opacity-50 font-medium shadow-md"
+            >
+              {isUploading ? (
+                <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+              ) : (
+                <Check className="w-5 h-5" />
+              )}
+              {isUploading ? 'Enviando...' : selectedFiles.length === 0 ? 'Nenhuma foto nova' : 'Salvar Novas Fotos'}
+            </button>
           </div>
-        </div>
-
-        {/* Botões de ação */}
-        <div className="flex justify-end gap-3">
-          <Button
-            type="button"
-            onClick={() => window.history.back()}
-            className="px-8 py-3 h-12 text-[16px]"
-            style={{
-              backgroundColor: 'white',
-              color: '#9D8189',
-              border: '1px solid #D8E2DC'
-            }}
-          >
-            Voltar
-          </Button>
-          <Button
-            onClick={handleSave}
-            disabled={photos.length === 0}
-            className="px-8 py-3 h-12 text-[16px] disabled:opacity-40"
-            style={{
-              backgroundColor: '#F4ACB7',
-              color: 'white'
-            }}
-          >
-            Salvar e Finalizar
-          </Button>
         </div>
       </div>
     </div>

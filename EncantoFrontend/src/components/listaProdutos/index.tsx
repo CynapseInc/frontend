@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, Pencil, Plus, Filter } from 'lucide-react';
+import { Search, Pencil, Plus, Filter, Image as ImageIcon } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
@@ -215,8 +215,21 @@ export default function App() {
                       </span>
                     </td>
                     <td className="px-6 py-4">
-                      <div className="flex justify-end">
-                        <button onClick={() => handleEditProduct(product.id)} className="p-2 rounded-md transition-all hover:bg-opacity-80" style={{ backgroundColor: '#D8E2DC' }} title="Editar">
+                      <div className="flex justify-end gap-2">
+                        <button 
+                          onClick={() => navigate(`/produtos/fotos/${product.id}`)} 
+                          className="p-2 rounded-md transition-all hover:bg-opacity-80" 
+                          style={{ backgroundColor: '#FFE5D9' }} 
+                          title="Gerenciar Fotos"
+                        >
+                          <ImageIcon className="size-4" style={{ color: '#F4ACB7' }} />
+                        </button>
+                        <button 
+                          onClick={() => handleEditProduct(product.id)} 
+                          className="p-2 rounded-md transition-all hover:bg-opacity-80" 
+                          style={{ backgroundColor: '#D8E2DC' }} 
+                          title="Editar Dados"
+                        >
                           <Pencil className="size-4" style={{ color: '#6D6875' }} />
                         </button>
                       </div>

@@ -9,7 +9,7 @@ import './index.css';
 export default function App() {
   const navigate = useNavigate();
   useEffect(() => {
-    sessionStorage.removeItem('authToken');
+    sessionStorage.clear(); 
   }, []);
   
   const [email, setEmail] = useState('');
@@ -35,21 +35,27 @@ export default function App() {
     setIsLoading(true);
 
     try {
-    const response = await api.post('/login', {
-      email: email,
-      password: password
-    });
+      const response = await api.post('/login', {
+        email: email,
+        password: password
+      });
 
-    const data = response.data;
-    
-    sessionStorage.setItem('authToken', data.token);
-    
-    alert('Login realizado com sucesso!');
-    setTimeout(() => {
+      const data = response.data;
+      
+      sessionStorage.setItem('encanto_token', data.token);
+      
+      sessionStorage.setItem('encanto_user', JSON.stringify({
+         nome: data.nome || 'Administrador', 
+         email: data.email || email,
+         role: 'Gestor'
+      }));
+      
+      alert('Login realizado com sucesso!');
+      setTimeout(() => {
           navigate('/home');
-    }, 1000); 
+      }, 1000); 
 
-  } catch (err: any) {
+    } catch (err: any) {
     if (err.response) {
       if (err.response.status === 404 || err.response.status === 401) {
         setError('E-mail ou senha incorretos');
