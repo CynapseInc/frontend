@@ -12,6 +12,14 @@ import {
 import { Card } from '../../genericos/card';
 import styles from './graficoVendasCategoria.module.css';
 
+interface GraficoVendasCategoriaProps {
+  dados?: Array<{
+    categoria: string;
+    receita: number;
+    quantidade: number;
+  }>;
+}
+
 const dadosExemplo = [
   { categoria: 'Heróis', receita: 12000, quantidade: 45 },
   { categoria: 'Princesas', receita: 18000, quantidade: 68 },
@@ -20,7 +28,19 @@ const dadosExemplo = [
   { categoria: 'Nerd', receita: 10000, quantidade: 38 },
 ];
 
-export function GraficoVendasCategoria() {
+export function GraficoVendasCategoria({ dados = [] }: GraficoVendasCategoriaProps) {
+  
+  if (!dados || dados.length === 0) {
+    return (
+      <Card classeCss={styles.containerGrafico}>
+        <h3 className={styles.tituloGrafico}>Categorias Mais Vendidas</h3>
+        <div className={styles.areaGrafico} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <p style={{ color: '#999', fontSize: '14px' }}>Nenhum dado disponível para o período selecionado</p>
+        </div>
+      </Card>
+    );
+  }
+
   return (
     <Card classeCss={styles.containerGrafico}>
       <h3 className={styles.tituloGrafico}>Categorias Mais Vendidas</h3>
@@ -29,7 +49,7 @@ export function GraficoVendasCategoria() {
         <ResponsiveContainer width="100%" height="100%">
           
           <ComposedChart 
-            data={dadosExemplo} 
+            data={dados} 
             margin={{ top: 20, right: 0, bottom: -5, left: 20 }}
             barCategoryGap="20%" 
           >
@@ -56,7 +76,7 @@ export function GraficoVendasCategoria() {
               tickLine={false}
               tick={{ fill: '#6D6875', fontSize: 12 }}
               tickFormatter={(val) => `R$ ${val / 1000}k`}
-              domain={[0, 20000]}
+              domain={[0, 'auto']}
               tickCount={5}
             />
 
@@ -66,13 +86,19 @@ export function GraficoVendasCategoria() {
               axisLine={false} 
               tickLine={false}
               tick={{ fill: '#6D6875', fontSize: 12 }}
-              domain={[0, 80]}
+              domain={[0, 'auto']}
               tickCount={5}
             />
 
             <Tooltip 
               cursor={{ fill: 'rgba(0,0,0,0.05)' }}
               contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
+              formatter={(value: any) => {
+                if (typeof value === 'number' && value > 1000) {
+                  return `R$ ${Number(value).toLocaleString('pt-BR', { maximumFractionDigits: 2 })}`;
+                }
+                return value;
+              }}
             />
 
             <Legend 

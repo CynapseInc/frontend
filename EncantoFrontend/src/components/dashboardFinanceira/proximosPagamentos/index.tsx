@@ -2,7 +2,20 @@ import { Card } from '../../genericos/card';
 import { ItemPagamento } from './itemPagamento';
 import styles from './ProximosPagamentos.module.css';
 
-const dadosPagamentos = [
+interface PagamentoItem {
+  id: number;
+  nome: string;
+  categoria: string;
+  valor: number;
+  dataTexto: string;
+  status: 'atrasado' | 'proximo';
+}
+
+interface ProximosPagamentosProps {
+  pagamentos?: PagamentoItem[];
+}
+
+const dadosPagamentosPadrao = [
   {
     id: 1,
     nome: 'Conta de Luz - Atrasada',
@@ -37,9 +50,30 @@ const dadosPagamentos = [
   }
 ];
 
-export function ProximosPagamentos() {
+export function ProximosPagamentos({ pagamentos = [] }: ProximosPagamentosProps) {
   
-  const total = dadosPagamentos.reduce((acc, item) => acc + item.valor, 0);
+  if (!pagamentos || pagamentos.length === 0) {
+    return (
+      <Card classeCss={styles.containerPagamentos}>
+        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+          <div className={styles.cabecalho}>
+            <h3 className={styles.titulo}>Próximos Pagamentos</h3>
+          </div>
+          <div className={styles.listaScroll} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
+            <p style={{ color: '#999', fontSize: '14px', textAlign: 'center' }}>Nenhum pagamento para o período selecionado</p>
+          </div>
+        </div>
+        <div className={styles.totalContainer}>
+          <span className={styles.labelTotal}>Total a Pagar</span>
+          <span className={styles.valorTotal}>
+            {(0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+          </span>
+        </div>
+      </Card>
+    );
+  }
+
+  const total = pagamentos.reduce((acc, item) => acc + item.valor, 0);
 
   return (
     <Card classeCss={styles.containerPagamentos}>
@@ -49,7 +83,7 @@ export function ProximosPagamentos() {
         </div>
 
         <div className={styles.listaScroll}>
-            {dadosPagamentos.map((item) => (
+            {pagamentos.map((item) => (
             <ItemPagamento 
                 key={item.id}
                 nome={item.nome}
