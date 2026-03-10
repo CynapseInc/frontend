@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { User, LogOut, Settings, ChevronDown } from 'lucide-react';
+import logoEncanto from '../assets/logoEncanto.png';
 
 export default function Navbar() {
   const navigate = useNavigate();
@@ -71,17 +72,22 @@ export default function Navbar() {
     <header className="navbar-padrao" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2vw', height: '10vh', borderBottom: '1px solid #D8E2DC', backgroundColor: 'white', position: 'sticky', top: 0, zIndex: 40 }}>
       
       {/* Lado Esquerdo: Logo (MANTIDO INTACTO) */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1vw' }}>
-        <div style={{ width: '3vw', height: '3vw', borderRadius: '50%', backgroundColor: '#F4ACB7', display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', fontWeight: 'bold' }}>
-          OE
-        </div>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <span style={{ fontSize: '1.2vw', color: '#F4ACB7', fontWeight: 'bold' }}>O Encanto</span>
-          <span style={{ fontSize: '0.8vw', color: '#9D8189' }}>personalizados</span>
-        </div>
+      <div 
+        style={{ display: 'flex', alignItems: 'center', height: '100%', cursor: 'pointer' }} 
+        onClick={() => navigate("/home")}
+        title="Ir para a Home"
+      >
+        <img 
+          src={logoEncanto} 
+          alt="Logo O Encanto Personalizados" 
+          style={{ 
+            height: '6.5vh',
+            width: 'auto',   
+            objectFit: 'contain' 
+          }} 
+        />
       </div>
 
-      {/* Centro: Menu de Navegação Dinâmico (MANTIDO INTACTO) */}
       <nav style={{ display: 'flex', gap: '3vw', fontSize: '1vw' }}>
          <div onClick={() => navigate("/home")} style={getEstiloLink("/home")}>Home</div>
          <div onClick={() => navigate("/kanban")} style={getEstiloLink("/kanban")}>Pedidos</div>
