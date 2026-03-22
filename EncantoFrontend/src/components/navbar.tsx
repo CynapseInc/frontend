@@ -25,6 +25,8 @@ export default function Navbar() {
         nome: sessionStorage.getItem('usuarioNome'), 
         email: 'funcionario@encanto.com' 
       });
+    }else{
+      navigate('/login'); // Redireciona para login se não encontrar dados do usuário
     }
 
     // Fechar o modal ao clicar fora dele
@@ -67,7 +69,7 @@ export default function Navbar() {
       transition: 'color 0.3s ease'
     };
   };
-
+  if(userData !== null){
   return (
     <header className="navbar-padrao" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 2vw', height: '10vh', borderBottom: '1px solid #D8E2DC', backgroundColor: 'white', position: 'sticky', top: 0, zIndex: 40 }}>
       
@@ -87,6 +89,9 @@ export default function Navbar() {
           }} 
         />
       </div>
+      {/* A depender do cargo do usuario mostrar uma nav bar diferente */}
+      {userData?.cargo === 'Administrador' && (
+
 
       <nav style={{ display: 'flex', gap: '3vw', fontSize: '1vw' }}>
          <div onClick={() => navigate("/home")} style={getEstiloLink("/home")}>Home</div>
@@ -97,6 +102,22 @@ export default function Navbar() {
          <div onClick={() => navigate("/funcionarios")} style={getEstiloLink("/funcionarios")}>Funcionários</div>
          <div onClick={() => navigate("/dashboard-gestao")} style={getEstiloLink("/dashboard-gestao")}>Dashboard Gestão</div>
       </nav>
+      )}
+
+      {userData?.cargo === 'Manufatura' && (
+         <nav style={{ display: 'flex', gap: '3vw', fontSize: '1vw' }}>
+         <div onClick={() => navigate("/home")} style={getEstiloLink("/home")}>Home</div>
+         <div onClick={() => navigate("/kanban")} style={getEstiloLink("/kanban")}>Pedidos</div>
+      </nav>
+      )}
+
+      {userData?.cargo === 'Social Media' && (
+        <nav style={{ display: 'flex', gap: '3vw', fontSize: '1vw' }}>
+         <div onClick={() => navigate("/home")} style={getEstiloLink("/home")}>Home</div>
+         <div onClick={() => navigate("/kanban")} style={getEstiloLink("/kanban")}>Pedidos</div>
+          <div onClick={() => navigate("/lista-produtos")} style={getEstiloLink("/lista-produtos")}>Produtos</div>
+      </nav>
+      )}
 
       {/* Lado Direito: Perfil / Logout (NOVO) */}
       <div className="relative" ref={dropdownRef}>
@@ -164,4 +185,7 @@ export default function Navbar() {
       </div>
     </header>
   );
+  }else {
+    return null; // Ou um loader, ou redirecionamento, etc. dependendo do que você queira mostrar enquanto carrega os dados do usuário
+  }
 }

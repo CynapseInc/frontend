@@ -19,15 +19,18 @@ export default function App() {
   const [deleteEmployee, setDeleteEmployee] = useState<Funcionario | null>(null);
   
   const itemsPerPage = 8;
-  const filters = ['Todos', 'Produção', 'Social Media', 'Costura']; // Ajuste estes cargos conforme os do seu backend
+  const filters = ['Todos', 'Administrador', 'Social Media', 'Manufatura']; // Ajuste estes cargos conforme os do seu backend
 
   // 1. Busca os dados à API
   useEffect(() => {
     const fetchFuncionarios = async () => {
       try {
         const dados = await funcionarioService.listarTodos();
+        const totalElements = dados.totalElements || dados.length || 0;
+        const funcionarios = dados.content || [];
+
         
-        const funcionariosFormatados: Funcionario[] = dados.map((usuario: any) => ({
+        const funcionariosFormatados: Funcionario[] = funcionarios.map((usuario: any) => ({
           id: usuario.id,
           name: usuario.name, 
           email: usuario.email,
@@ -72,7 +75,7 @@ export default function App() {
         dataNasc: employee.dataNasc,
         cargo: employee.cargo
       };
-      
+      console.log(dadosBackend)
       const novoUsuario = await funcionarioService.criar(dadosBackend);
       setEmployees([...employees, { ...novoUsuario, status: 'Ativo' }]);
       setIsModalOpen(false);
@@ -202,7 +205,7 @@ export default function App() {
               </tr>
             </thead>
             <tbody>
-              {currentEmployees.map((employee, index) => (
+              {employees.map((employee, index) => (
                 <tr 
                   key={employee.id}
                   className="border-b transition-colors hover:bg-opacity-50"

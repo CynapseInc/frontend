@@ -47,10 +47,10 @@ export default function App() {
       sessionStorage.setItem('encanto_user', JSON.stringify({
          nome: data.nome || 'Administrador', 
          email: data.email || email,
-         role: 'Gestor'
+         cargo: data.cargo || 'Administrador' 
       }));
       
-      alert('Login realizado com sucesso!');
+      
       setTimeout(() => {
           navigate('/home');
       }, 1000); 

@@ -3,8 +3,9 @@ import type { Funcionario } from '../interfaces/Funcionario';
 
 export const funcionarioService = {
   listarTodos: async (): Promise<Funcionario[]> => {
-    const { data } = await api.get<Funcionario[]>('/usuarios');
-    return Array.isArray(data) ? data : []; 
+    const { data } = await api.get('/usuarios');
+    console.log('Dados recebidos da API:', data);
+    return data ? data : []; 
   },
   // ... resto do código
   

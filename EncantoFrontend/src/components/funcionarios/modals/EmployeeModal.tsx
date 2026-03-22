@@ -252,9 +252,9 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
                     color: '#6D6875'
                   }}
                 >
+                  <option value="Administrador">Administrador</option>
+                  <option value="Manufatura">Manufatura</option>
                   <option value="Social Media">Social Media</option>
-                  <option value="Produção">Produção</option>
-                  <option value="Costura">Costura</option>
                 </select>
               </div>
 
