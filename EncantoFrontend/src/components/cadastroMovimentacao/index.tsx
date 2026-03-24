@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Search, Pencil, Trash2, Plus, Filter, Tag, List, Users } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
@@ -11,7 +11,9 @@ import DeleteTransactionDialog from './modals/DeleteTransactionDialog';
 import DeleteCategoryDialog from './modals/DeleteCategoryDialog';
 import DeleteCounterpartyDialog from './modals/DeleteCounterpartyDialog';
 
+
 import './index-cadastro-mov.css'
+import { movimentacaoService } from '../../services/MovimentacaoService';
 
 interface Category {
   id: string;
@@ -55,71 +57,73 @@ const mockCounterparties: Counterparty[] = [
   { id: '6', name: 'Elo7 Brasil', contractType: 'Empresa', segment: 'E-commerce', description: 'Marketplace de produtos artesanais' },
 ];
 
-const mockTransactions: Transaction[] = [
-  {
-    id: '1',
-    counterpartyId: '1',
-    counterpartyName: 'Ana Carolina Silva',
-    description: 'Salário mensal',
-    category: 'Pagamento de Funcionário',
-    value: -3500.00,
-    date: '2024-01-05',
-    type: 'Despesa',
-  },
-  {
-    id: '2',
-    counterpartyId: '2',
-    counterpartyName: 'Shopee Brasil',
-    description: '20 Cadernos Hello Kit',
-    category: 'Venda de Produto',
-    value: 500.00,
-    date: '2024-01-10',
-    type: 'Receita',
-  },
-  {
-    id: '3',
-    counterpartyId: '3',
-    counterpartyName: 'Tecidos Premium Ltda',
-    description: 'Compra de tecidos para produção',
-    category: 'Fornecedor',
-    value: -1200.00,
-    date: '2024-01-12',
-    type: 'Despesa',
-  },
-  {
-    id: '4',
-    counterpartyId: '4',
-    counterpartyName: 'Instagram Store',
-    description: '2 Canecas Corintians',
-    category: 'Venda de Produto',
-    value: 60.00,
-    date: '2024-01-15',
-    type: 'Receita',
-  },
-  {
-    id: '5',
-    counterpartyId: '5',
-    counterpartyName: 'João Silva - Designer',
-    description: 'Criação de artes personalizadas',
-    category: 'Prestador de Serviço',
-    value: -800.00,
-    date: '2024-01-18',
-    type: 'Despesa',
-  },
-  {
-    id: '6',
-    counterpartyId: '6',
-    counterpartyName: 'Elo7 Brasil',
-    description: '100 Cadernos Frozen',
-    category: 'Venda de Produto',
-    value: 1000.00,
-    date: '2024-01-20',
-    type: 'Receita',
-  },
-];
+// const mockTransactions: Transaction[] = [
+//   {
+//     id: '1',
+//     counterpartyId: '1',
+//     counterpartyName: 'Ana Carolina Silva',
+//     description: 'Salário mensal',
+//     category: 'Pagamento de Funcionário',
+//     value: -3500.00,
+//     date: '2024-01-05',
+//     type: 'Despesa',
+//   },
+//   {
+//     id: '2',
+//     counterpartyId: '2',
+//     counterpartyName: 'Shopee Brasil',
+//     description: '20 Cadernos Hello Kit',
+//     category: 'Venda de Produto',
+//     value: 500.00,
+//     date: '2024-01-10',
+//     type: 'Receita',
+//   },
+//   {
+//     id: '3',
+//     counterpartyId: '3',
+//     counterpartyName: 'Tecidos Premium Ltda',
+//     description: 'Compra de tecidos para produção',
+//     category: 'Fornecedor',
+//     value: -1200.00,
+//     date: '2024-01-12',
+//     type: 'Despesa',
+//   },
+//   {
+//     id: '4',
+//     counterpartyId: '4',
+//     counterpartyName: 'Instagram Store',
+//     description: '2 Canecas Corintians',
+//     category: 'Venda de Produto',
+//     value: 60.00,
+//     date: '2024-01-15',
+//     type: 'Receita',
+//   },
+//   {
+//     id: '5',
+//     counterpartyId: '5',
+//     counterpartyName: 'João Silva - Designer',
+//     description: 'Criação de artes personalizadas',
+//     category: 'Prestador de Serviço',
+//     value: -800.00,
+//     date: '2024-01-18',
+//     type: 'Despesa',
+//   },
+//   {
+//     id: '6',
+//     counterpartyId: '6',
+//     counterpartyName: 'Elo7 Brasil',
+//     description: '100 Cadernos Frozen',
+//     category: 'Venda de Produto',
+//     value: 1000.00,
+//     date: '2024-01-20',
+//     type: 'Receita',
+//   },
+// ];
+
+
 
 export default function App() {
-  const [transactions, setTransactions] = useState<Transaction[]>(mockTransactions);
+  const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<Category[]>(mockCategories);
   const [counterparties, setCounterparties] = useState<Counterparty[]>(mockCounterparties);
   const [searchTerm, setSearchTerm] = useState('');
@@ -142,9 +146,81 @@ export default function App() {
   const [deleteTransaction, setDeleteTransaction] = useState<Transaction | null>(null);
   const [deleteCategory, setDeleteCategory] = useState<Category | null>(null);
   const [deleteCounterparty, setDeleteCounterparty] = useState<Counterparty | null>(null);
+
+  // paginacao 
+  const [totalPages, setTotalPages] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const [totalElements, setTotalElements] = useState(0);
+ 
+
+
+
+  const gerarPaginas = (currentPage: number, totalPages: number) => {
+  const maxPages = 7;
+  const pages: (number | string)[] = [];
+
+  if (totalPages <= maxPages) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+
+  const start = Math.max(2, currentPage - 2);
+  const end = Math.min(totalPages - 1, currentPage + 2);
+
+  pages.push(1);
+
+  if (start > 2) {
+    pages.push('...');
+  }
+
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+
+  if (end < totalPages - 1) {
+    pages.push('...');
+  }
+
+  pages.push(totalPages);
+
+  return pages;
+};
+
+ const paginas = gerarPaginas(currentPage, totalPages);
+
+
+  const carregarMovimentacoes = async () => {
+    const response = await movimentacaoService.listar({
+      search: searchTerm || undefined,
+      tipo: selectedFilter !== 'Todos' ? selectedFilter : undefined,
+      page: currentPage - 1
+    });
+
+    console.log('Resposta da API:', response);
+    setTransactions(response.content.map(mov => ({
+      id: mov.id.toString(),
+      counterpartyId: mov.id.toString(), 
+      counterpartyName: mov.descricao, 
+      description: mov.descricao,
+      category: mov.tipo, 
+      value: mov.valor,
+      date: mov.dataVencimento,
+      type: mov.tipo === 'Receita' ? 'Receita' : 'Despesa'
+    }))); 
+
+    setTotalPages(response.totalPages);
+    setTotalElements(response.totalElements);
+  };
+
+  useEffect(() => {
+    carregarMovimentacoes();
+  }, [searchTerm, selectedFilter, currentPage]);
+
+
   
-  const itemsPerPage = 8;
-  const filters = ['Todos', 'Receitas', 'Despesas'];
+  // const itemsPerPage = 8;
+  const filters = ['Todos', 'Receita', 'Despesa'];
 
   // Filtrar transações
   const filteredTransactions = transactions.filter(transaction => {
@@ -157,13 +233,11 @@ export default function App() {
   });
 
   // Paginação
-  const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentTransactions = filteredTransactions.slice(startIndex, endIndex);
+  // const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
+  // const startIndex = (currentPage - 1) * itemsPerPage;
 
   // Calcular total
-  const total = filteredTransactions.reduce((sum, t) => sum + t.value, 0);
+  const total = transactions.reduce((sum, t) => sum + t.value, 0);
 
   // Category handlers
   const handleAddCategory = (category: Category) => {
@@ -410,7 +484,7 @@ export default function App() {
               </tr>
             </thead>
             <tbody>
-              {currentTransactions.map((transaction, index) => (
+              {transactions.map((transaction, index) => (
                 <tr 
                   key={transaction.id}
                   className="border-b transition-colors hover:bg-opacity-50"
@@ -490,14 +564,14 @@ export default function App() {
         <div className="flex items-center justify-between mt-6">
           <div className="flex items-center gap-8">
             <p className="text-[15px]" style={{ color: '#9D8189' }}>
-              Mostrando {startIndex + 1} a {Math.min(endIndex, filteredTransactions.length)} de {filteredTransactions.length} movimentações
+              Mostrando {startIndex + 1} a {Math.min(endIndex, totalElements)} de {totalElements} movimentações
             </p>
             <p className="text-[17px]" style={{ color: total >= 0 ? '#4CAF50' : '#F4ACB7' }}>
               <strong>Total: {formatCurrency(total)}</strong>
             </p>
           </div>
           
-          {totalPages > 1 && (
+          {/* {totalPages > 1 && (
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
@@ -540,7 +614,48 @@ export default function App() {
                 Próximo
               </button>
             </div>
-          )}
+          )} */}
+          {totalPages > 1 && (
+  <div className="flex items-center gap-2">
+    
+    {/* Anterior */}
+    <button
+      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+      disabled={currentPage === 1}
+      className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
+    >
+      Anterior
+    </button>
+
+    {/* Páginas */}
+    {paginas.map((page, index) => (
+      <button
+        key={index}
+        onClick={() => typeof page === 'number' && setCurrentPage(page)}
+        disabled={page === '...'}
+        className="px-4 py-2 rounded-md text-[15px] transition-all"
+        style={{
+          backgroundColor: currentPage === page ? '#F4ACB7' : 'white',
+          color: currentPage === page ? 'white' : '#6D6875',
+          border: `1px solid ${currentPage === page ? '#F4ACB7' : '#D8E2DC'}`,
+          cursor: page === '...' ? 'default' : 'pointer'
+        }}
+      >
+        {page}
+      </button>
+    ))}
+
+    {/* Próximo */}
+    <button
+      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+      disabled={currentPage === totalPages}
+      className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
+    >
+      Próximo
+    </button>
+
+  </div>
+)}
         </div>
       </div>
 
