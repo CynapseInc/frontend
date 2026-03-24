@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { X, Plus, Trash2, Edit2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import InputMask from 'react-input-mask';
 
 interface EnderecoCliente {
   id?: number;
@@ -46,6 +47,37 @@ export default function ClientFormModal({ isOpen, onClose, onSave, client }: Cli
   const [cidade, setCidade] = useState('');
   const [estado, setEstado] = useState('');
   const [complemento, setComplemento] = useState('');
+  const [errorMsgCep, setErrorMsgCep] = useState('');
+  const buscarCep = async (cep) => {
+      const cepLimpo = cep.replace(/\D/g, '');
+
+      if (cepLimpo.length !== 8) return;
+
+      try {
+        const response = await fetch(`https://viacep.com.br/ws/${cepLimpo}/json/`);
+        const data = await response.json();
+
+        if (data.erro) {
+          setErrorMsgCep('CEP não encontrado');
+          return;
+        }
+
+        setLogradouro(data.logradouro);
+        setBairro(data.bairro);
+        setCidade(data.localidade);
+        setEstado(data.uf);
+        setErrorMsgCep('');
+      } catch (error) {
+        console.error('Erro ao buscar CEP:', error);
+        setErrorMsgCep('Erro ao buscar CEP');
+      }
+  };
+
+  useEffect(() => {
+  if (cep.length === 9) { // formato 00000-000
+    buscarCep(cep);
+  }
+}, [cep]);
 
   useEffect(() => {
     if (client) {
@@ -194,7 +226,22 @@ export default function ClientFormModal({ isOpen, onClose, onSave, client }: Cli
                   <div className="grid grid-cols-3 gap-4">
                     <div>
                       <label className="block text-[13px] mb-1" style={{ color: '#6D6875' }}><strong>CEP</strong> <span style={{ color: '#F4ACB7' }}>*</span></label>
-                      <Input value={cep} onChange={(e) => setCep(e.target.value)} placeholder="00000-000" className="h-10 text-[14px]" style={{ backgroundColor: 'white' }} />
+                      {/* Adicionar mascara com o react-input-mask */}
+
+                      <Input
+                            value={cep}
+                            onChange={(e) => {
+                              const valor = e.target.value.replace(/\D/g, '');
+                              const formatado =
+                                valor.length <= 5
+                                  ? valor
+                                  : valor.slice(0, 5) + '-' + valor.slice(5, 8);
+
+                              setCep(formatado);
+                            }}
+                            placeholder="00000-000"
+                          />
+                          <span className="text-[12px] text-red-500">{errorMsgCep}</span>
                     </div>
                     <div className="col-span-2">
                       <label className="block text-[13px] mb-1" style={{ color: '#6D6875' }}><strong>Logradouro (Rua)</strong> <span style={{ color: '#F4ACB7' }}>*</span></label>
