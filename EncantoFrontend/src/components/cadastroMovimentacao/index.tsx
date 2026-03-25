@@ -14,6 +14,7 @@ import DeleteCounterpartyDialog from './modals/DeleteCounterpartyDialog';
 
 import './index-cadastro-mov.css'
 import { movimentacaoService } from '../../services/MovimentacaoService';
+import { categoriaMovService } from '../../services/CategoriaMov';
 
 interface Category {
   id: string;
@@ -241,20 +242,33 @@ export default function App() {
 
   // Category handlers
   const handleAddCategory = (category: Category) => {
-    setCategories([...categories, { ...category, id: Date.now().toString() }]);
+    
+    const data = {
+      descricao: category.name
+    }
+    categoriaMovService.cadastrar(data);
+    
+          
+
     setIsCategoryModalOpen(false);
   };
 
   const handleEditCategory = (category: Category) => {
-    setCategories(categories.map(cat => cat.id === category.id ? category : cat));
+    // setCategories(categories.map(cat => cat.id === category.id ? category : cat));
+    const data = {
+      descricao: category.name
+    }
+    categoriaMovService.editar(Number(category.id), data);
     setIsCategoryModalOpen(false);
     setEditingCategory(null);
   };
 
   const handleDeleteCategory = () => {
     if (deleteCategory) {
-      setCategories(categories.filter(cat => cat.id !== deleteCategory.id));
+      categoriaMovService.deletar(Number(deleteCategory.id));
       setDeleteCategory(null);
+      setIsCategoryListModalOpen(false);
+      setIsCategoryListModalOpen(true);
     }
   };
 
