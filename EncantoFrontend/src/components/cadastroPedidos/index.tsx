@@ -358,12 +358,13 @@ export default function App() {
           <div className="grid grid-cols-4 gap-4 max-h-[500px] overflow-y-auto pr-2">
             {filteredProducts.map(product => (
               <div key={product.id} className="border rounded-lg overflow-hidden transition-all hover:shadow-lg" style={{ borderColor: '#D8E2DC' }}>
-                <div className="aspect-square overflow-hidden bg-gray-50 flex items-center justify-center">
+                {/* Substituímos aspect-square por h-40 para limitar a altura da imagem */}
+                <div className="h-40 overflow-hidden bg-gray-50 flex items-center justify-center">
                   {product.imageUrl ? (
                     <ImageWithFallback src={product.imageUrl} alt={product.title} className="w-full h-full object-cover" />
                   ) : (
                     <span className="text-gray-400 text-sm">Sem Foto</span>
-                  )}
+                  )}  
                 </div>
                 <div className="p-4">
                   <h3 className="text-[16px] mb-1 truncate" style={{ color: '#6D6875' }}><strong>{product.title}</strong></h3>

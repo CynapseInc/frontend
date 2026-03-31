@@ -79,7 +79,8 @@ export default function ThemeListModal({ isOpen, onClose, themes, categories, on
               style={{ 
                 borderColor: '#D8E2DC',
                 backgroundColor: '#F9F9F9',
-                color: '#6D6875'
+                color: '#6D6875',
+                paddingLeft: '40px'
               }}
             />
           </div>

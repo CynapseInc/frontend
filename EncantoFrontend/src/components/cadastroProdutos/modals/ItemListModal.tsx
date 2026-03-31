@@ -82,7 +82,8 @@ export default function ItemListModal({ isOpen, onClose, items, onEdit, onDelete
               style={{ 
                 borderColor: '#D8E2DC',
                 backgroundColor: '#F9F9F9',
-                color: '#6D6875'
+                color: '#6D6875',
+                paddingLeft: '40px'
               }}
             />
           </div>

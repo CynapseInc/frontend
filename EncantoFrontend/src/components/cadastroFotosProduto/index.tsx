@@ -40,13 +40,17 @@ export default function CadastroFotosProduto() {
   const handleDeleteExistingPhoto = async (fotoId: number) => {
     if (!confirm('Tem a certeza que deseja excluir esta foto permanentemente?')) return;
     try {
-      await fotoProdutoService.deletarFoto(fotoId);
-      // Remove da tela sem precisar recarregar a página
-      setExistingPhotos(prev => prev.filter(f => f.id !== fotoId));
+      if (!id) return; // Proteção de segurança do React
+      
+      await fotoProdutoService.deletarFoto(id, fotoId);
+      
+      // MUDANÇA AQUI: Forçamos a conversão de ambos para String para evitar conflitos de tipagem
+      setExistingPhotos(prev => prev.filter(f => String(f.id) !== String(fotoId)));
       alert('Foto excluída com sucesso!');
+      
     } catch (error) {
       console.error("Erro ao excluir foto:", error);
-      alert('Erro ao excluir foto.');
+      alert('Erro ao excluir foto. Verifique a consola.');
     }
   };
 
