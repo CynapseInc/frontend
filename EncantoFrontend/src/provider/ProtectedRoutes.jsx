@@ -9,6 +9,10 @@ export default function ProtectedRoute({ allowedRoles }) {
   }
 
   if (!allowedRoles.includes(user.cargo)) {
+
+    if(user.cargo != "Administrador" && user.cargo != "Manufatura" && user.cargo != "Social Media"){
+      return <Navigate to="/login" />;
+    } 
     return <Navigate to="/home" />; 
   }
 
