@@ -17,6 +17,7 @@ interface Item {
   weight: string;
   length: string;
   material: string;
+  descricaoPadrao?: string;
   promotionalPrice: number;
   unitPrice: number;
   minimumQuantity: number;
@@ -39,6 +40,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
   const [weight, setWeight] = useState('');
   const [length, setLength] = useState('');
   const [material, setMaterial] = useState('');
+  const [descricaoPadrao, setDescricaoPadrao] = useState('');
   const [promotionalPrice, setPromotionalPrice] = useState('');
   const [unitPrice, setUnitPrice] = useState('');
   const [minimumQuantity, setMinimumQuantity] = useState('');
@@ -57,6 +59,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
       setWeight(item.weight);
       setLength(item.length);
       setMaterial(item.material);
+      setDescricaoPadrao(item.descricaoPadrao || '');
       setPromotionalPrice(item.promotionalPrice.toString());
       setUnitPrice(item.unitPrice.toString());
       setMinimumQuantity(item.minimumQuantity.toString());
@@ -75,6 +78,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
     setWeight('');
     setLength('');
     setMaterial('');
+    setDescricaoPadrao('');
     setPromotionalPrice('');
     setUnitPrice('');
     setMinimumQuantity('');
@@ -116,6 +120,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
       weight,
       length,
       material,
+      descricaoPadrao,
       promotionalPrice: parseFloat(promotionalPrice || '0'),
       unitPrice: parseFloat(unitPrice || '0'),
       minimumQuantity: parseFloat(minimumQuantity || '0'),
@@ -197,7 +202,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
             {/* Descrição */}
             <div>
               <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}>
-                Descrição <span style={{ color: '#F4ACB7' }}>*</span>
+                Item <span style={{ color: '#F4ACB7' }}>*</span>
               </label>
               <Input
                 value={description}
@@ -211,6 +216,23 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
                 required
               />
             </div>
+
+            <div className="mt-4">
+            <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}>
+              Descrição Padrão
+            </label>
+            <textarea
+              value={descricaoPadrao}
+              onChange={(e) => setDescricaoPadrao(e.target.value)}
+              placeholder="Ex: Caneca de cerâmica 325ml. Pode ir ao micro-ondas..."
+              className="w-full min-h-[100px] px-4 py-3 rounded-md text-[15px] border transition-all focus:outline-none"
+              style={{ borderColor: '#D8E2DC', color: '#6D6875' }}
+            />
+            <p className="text-[13px] mt-1" style={{ color: '#9D8189' }}>
+              Este texto será carregado automaticamente na tela de Produto quando este item for selecionado.
+            </p>
+          </div>
+            
 
             {/* Linha 1: Preço e Custo */}
             <div className="grid grid-cols-2 gap-4">

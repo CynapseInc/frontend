@@ -28,7 +28,7 @@ interface Theme { id: string; description: string; categoryId: string; }
 interface Item {
   id: string; description: string; salePrice: number; productionCost: number;
   productionDeadline: string; width: string; height: string; weight: string;
-  length: string; material: string; promotionalPrice: number; unitPrice: number; minimumQuantity: number;
+  length: string; material: string; descricaoPadrao?: string; promotionalPrice: number; unitPrice: number; minimumQuantity: number;
 }
 
 export default function App() {
@@ -97,6 +97,7 @@ export default function App() {
           weight: i.peso ? `${i.peso}g` : '-',
           length: i.comprimento ? `${i.comprimento}cm` : '-',
           material: i.material || '-',
+          descricaoPadrao: i.descricaoPadrao || '',
           promotionalPrice: i.precoPromocional || 0,
           unitPrice: i.precoVenda || 0, 
           minimumQuantity: 1 
@@ -156,6 +157,18 @@ export default function App() {
       if (item) { setCurrentItem(item); setIsItemLocked(true); }
     } else { setCurrentItem(null); setIsItemLocked(false); }
   }, [selectedItemId, items]);
+
+  useEffect(() => {
+    if (!isEditingProduct && selectedItemId && productDescription.trim() === '') {
+      
+      const itemSelecionado = items.find(i => i.id === selectedItemId);
+      
+      if (itemSelecionado && itemSelecionado.descricaoPadrao) {
+        
+        setProductDescription(itemSelecionado.descricaoPadrao);
+      }
+    }
+  }, [selectedItemId, isEditingProduct, items, productDescription]);
 
   // Função auxiliar para limpeza de números
   const extractNumber = (str: string | number) => {
@@ -229,6 +242,7 @@ export default function App() {
     peso: extractNumber(item.weight),
     comprimento: extractNumber(item.length),
     material: item.material,
+    descricaoPadrao: item.descricaoPadrao,
     precoPromocional: item.promotionalPrice || 0
   });
 

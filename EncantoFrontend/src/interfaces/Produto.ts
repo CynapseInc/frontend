@@ -22,6 +22,7 @@ export interface ItemProduto {
   peso: number;
   comprimento: number;
   material: string;
+  descricaoPadrao?: string;
   precoPromocional: number;
 }
 
