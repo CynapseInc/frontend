@@ -41,5 +41,10 @@ export const movimentacaoService = {
     }
 
     return data;
+  },
+  cadastrar: async (data: any) => {
+    console.log("mandando:" , data)
+    const response = await api.post('/movimentacoes', data);
+    return response.data;
   }
 };

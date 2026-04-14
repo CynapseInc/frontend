@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../../ui/dialog';
 import { X } from 'lucide-react';
+import CounterpartyCombobox from './CounterpartyCombobox';
+import CategoryCombobox from './CategoryCombobox copy';
 
 interface Category {
   id: string;
@@ -20,10 +22,13 @@ interface Transaction {
   counterpartyId: string;
   counterpartyName: string;
   description: string;
+  categoryId: string;
   category: string;
   value: number;
   date: string;
   type: 'Receita' | 'Despesa';
+  paymentStatus?: 'pago' | 'pendente';
+  dueDate?: string;
   updatedAt?: string;
 }
 
@@ -41,10 +46,13 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
     counterpartyId: '',
     counterpartyName: '',
     description: '',
+    categoryId: '',
     category: '',
     value: 0,
     date: '',
     type: 'Receita',
+    paymentStatus: 'pago',
+    dueDate: '',
   });
 
   useEffect(() => {
@@ -59,6 +67,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
         value: 0,
         date: new Date().toISOString().split('T')[0],
         type: 'Receita',
+        paymentStatus: 'pago',
+        dueDate: '',
       });
     }
   }, [transaction, isOpen, categories, counterparties]);
@@ -76,7 +86,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
+    console.log(formData)
     if (formData.counterpartyId && formData.category && formData.value && formData.date) {
       const transactionData = {
         ...formData,
@@ -92,6 +102,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
         value: 0,
         date: '',
         type: 'Receita',
+        paymentStatus: 'pago',
+        dueDate: '',
       });
     }
   };
@@ -146,18 +158,18 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
                 <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
                   Nome
                 </label>
-                <select
-                  value={formData.counterpartyId}
-                  onChange={(e) => handleCounterpartyChange(e.target.value)}
-                  className="w-full px-4 py-2.5 rounded-md border text-[15px] focus:outline-none focus:border-[#F4ACB7] transition-colors"
-                  style={{ 
-                    backgroundColor: '#F9F9F9', 
-                    borderColor: '#D8E2DC',
-                    color: '#6D6875'
-                  }}
-                  required
-                >
-                  {counterparties.length === 0 ? (
+
+                 <CounterpartyCombobox 
+    value={formData.counterpartyId || ''}
+    onChange={(id, name) => setFormData({ 
+      ...formData, 
+      counterpartyId: id,
+      counterpartyName: name 
+    })}
+    isErr={!formData.counterpartyId}
+  />
+                
+                  {/* {counterparties.length === 0 ? (
                     <option value="">Nenhum contratante cadastrado</option>
                   ) : (
                     counterparties.map(cp => (
@@ -165,8 +177,8 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
                         {cp.name}
                       </option>
                     ))
-                  )}
-                </select>
+                  )} */}
+                {/* </select> */}
               </div>
 
               {/* Descrição */}
@@ -267,28 +279,71 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
                 <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
                   Categoria de movimentação
                 </label>
-                <select
-                  value={formData.category}
-                  onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                  className="w-full px-4 py-2.5 rounded-md border text-[15px] focus:outline-none focus:border-[#F4ACB7] transition-colors"
-                  style={{ 
-                    backgroundColor: '#F9F9F9', 
-                    borderColor: '#D8E2DC',
-                    color: '#6D6875'
-                  }}
-                  required
-                >
-                  {categories.length === 0 ? (
-                    <option value="">Nenhuma categoria cadastrada</option>
-                  ) : (
-                    categories.map(cat => (
-                      <option key={cat.id} value={cat.name}>
-                        {cat.name}
-                      </option>
-                    ))
-                  )}
-                </select>
+                 <CategoryCombobox 
+                  value={formData.categoryId || ''}
+                  onChange={(id, name) => setFormData({ 
+                    ...formData, 
+                    categoryId: id,
+                    category: name 
+                  })}
+                  isErr={!formData.categoryId}
+                />
+               
               </div>
+
+              {/* Status de Pagamento */}
+              <div className="col-span-2">
+                <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
+                  Status de pagamento
+                </label>
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, paymentStatus: 'PAGO' })}
+                    className="flex-1 px-4 py-2.5 rounded-md text-[15px] transition-all"
+                    style={{
+                      backgroundColor: formData.paymentStatus === 'PAGO' ? '#D8E2DC' : '#F9F9F9',
+                      color: formData.paymentStatus === 'PAGO' ? '#6D6875' : '#9D8189',
+                      border: `1px solid ${formData.paymentStatus === 'PAGO' ? '#D8E2DC' : '#D8E2DC'}`
+                    }}
+                  >
+                    Pago
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setFormData({ ...formData, paymentStatus: 'PENDENTE' })}
+                    className="flex-1 px-4 py-2.5 rounded-md text-[15px] transition-all"
+                    style={{
+                      backgroundColor: formData.paymentStatus === 'PENDENTE' ? '#FFF4E6' : '#F9F9F9',
+                      color: formData.paymentStatus === 'PENDENTE' ? '#6D6875' : '#9D8189',
+                      border: `1px solid ${formData.paymentStatus === 'PENDENTE' ? '#FFD89B' : '#D8E2DC'}`
+                    }}
+                  >
+                    Pendente
+                  </button>
+                </div>
+              </div>
+
+              {/* Data de Vencimento (aparece apenas se pendente) */}
+              {formData.paymentStatus === 'PENDENTE' && (
+                <div>
+                  <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
+                    Data de vencimento
+                  </label>
+                  <input
+                    type="date"
+                    value={formData.dueDate || ''}
+                    onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
+                    className="w-full px-4 py-2.5 rounded-md border text-[15px] focus:outline-none focus:border-[#F4ACB7] transition-colors"
+                    style={{ 
+                      backgroundColor: '#F9F9F9', 
+                      borderColor: '#D8E2DC',
+                      color: '#6D6875'
+                    }}
+                    required
+                  />
+                </div>
+              )}
 
               {/* Data da última alteração (apenas na edição) */}
               {transaction && transaction.updatedAt && (

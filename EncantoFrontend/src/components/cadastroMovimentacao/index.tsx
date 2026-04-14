@@ -16,6 +16,7 @@ import './index-cadastro-mov.css'
 import { movimentacaoService } from '../../services/MovimentacaoService';
 import { categoriaMovService } from '../../services/CategoriaMov';
 import { contraparteService } from '../../services/Contraparte';
+import { statusPedidoService } from '../../services/StatusPedidoService';
 
 interface Category {
   id: string;
@@ -35,10 +36,13 @@ interface Transaction {
   counterpartyId: string;
   counterpartyName: string;
   description: string;
+  categoryId: string;
   category: string;
   value: number;
   date: string;
   type: 'Receita' | 'Despesa';
+  paymentStatus?: 'pago' | 'pendente';
+  dueDate?: string;
   updatedAt?: string;
 }
 
@@ -207,8 +211,10 @@ export default function App() {
       description: mov.descricao,
       category: mov.tipo, 
       value: mov.valor,
-      date: mov.dataVencimento,
-      type: mov.tipo === 'Receita' ? 'Receita' : 'Despesa'
+      date: mov.dataPagamento,
+      type: mov.tipo === 'Receita' ? 'Receita' : 'Despesa',
+      paymentStatus: mov.statusPagamento,
+      dueDate: mov.dataVencimento
     }))); 
 
     setTotalPages(response.totalPages);
@@ -318,7 +324,17 @@ export default function App() {
 
   // Transaction handlers
   const handleAddTransaction = (transaction: Transaction) => {
-    setTransactions([...transactions, { ...transaction, id: Date.now().toString() }]);
+    movimentacaoService.cadastrar({
+      descricao: transaction.description,
+      valor: transaction.value,
+      tipo: transaction.type,
+      statusPagamento: transaction.paymentStatus,
+      dataVencimento: transaction.dueDate,
+      dataPagamento: transaction.date,
+      idContraparte: Number(transaction.counterpartyId),
+      idCategoriaMovimentacao: Number(transaction.categoryId)
+    });
+    // setTransactions([...transactions, { ...transaction, id: Date.now().toString() }]);
     setIsTransactionModalOpen(false);
   };
 
@@ -503,6 +519,9 @@ export default function App() {
                   Valor
                 </th>
                 <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>
+                  Status
+                </th>
+                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>
                   Data
                 </th>
                 <th className="text-right px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>
@@ -558,9 +577,16 @@ export default function App() {
                   </td>
                   <td className="px-6 py-4">
                     <span className="text-[15px]" style={{ color: '#9D8189' }}>
+                      {transaction.paymentStatus?.toUpperCase()}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4">
+                    <span className="text-[15px]" style={{ color: '#9D8189' }}>
                       {new Date(transaction.date).toLocaleDateString('pt-BR')}
                     </span>
                   </td>
+                    
+                  
                   <td className="px-6 py-4">
                     <div className="flex gap-2 justify-end">
                       <button
