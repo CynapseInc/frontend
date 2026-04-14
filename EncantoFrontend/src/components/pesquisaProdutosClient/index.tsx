@@ -7,13 +7,11 @@ import { produtoService } from '../../services/ProdutoService';
 import './pesquisa-index.css'
 
 export default function App() {
-  // Estados para armazenar dados da API
   const [products, setProducts] = useState<any[]>([]);
   const [categories, setCategories] = useState<{name: string, count: number}[]>([]);
   const [themes, setThemes] = useState<{name: string, count: number}[]>([]);
   const [items, setItems] = useState<{name: string, count: number}[]>([]);
 
-  // Estados dos Filtros
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
@@ -26,16 +24,12 @@ export default function App() {
   const [sortBy, setSortBy] = useState('newest');
   const [showFilters, setShowFilters] = useState(false);
   
-  // Paginação e Visuais
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(24);
   const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
 
   const navigate = useNavigate();
 
-  // ==========================================
-  // BUSCAR PRODUTOS DA API
-  // ==========================================
   useEffect(() => {
     const fetchCatalog = async () => {
       try {
@@ -53,12 +47,10 @@ export default function App() {
           const currentPrice = hasPromo ? precoPromocional : precoVenda;
           const oldPrice = hasPromo ? precoVenda : null;
           
-          // Tenta buscar a categoria (pode variar dependendo do retorno exato do seu DTO)
           const categoriaStr = p.tema?.categoriaTema?.titulo || p.tema?.categoria?.titulo || 'Sem Categoria';
           const temaStr = p.tema?.descricao || 'Sem Tema';
           const itemStr = p.item?.descricao || 'Sem Item';
 
-          // Contagem para os filtros do menu lateral
           catCount[categoriaStr] = (catCount[categoriaStr] || 0) + 1;
           themeCount[temaStr] = (themeCount[temaStr] || 0) + 1;
           itemCount[itemStr] = (itemCount[itemStr] || 0) + 1;
@@ -73,22 +65,20 @@ export default function App() {
             theme: temaStr,
             item: itemStr,
             image: p.fotos && p.fotos.length > 0 ? p.fotos[0].foto : '',
-            rating: 5, // Fixo por enquanto, até ter sistema de avaliações
+            rating: 5,
             isNew: false, 
             isBestSeller: false,
             isPromo: hasPromo,
-            inStock: p.ativo !== false // Assume true se não vier false
+            inStock: p.ativo !== false
           };
         });
 
         setProducts(formattedProducts);
         
-        // Transforma o Record em array para os filtros
         setCategories(Object.keys(catCount).map(k => ({ name: k, count: catCount[k] })));
         setThemes(Object.keys(themeCount).map(k => ({ name: k, count: themeCount[k] })));
         setItems(Object.keys(itemCount).map(k => ({ name: k, count: itemCount[k] })));
 
-        // Ajusta o slider de preço máximo automaticamente baseado no produto mais caro
         if (formattedProducts.length > 0) {
            const maxPrice = Math.max(...formattedProducts.map((p: any) => p.oldPrice || p.price));
            setPriceRange([0, Math.ceil(maxPrice) + 50]);
@@ -111,7 +101,7 @@ export default function App() {
     setSelectedCategories([]);
     setSelectedThemes([]);
     setSelectedItems([]);
-    setPriceRange([0, 500]); // Valor default, idealmente deve ler do maxPrice novamente
+    setPriceRange([0, 500]);
     setOnlyPromo(false);
     setInStock(true);
     setQuickFilter(null);
@@ -153,11 +143,9 @@ export default function App() {
     return true;
   });
 
-  // Ordenação dos produtos
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (sortBy === 'lowprice') return a.price - b.price;
     if (sortBy === 'highprice') return b.price - a.price;
-    // Se quiser implementar ordenação por "mais novo" precisa ter data de criação no DTO
     return 0; 
   });
 
@@ -170,7 +158,6 @@ export default function App() {
   return (
     <div className="min-h-screen bg-[#F9F9F9]">
 
-      {/* Page Header */}
       <div className="bg-gradient-to-br from-[#FFE5D9] to-[#F9F9F9] py-12 border-b-2 border-[#D8E2DC]">
         <div className="w-full px-8">
           <div className="flex items-center justify-between">
@@ -190,10 +177,8 @@ export default function App() {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="w-full px-8 py-8">
         <div className="flex gap-8">
-          {/* Left Column - Filters */}
            <aside className={`${showFilters ? 'block' : 'hidden'} md:block w-36 shrink-0`}>
             <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-[#D8E2DC] sticky top-24">
               <div className="flex items-center justify-between mb-6">
@@ -201,7 +186,6 @@ export default function App() {
                 <button onClick={clearFilters} className="text-[#F4ACB7] text-sm hover:underline">Limpar tudo</button>
               </div>
 
-              {/* Search */}
               <div className="mb-6">
                 <div className="relative">
                   <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#9D8189]" />
@@ -220,7 +204,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Categories */}
               {categories.length > 0 && (
                 <div className="mb-6">
                   <h4 className="text-[#6D6875] mb-3">Categoria</h4>
@@ -251,7 +234,6 @@ export default function App() {
                 </div>
               )}
 
-              {/* Themes */}
               {themes.length > 0 && (
                 <div className="mb-6">
                   <h4 className="text-[#6D6875] mb-3">Tema</h4>
@@ -282,7 +264,6 @@ export default function App() {
                 </div>
               )}
 
-              {/* Items */}
               {items.length > 0 && (
                 <div className="mb-6">
                   <h4 className="text-[#6D6875] mb-3">Item</h4>
@@ -313,7 +294,6 @@ export default function App() {
                 </div>
               )}
 
-              {/* Price Range */}
               <div className="mb-6">
                 <h4 className="text-[#6D6875] mb-3">Preço</h4>
                 <div className="space-y-3">
@@ -345,7 +325,6 @@ export default function App() {
                 </div>
               </div>
 
-              {/* Other Filters */}
               <div className="space-y-3">
                 <label className="flex items-center gap-2 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg">
                   <input type="checkbox" checked={onlyPromo} onChange={(e) => setOnlyPromo(e.target.checked)} className="w-4 h-4 accent-[#F4ACB7]" />
@@ -359,7 +338,6 @@ export default function App() {
             </div>
           </aside>
 
-          {/* Right Column - Products */}
           <div className="flex-1">
             <div className="bg-white rounded-2xl p-6 mb-6 w-70 shadow-lg border-2 border-[#D8E2DC]">
               <div className="flex flex-wrap items-center justify-between gap-4">
@@ -482,7 +460,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* Quick View Modal */}
       {quickViewProduct && (
         <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4">
           <div className="bg-white rounded-3xl max-w-4xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">

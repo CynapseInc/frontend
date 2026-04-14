@@ -1,4 +1,3 @@
-// src/interfaces/Produto.ts
 
 export interface CategoriaTema {
   id: number;
@@ -41,14 +40,8 @@ export interface Produto {
   ativo?: boolean;
 }
 
-// ==========================================
-// ADICIONADO: Tipagens para o Service
-// ==========================================
-
-// O Response que vem do Java é exatamente o nosso Produto completo
 export type ProdutoResponse = Produto;
 
-// O Request que enviamos para o Java ao criar/editar um produto
 export interface ProdutoRequest {
   titulo: string;
   descricao: string;

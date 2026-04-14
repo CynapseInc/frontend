@@ -109,9 +109,7 @@ export default function App() {
             </div>
           )}
 
-          {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Email Field */}
             <div>
               <label htmlFor="email" className="block text-[#6D6875] mb-2">
                 E-mail
@@ -132,7 +130,6 @@ export default function App() {
               </div>
             </div>
 
-            {/* Password Field */}
             <div>
               <label htmlFor="password" className="block text-[#6D6875] mb-2">
                 Senha
@@ -226,7 +223,6 @@ export default function App() {
             </button>
           </form>
 
-          {/* Footer */}
           <div className="mt-8 pt-6 border-t-2 border-[#D8E2DC] text-center">
             <p className="text-[#9D8189] text-sm">
               Acesso exclusivo para administradores
@@ -234,7 +230,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* Info Card - Demo Credentials */}
         <div className="mt-6 bg-gradient-to-br from-[#FFCAD4]/10 to-[#FFE5D9]/30 backdrop-blur-sm rounded-2xl p-4 border-2 border-[#FFCAD4]/30">
           <p className="text-[#6D6875] text-sm text-center mb-2">
             <strong>Demo:</strong> Use as credenciais para teste

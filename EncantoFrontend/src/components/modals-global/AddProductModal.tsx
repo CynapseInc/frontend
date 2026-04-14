@@ -64,7 +64,6 @@ export default function AddProductModal({ isOpen, onClose, products, selectedPro
         className="bg-white rounded-lg shadow-xl w-full max-w-[1000px] max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Header */}
         <div 
           className="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10"
           style={{ borderColor: '#D8E2DC' }}
@@ -85,10 +84,8 @@ export default function AddProductModal({ isOpen, onClose, products, selectedPro
           </button>
         </div>
 
-        {/* Content */}
         <div className="p-6">
           
-          {/* Barra de Pesquisa */}
           <div className="mb-5">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 size-5" style={{ color: '#9D8189' }} />
@@ -107,7 +104,6 @@ export default function AddProductModal({ isOpen, onClose, products, selectedPro
             </div>
           </div>
 
-          {/* Grid de Produtos */}
           <div className="grid grid-cols-3 gap-4 max-h-[500px] overflow-y-auto pr-2">
             {filteredProducts.map(product => {
               const isAlreadySelected = selectedProducts.some(sp => sp.product.id === product.id);
@@ -172,7 +168,6 @@ export default function AddProductModal({ isOpen, onClose, products, selectedPro
           </div>
         </div>
 
-        {/* Footer */}
         <div 
           className="flex justify-end p-6 border-t"
           style={{ borderColor: '#D8E2DC' }}

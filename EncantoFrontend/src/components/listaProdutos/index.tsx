@@ -6,7 +6,7 @@ import { Input } from '../ui/input';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { useNavigate } from 'react-router-dom';
 import { produtoService } from '../../services/ProdutoService';
-import type { Produto } from '../../interfaces/Produto'; // Atualizado para a interface correta
+import type { Produto } from '../../interfaces/Produto'; 
 import './index-lista-produtos.css';
 
 export default function App() {
@@ -19,10 +19,9 @@ export default function App() {
   const [currentPage, setCurrentPage] = useState(1);
   const navigate = useNavigate();
 
-  // Opções dinâmicas baseadas nos produtos
   const [themes, setThemes] = useState<string[]>(['Todos']);
   const [items, setItems] = useState<string[]>(['Todos']);
-  const [categories, setCategories] = useState<string[]>(['Todos']); // Agora é dinâmico também!
+  const [categories, setCategories] = useState<string[]>(['Todos']);
 
   const itemsPerPage = 8;
 
@@ -36,10 +35,8 @@ export default function App() {
           return;
         }
 
-        // Não precisamos mais de mapear para outro formato, o estado recebe o DTO original!
         setProducts(dados);
 
-        // Preenche os selects dinamicamente com base nos dados do backend
         const uniqueThemes = Array.from(new Set(dados.map(p => p.tema?.descricao || 'Sem tema')));
         const uniqueItems = Array.from(new Set(dados.map(p => p.item?.descricao || 'Sem item')));
         const uniqueCategories = Array.from(new Set(dados.map(p => p.tema?.categoriaTema?.titulo || 'Sem Categoria')));
@@ -56,7 +53,6 @@ export default function App() {
     fetchProdutos();
   }, []);
 
-  // Lógica de filtro adaptada para ler as chaves reais do Java
   const filteredProducts = products.filter(product => {
     const nome = product.titulo || '';
     const categoria = product.tema?.categoriaTema?.titulo || 'Sem Categoria';

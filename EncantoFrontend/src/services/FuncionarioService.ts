@@ -7,7 +7,6 @@ export const funcionarioService = {
     console.log('Dados recebidos da API:', data);
     return data ? data : []; 
   },
-  // ... resto do código
   
   buscarPorId: async (id: number) => {
     const response = await api.get(`/usuarios/${id}`);

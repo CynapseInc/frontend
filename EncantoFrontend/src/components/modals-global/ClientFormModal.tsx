@@ -39,7 +39,6 @@ export default function ClientFormModal({ isOpen, onClose, onSave, client }: Cli
   const [editingAddressIndex, setEditingAddressIndex] = useState<number | null>(null);
   const [showAddressForm, setShowAddressForm] = useState(false);
 
-  // Campos do endereço
   const [cep, setCep] = useState('');
   const [logradouro, setLogradouro] = useState('');
   const [numero, setNumero] = useState('');
@@ -162,13 +161,11 @@ export default function ClientFormModal({ isOpen, onClose, onSave, client }: Cli
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }} onClick={handleClose}>
       <div className="bg-white rounded-lg shadow-xl w-full max-w-[800px] max-h-[90vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-        {/* Header */}
         <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10" style={{ borderColor: '#D8E2DC' }}>
           <h2 className="text-[24px]" style={{ color: '#F4ACB7' }}><strong>{client ? 'Editar' : 'Cadastrar'} Cliente</strong></h2>
           <button onClick={handleClose} className="p-2 rounded-md hover:bg-gray-100"><X className="size-6" style={{ color: '#9D8189' }} /></button>
         </div>
 
-        {/* Content */}
         <form onSubmit={handleSubmit}>
           <div className="p-6 space-y-6">
             <div>
@@ -189,7 +186,6 @@ export default function ClientFormModal({ isOpen, onClose, onSave, client }: Cli
               </div>
             </div>
 
-            {/* Endereços */}
             <div>
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-[18px]" style={{ color: '#6D6875' }}><strong>Endereços</strong></h3>

@@ -1,6 +1,4 @@
-// src/interfaces/Pedido.ts
 
-// Espelha o StatusPedidoResponseDto do Java
 export interface StatusPedidoResponse {
   id: number;
   status: string;
@@ -10,7 +8,6 @@ export interface StatusPedidoResponse {
   updated_at?: string;
 }
 
-// Espelha o ProdutosPedidoResponseDto do Java
 export interface ProdutosPedidoResponse {
   id: number;
   idProduto: number;
@@ -24,22 +21,20 @@ export interface ProdutosPedidoResponse {
   updatedAt?: string;
 }
 
-// Substitua o bloco antigo por este:
 export interface PedidoStatusPedidoResponse {
   status: any;
   id?: number;
   idPedido?: number;
-  idStatusPedido: number; // MUDANÇA: Agora lemos o ID direto que vem do Java
+  idStatusPedido: number;
   statusAtual?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
-// Espelha o PedidoResponseDto do Java
 export interface PedidoResponse {
   id: number;
   observacoes: string;
   origem: string;
-  dataLimite: string; // Vem como ISO string do LocalDateTime
+  dataLimite: string;
   precoTotal: number;
   pesoTotal: number;
   cliente: {

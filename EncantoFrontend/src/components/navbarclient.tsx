@@ -27,7 +27,6 @@ function Navbar() {
               </div>
             </div>
 
-            {/* Menu */}
             <div className="hidden md:flex items-center gap-12">
               <div onClick={() => navigate('/catalogo')} className="text-[#6D6875] hover:text-[#F4ACB7] transition-colors text-lg">
                 Home
@@ -40,7 +39,6 @@ function Navbar() {
               </div>
             </div>
 
-            {/* Cart */}
             <button onClick={() => navigate("/carrinho")} className="relative p-4 bg-[#FFE5D9] rounded-2xl hover:bg-[#FFCAD4] transition-all shadow-md hover:shadow-lg">
               <ShoppingCart className="w-6 h-6 text-[#6D6875]" />
               {cartCount > 0 && (
