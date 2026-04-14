@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { Search, Pencil, Plus, Filter, Image as ImageIcon } from 'lucide-react';
+import DeleteConfirmDialog from "./modais/DeleteConfirmDialog"
+import { Search, Pencil, Plus, Filter, Image as ImageIcon, Trash2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
@@ -10,6 +11,7 @@ import './index-lista-produtos.css';
 
 export default function App() {
   const [products, setProducts] = useState<Produto[]>([]);
+  const [deleteProduct, setDeleteProduct] = useState<Produto | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [selectedTheme, setSelectedTheme] = useState('Todos');
@@ -81,6 +83,17 @@ export default function App() {
   const handleAddProduct = () => {
     navigate("/produtos");
   };
+  const handleDeleteProduct = async () => {
+      if (deleteProduct && deleteProduct.id) {
+        try {
+          await produtoService.deletar(deleteProduct.id);
+          setProducts(products.filter(prod => prod.id !== deleteProduct.id));
+          setDeleteProduct(null);
+        } catch (error) {
+          console.error("Erro ao apagar Produto:", error);
+        }
+      }
+    };
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
@@ -190,7 +203,7 @@ export default function App() {
                     <td className="px-6 py-4">
                       <div className="size-16 rounded-lg overflow-hidden border" style={{ borderColor: '#D8E2DC' }}>
                         {fotoUrl ? (
-                          <ImageWithFallback src={fotoUrl} alt={product.titulo} className="w-full h-full object-cover" />
+                          <ImageWithFallback onClick={() => navigate(`/produtos/fotos/${product.id}`)} src={fotoUrl} alt={product.titulo} className="w-full h-full object-cover" style={{ cursor: "pointer"}}/>
                         ) : (
                           <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 text-xs">Sem Foto</div>
                         )}
@@ -216,13 +229,13 @@ export default function App() {
                     </td>
                     <td className="px-6 py-4">
                       <div className="flex justify-end gap-2">
-                        <button 
-                          onClick={() => navigate(`/produtos/fotos/${product.id}`)} 
-                          className="p-2 rounded-md transition-all hover:bg-opacity-80" 
-                          style={{ backgroundColor: '#FFE5D9' }} 
-                          title="Gerenciar Fotos"
+                        <button
+                          onClick={() => setDeleteProduct(product)}
+                          className="p-2 rounded-md transition-all hover:bg-opacity-80"
+                          style={{ backgroundColor: '#FFCAD4' }}
+                          title="Excluir"
                         >
-                          <ImageIcon className="size-4" style={{ color: '#F4ACB7' }} />
+                          <Trash2 className="size-4" style={{ color: '#6D6875' }} />
                         </button>
                         <button 
                           onClick={() => handleEditProduct(product.id)} 
@@ -262,6 +275,12 @@ export default function App() {
           )}
         </div>
       </div>
+      <DeleteConfirmDialog
+        isOpen={!!deleteProduct}
+        onClose={() => setDeleteProduct(null)}
+        onConfirm={handleDeleteProduct}
+        productTitulo={deleteProduct?.titulo || ''}
+      />
     </div>
   );
 }

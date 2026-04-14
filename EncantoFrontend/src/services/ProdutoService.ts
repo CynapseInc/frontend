@@ -30,6 +30,6 @@ export const produtoService = {
   },
 
   deletar: async (id: string | number): Promise<void> => {
-    await api.delete(`/produtos/${id}`);
+    await api.patch(`/produtos/mudar-estado/${id}`);
   }
 };
