@@ -15,6 +15,7 @@ import DeleteCounterpartyDialog from './modals/DeleteCounterpartyDialog';
 import './index-cadastro-mov.css'
 import { movimentacaoService } from '../../services/MovimentacaoService';
 import { categoriaMovService } from '../../services/CategoriaMov';
+import { contraparteService } from '../../services/Contraparte';
 
 interface Category {
   id: string;
@@ -253,6 +254,8 @@ export default function App() {
     setIsCategoryModalOpen(false);
   };
 
+  
+
   const handleEditCategory = (category: Category) => {
     // setCategories(categories.map(cat => cat.id === category.id ? category : cat));
     const data = {
@@ -280,19 +283,29 @@ export default function App() {
 
   // Counterparty handlers
   const handleAddCounterparty = (counterparty: Counterparty) => {
-    setCounterparties([...counterparties, { ...counterparty, id: Date.now().toString() }]);
+    contraparteService.criar({
+      nome: counterparty.name,
+      descricao: counterparty.description,
+      segmento: counterparty.segment,
+      tipoContrato: counterparty.contractType
+    });
     setIsCounterpartyModalOpen(false);
   };
 
   const handleEditCounterparty = (counterparty: Counterparty) => {
-    setCounterparties(counterparties.map(cp => cp.id === counterparty.id ? counterparty : cp));
+    contraparteService.editar(Number(counterparty.id), {
+      nome: counterparty.name,
+      descricao: counterparty.description,
+      segmento: counterparty.segment,
+      tipoContrato: counterparty.contractType
+    });
     setIsCounterpartyModalOpen(false);
     setEditingCounterparty(null);
   };
 
   const handleDeleteCounterparty = () => {
     if (deleteCounterparty) {
-      setCounterparties(counterparties.filter(cp => cp.id !== deleteCounterparty.id));
+      contraparteService.deletar(Number(deleteCounterparty.id));
       setDeleteCounterparty(null);
     }
   };
