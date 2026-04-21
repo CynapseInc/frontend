@@ -4,6 +4,7 @@ import { useNavigate, useParams } from 'react-router-dom';
 import { fotoProdutoService } from '../../services/FotoProdutoService';
 import { produtoService } from '../../services/ProdutoService';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
+import FeedbackModal from '../ui/FeedbackModal';
 import './index-fotos.css';
 
 export default function CadastroFotosProduto() {
@@ -15,6 +16,19 @@ export default function CadastroFotosProduto() {
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [feedback, setFeedback] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>({
+    isOpen: false,
+    message: '',
+    type: 'success'
+  });
+
+  const showFeedback = (message: string, type: 'success' | 'error') => {
+    setFeedback({ isOpen: true, message, type });
+  };
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -46,11 +60,11 @@ export default function CadastroFotosProduto() {
       
       // MUDANÇA AQUI: Forçamos a conversão de ambos para String para evitar conflitos de tipagem
       setExistingPhotos(prev => prev.filter(f => String(f.id) !== String(fotoId)));
-      alert('Foto excluída com sucesso!');
+      showFeedback('Foto excluída com sucesso!', 'success');
       
     } catch (error) {
       console.error("Erro ao excluir foto:", error);
-      alert('Erro ao excluir foto. Verifique a consola.');
+      showFeedback('Erro ao excluir foto. Verifique a consola.', 'error');
     }
   };
 
@@ -81,11 +95,11 @@ export default function CadastroFotosProduto() {
       for (const file of selectedFiles) {
         await fotoProdutoService.uploadFoto(id, file);
       }
-      alert("Novas fotos adicionadas com sucesso!");
+      showFeedback("Novas fotos adicionadas com sucesso!", "success");
       navigate('/lista-produtos');
     } catch (error) {
       console.error("Erro no upload:", error);
-      alert("Erro ao enviar as fotos. Verifique o console.");
+      showFeedback("Erro ao enviar as fotos. Verifique o console.", "error");
     } finally {
       setIsUploading(false);
     }
@@ -207,6 +221,12 @@ export default function CadastroFotosProduto() {
           </div>
         </div>
       </div>
+      <FeedbackModal
+              isOpen={feedback.isOpen}
+              onClose={() => setFeedback({ ...feedback, isOpen: false })}
+              message={feedback.message}
+              type={feedback.type}
+            />
     </div>
   );
 }

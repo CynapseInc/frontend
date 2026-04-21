@@ -3,7 +3,7 @@ import { Tag, List, Box, ArrowLeft } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { useNavigate, useParams } from 'react-router-dom'; // Adicionado useParams
-
+import FeedbackModal from '../ui/FeedbackModal';
 // Importação dos Modais
 import ProductCategoryModal from './modals/ProductCategoryModal';
 import ProductCategoryListModal from './modals/ProductCategoryListModal';
@@ -56,6 +56,15 @@ export default function App() {
   const [isThemeListModalOpen, setIsThemeListModalOpen] = useState(false);
   const [isItemModalOpen, setIsItemModalOpen] = useState(false);
   const [isItemListModalOpen, setIsItemListModalOpen] = useState(false);
+  const [feedback, setFeedback] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>({
+    isOpen: false,
+    message: '',
+    type: 'success'
+  });
 
   // Estados de Edição e Exclusão (Auxiliares)
   const [editingCategory, setEditingCategory] = useState<ProductCategory | null>(null);
@@ -133,7 +142,7 @@ export default function App() {
         
       } catch (error) {
         console.error("Erro ao buscar produto para edição:", error);
-        alert("Não foi possível carregar os dados deste produto.");
+        showFeedback("Não foi possível carregar o produto para edição. Tente novamente.", "error");
       }
     };
 
@@ -185,7 +194,10 @@ export default function App() {
       const data = await categoriaTemaService.criar(category.description);
       setCategories([...categories, { id: data.id.toString(), description: data.titulo }]);
       setIsCategoryModalOpen(false);
-    } catch (e) { console.error(e); alert("Erro ao criar categoria."); }
+    } catch (e) { 
+      console.error(e); 
+      showFeedback("Erro ao criar categoria.", "error");
+    }
   };
 
   const handleEditCategory = async (category: ProductCategory) => {
@@ -193,7 +205,7 @@ export default function App() {
       await categoriaTemaService.atualizar(category.id, category.description);
       setCategories(categories.map(cat => cat.id === category.id ? category : cat));
       setIsCategoryModalOpen(false); setEditingCategory(null);
-    } catch (e) { console.error(e); alert("Erro ao atualizar categoria."); }
+    } catch (e) { console.error(e); showFeedback("Erro ao atualizar categoria.", "error"); }
   };
 
   const handleDeleteCategory = async () => {
@@ -202,7 +214,7 @@ export default function App() {
         await categoriaTemaService.deletar(deleteCategory.id);
         setCategories(categories.filter(cat => cat.id !== deleteCategory.id));
         setDeleteCategory(null);
-      } catch (e) { console.error(e); alert("Erro ao excluir. Pode estar vinculada a um tema."); }
+      } catch (e) { console.error(e); showFeedback("Erro ao excluir. Pode estar vinculada a um tema.", "error"); }
     }
   };
 
@@ -211,7 +223,7 @@ export default function App() {
       const data = await temaService.criar(theme.description, parseInt(theme.categoryId));
       setThemes([...themes, { id: data.id.toString(), description: data.descricao, categoryId: theme.categoryId }]);
       setIsThemeModalOpen(false);
-    } catch (e) { console.error(e); alert("Erro ao criar tema."); }
+    } catch (e) { console.error(e); showFeedback("Erro ao criar tema.", "error"); }
   };
 
   const handleEditTheme = async (theme: Theme) => {
@@ -219,7 +231,7 @@ export default function App() {
       await temaService.atualizar(theme.id, theme.description, parseInt(theme.categoryId));
       setThemes(themes.map(t => t.id === theme.id ? theme : t));
       setIsThemeModalOpen(false); setEditingTheme(null);
-    } catch (e) { console.error(e); alert("Erro ao atualizar tema."); }
+    } catch (e) { console.error(e); showFeedback("Erro ao atualizar tema.", "error"); }
   };
 
   const handleDeleteTheme = async () => {
@@ -228,7 +240,7 @@ export default function App() {
         await temaService.deletar(deleteTheme.id);
         setThemes(themes.filter(t => t.id !== deleteTheme.id));
         setDeleteTheme(null);
-      } catch (e) { console.error(e); alert("Erro ao excluir. Pode estar vinculado a um produto."); }
+      } catch (e) { console.error(e); showFeedback("Erro ao excluir. Pode estar vinculado a um produto.", "error"); }
     }
   };
 
@@ -251,7 +263,7 @@ export default function App() {
       const data = await itemService.criar(buildItemPayload(item));
       setItems([...items, { ...item, id: data.id.toString() }]);
       setIsItemModalOpen(false);
-    } catch (e) { console.error(e); alert("Erro ao criar item."); }
+    } catch (e) { console.error(e); showFeedback("Erro ao criar item.", "error"); }
   };
 
   const handleEditItem = async (item: Item) => {
@@ -259,7 +271,7 @@ export default function App() {
       await itemService.atualizar(item.id, buildItemPayload(item));
       setItems(items.map(i => i.id === item.id ? item : i));
       setIsItemModalOpen(false); setEditingItem(null);
-    } catch (e) { console.error(e); alert("Erro ao atualizar item."); }
+    } catch (e) { console.error(e); showFeedback("Erro ao atualizar item.", "error"); }
   };
 
   const handleDeleteItem = async () => {
@@ -268,8 +280,12 @@ export default function App() {
         await itemService.deletar(deleteItem.id);
         setItems(items.filter(i => i.id !== deleteItem.id));
         setDeleteItem(null);
-      } catch (e) { console.error(e); alert("Erro ao excluir. Pode estar vinculado a um produto."); }
+      } catch (e) { console.error(e); showFeedback("Erro ao excluir. Pode estar vinculado a um produto.", "error"); }
     }
+  };
+
+  const showFeedback = (message: string, type: 'success' | 'error') => {
+    setFeedback({ isOpen: true, message, type });
   };
 
   // ==========================================
@@ -281,41 +297,44 @@ export default function App() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedThemeId || !selectedItemId) { 
-      alert("Por favor, selecione um Tema e um Item."); 
-      return; 
+      showFeedback("Por favor, selecione um Tema e um Item.", "error"); 
+      return;
     }
     
     try {
-      const dadosBackend = {
-        titulo: productTitle,
-        descricao: productDescription,
-        temaId: parseInt(selectedThemeId),
-        itemId: parseInt(selectedItemId),
-        fotos: [] 
-      };
+    const dadosBackend = {
+      titulo: productTitle,
+      descricao: productDescription,
+      temaId: parseInt(selectedThemeId),
+      itemId: parseInt(selectedItemId),
+      fotos: [] 
+    };
 
-      if (isEditingProduct && id) {
-        // FLUXO DE EDIÇÃO
-        await produtoService.atualizar(id, dadosBackend as any);
-        alert('Produto atualizado com sucesso!');
-        
-        // Na edição, volta para a lista de produtos
+    if (isEditingProduct && id) {
+      await produtoService.atualizar(id, dadosBackend as any);
+      
+      showFeedback('Produto atualizado com sucesso!', 'success');
+      
+      setTimeout(() => {
         navigate('/lista-produtos'); 
-        
-      } else {
-        // FLUXO DE CRIAÇÃO
-        const novoProduto = await produtoService.criar(dadosBackend as any);
-        alert('Produto cadastrado! Vamos adicionar as imagens agora.');
-        
-        // Na criação, VAI PARA A TELA DE FOTOS com o novo ID!
+      }, 1500); 
+      
+    } else {
+      const novoProduto = await produtoService.criar(dadosBackend as any);
+      
+      // 🟢 SUCESSO
+      showFeedback('Produto cadastrado! Vamos adicionar as imagens agora.', 'success');
+      
+      setTimeout(() => {
         navigate(`/produtos/fotos/${novoProduto.id}`); 
-      }
-
-    } catch (error) {
-      console.error('Erro ao salvar produto:', error);
-      alert('Erro ao salvar produto. Verifique se preencheu tudo corretamente.');
+      }, 1500);
     }
-  };
+
+  } catch (error) {
+    console.error('Erro ao salvar produto:', error);
+    showFeedback('Erro ao salvar produto. Verifique se preencheu tudo corretamente.', 'error');
+  }
+};
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
@@ -432,6 +451,12 @@ export default function App() {
       <DeleteProductCategoryDialog isOpen={!!deleteCategory} onClose={() => setDeleteCategory(null)} onConfirm={handleDeleteCategory} categoryName={deleteCategory?.description || ''} />
       <DeleteThemeDialog isOpen={!!deleteTheme} onClose={() => setDeleteTheme(null)} onConfirm={handleDeleteTheme} themeName={deleteTheme?.description || ''} />
       <DeleteItemDialog isOpen={!!deleteItem} onClose={() => setDeleteItem(null)} onConfirm={handleDeleteItem} itemName={deleteItem?.description || ''} />
+    <FeedbackModal
+        isOpen={feedback.isOpen}
+        onClose={() => setFeedback({ ...feedback, isOpen: false })}
+        message={feedback.message}
+        type={feedback.type}
+      />
     </div>
   );
 }

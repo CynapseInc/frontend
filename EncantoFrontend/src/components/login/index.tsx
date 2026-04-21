@@ -55,22 +55,25 @@ export default function App() {
           navigate('/home');
       }, 1000); 
 
-    } catch (err: any) {
+  } catch (err: any) {
+    console.error('Erro interno:', err); 
+
     if (err.response) {
-      if (err.response.status === 404 || err.response.status === 401) {
-        setError('E-mail ou senha incorretos');
-      } else {
-        setError('Erro no servidor. Tente novamente mais tarde.');
-      }
-    } else if (err.request) {
-      setError('Erro de conexão: O servidor está rodando na porta 8080?');
+      if (err.response.status === 401 || err.response.status === 404) {
+      setError('E-mail ou senha incorretos.');
+    } else if (err.response.status === 403) {
+      setError('Você não tem permissão para acessar esta área.');
     } else {
-      setError('Erro ao configurar a requisição.');
+      setError('Ocorreu um problema no sistema. Tente novamente.');
     }
-    console.error('Erro detalhado:', err);
-  } finally {
-    setIsLoading(false);
+  } else if (err.request) {
+    setError('Não foi possível conectar ao sistema. Verifique sua conexão ou tente novamente em instantes.');
+  } else {
+    setError('Ocorreu um erro inesperado. Tente novamente mais tarde.');
   }
+} finally {
+  setIsLoading(false);
+}
   };
 
 

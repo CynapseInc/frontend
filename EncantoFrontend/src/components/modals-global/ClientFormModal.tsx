@@ -3,6 +3,7 @@ import { X, Plus, Trash2, Edit2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import InputMask from 'react-input-mask';
+import FeedbackModal from '../ui/FeedbackModal';
 
 interface EnderecoCliente {
   id?: number;
@@ -47,7 +48,21 @@ export default function ClientFormModal({ isOpen, onClose, onSave, client }: Cli
   const [estado, setEstado] = useState('');
   const [complemento, setComplemento] = useState('');
   const [errorMsgCep, setErrorMsgCep] = useState('');
-  const buscarCep = async (cep) => {
+  const [feedback, setFeedback] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>({
+    isOpen: false,
+    message: '',
+    type: 'success'
+  });
+
+  const showFeedback = (message: string, type: 'success' | 'error') => {
+    setFeedback({ isOpen: true, message, type });
+  };
+
+  const buscarCep = async (cep: any) => {
       const cepLimpo = cep.replace(/\D/g, '');
 
       if (cepLimpo.length !== 8) return;
@@ -105,10 +120,11 @@ export default function ClientFormModal({ isOpen, onClose, onSave, client }: Cli
     e.preventDefault();
     
     if (!nome.trim() || !telefone.trim()) {
-      alert('Por favor, preencha nome e telefone'); return;
+      showFeedback('Por favor, preencha os campos obrigatórios: Nome e Telefone.', 'error');
     }
     if (enderecos.length === 0) {
-      alert('Por favor, adicione pelo menos um endereço'); return;
+      showFeedback('Por favor, adicione pelo menos um endereço para o cliente.', 'error');
+      return;
     }
 
     onSave({
@@ -124,7 +140,8 @@ export default function ClientFormModal({ isOpen, onClose, onSave, client }: Cli
 
   const handleAddAddress = () => {
     if (!cep.trim() || !logradouro.trim() || !numero.trim() || !bairro.trim() || !cidade.trim() || !estado.trim()) {
-      alert('Por favor, preencha todos os campos obrigatórios do endereço'); return;
+      showFeedback('Por favor, preencha todos os campos obrigatórios do endereço.', 'error');
+      return;
     }
 
     const newAddress: EnderecoCliente = {
@@ -279,6 +296,12 @@ export default function ClientFormModal({ isOpen, onClose, onSave, client }: Cli
           </div>
         </form>
       </div>
+      <FeedbackModal
+          isOpen={feedback.isOpen}
+          onClose={() => setFeedback({ ...feedback, isOpen: false })}
+          message={feedback.message}
+          type={feedback.type}
+        />
     </div>
   );
 }

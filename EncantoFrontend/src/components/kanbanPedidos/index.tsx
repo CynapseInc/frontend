@@ -4,7 +4,7 @@ import { Button } from '../ui/button';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { useNavigate } from 'react-router-dom';
-
+import FeedbackModal from '../ui/FeedbackModal';
 // Modais
 import OrderDetailModal from './modals/OrderDetailModal';
 import StatusTypeModal from './modals/StatusTypeModal';
@@ -146,10 +146,22 @@ export default function Kanban() {
   
   const [editingStatusType, setEditingStatusType] = useState<StatusPedidoResponse | null>(null);
   const [deleteStatusType, setDeleteStatusType] = useState<StatusPedidoResponse | null>(null);
+  const [feedback, setFeedback] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>({
+    isOpen: false,
+    message: '',
+    type: 'success'
+  });
+
+  const showFeedback = (message: string, type: 'success' | 'error') => {
+    setFeedback({ isOpen: true, message, type });
+  };
 
   const navigate = useNavigate();
 
-  // 1. CARREGAR DADOS INICIAIS DA API
   useEffect(() => {
     const fetchKanbanData = async () => {
       try {
@@ -181,15 +193,13 @@ export default function Kanban() {
       // Chamada à API para atualizar o status do pedido
       await pedidoService.mudarStatus(orderId, newStatusId);
 
-      // Atualizar o estado local para o cartão mover instantaneamente na tela
-      // Atualizar o estado local para o cartão mover instantaneamente na tela
       setOrders(prevOrders => prevOrders.map(order => {
         if (order.id === orderId) {
           return {
             ...order,
             statusAtual: {
               ...order.statusAtual,
-              idStatusPedido: newStatusId // MUDANÇA AQUI
+              idStatusPedido: newStatusId 
             }
           };
         }
@@ -197,7 +207,7 @@ export default function Kanban() {
       }));
     } catch (error) {
       console.error("Erro ao mover pedido:", error);
-      alert("Ocorreu um erro ao mover o pedido.");
+      showFeedback("Não foi possível mover o pedido. Tente novamente.", "error");
     }
   };
 
@@ -214,6 +224,7 @@ export default function Kanban() {
       setStatusTypes([...statusTypes, novoStatus]);
       setIsStatusTypeModalOpen(false);
     } catch (error) {
+      showFeedback('Erro ao criar status.', 'error');
       console.error("Erro ao criar status", error);
     }
   };
@@ -226,6 +237,7 @@ export default function Kanban() {
       setIsStatusTypeModalOpen(false);
       setEditingStatusType(null);
     } catch (error) {
+      showFeedback('Erro ao atualizar status.', 'error');
        console.error("Erro ao atualizar status", error);
     }
   };
@@ -237,6 +249,7 @@ export default function Kanban() {
         setStatusTypes(statusTypes.filter(st => st.id !== deleteStatusType.id));
         setDeleteStatusType(null);
       } catch (error) {
+        showFeedback('Erro ao deletar status.', 'error');
         console.error("Erro ao deletar status", error);
       }
     }
@@ -355,6 +368,12 @@ export default function Kanban() {
           onConfirm={handleDeleteStatusType}
           statusTypeName={deleteStatusType?.status || ''}
         />
+        <FeedbackModal
+                isOpen={feedback.isOpen}
+                onClose={() => setFeedback({ ...feedback, isOpen: false })}
+                message={feedback.message}
+                type={feedback.type}
+              />
       </div>
     </DndProvider>
   );

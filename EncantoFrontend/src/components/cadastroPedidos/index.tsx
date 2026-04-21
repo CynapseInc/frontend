@@ -5,6 +5,7 @@ import { ImageWithFallback } from '../figma/ImageWithFallback';
 import ClientListModal from '../modals-global/ClientListModal';
 import ClientFormModal from '../modals-global/ClientFormModal';
 import { useNavigate } from 'react-router-dom';
+import FeedbackModal from '../ui/FeedbackModal';
 
 // Serviços
 import { clienteService } from '../../services/ClienteService';
@@ -51,6 +52,20 @@ interface StatusType {
 export default function App() {
   const navigate = useNavigate();
   
+  const [feedback, setFeedback] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>({
+    isOpen: false,
+    message: '',
+    type: 'success'
+  });
+
+  const showFeedback = (message: string, type: 'success' | 'error') => {
+    setFeedback({ isOpen: true, message, type });
+  };
+
   // Estados para dados da API
   const [clients, setClients] = useState<Cliente[]>([]);  
   const [products, setProducts] = useState<Product[]>([]);
@@ -130,7 +145,7 @@ export default function App() {
   // ==========================================
   const handleSelectProduct = (product: Product) => {
     if (selectedProducts.find(sp => sp.product.id === product.id)) {
-      alert('Produto já adicionado ao pedido');
+      showFeedback('Este produto já foi adicionado ao pedido.', 'error');
       return;
     }
     const newSelected: SelectedProduct = {
@@ -174,7 +189,7 @@ export default function App() {
   // ==========================================
   const handleConfirmOrder = async () => {
     if (!selectedClientId || selectedProducts.length === 0) {
-      alert('Por favor, selecione um cliente e adicione pelo menos um produto.');
+      showFeedback('Por favor, selecione um cliente e adicione pelo menos um produto.', 'error');
       return;
     }
 
@@ -199,12 +214,14 @@ export default function App() {
         await pedidoService.mudarStatus(novoPedido.id, parseInt(statusId));
       }
 
-      alert('Pedido confirmado e cadastrado com sucesso!');
-      navigate('/kanban'); // Redireciona para o Kanban
+      showFeedback('Pedido confirmado e cadastrado com sucesso!', 'success');
+      setTimeout(() => {
+        navigate('/kanban');
+      }, 1500); // Redireciona para o Kanban
 
     } catch (error) {
       console.error('Erro ao cadastrar pedido:', error);
-      alert('Erro ao cadastrar o pedido. Verifique os dados e tente novamente.');
+      showFeedback('Não foi possível cadastrar o pedido no momento. Verifique os dados ou tente novamente mais tarde.', 'error');
     }
   };
 
@@ -218,10 +235,10 @@ export default function App() {
     try {
       if (clientData.id) {
         await clienteService.atualizar(clientData.id, clientData);
-        alert("Cliente atualizado com sucesso!");
+        showFeedback("Cliente atualizado com sucesso!", "success");
       } else {
         await clienteService.criar(clientData);
-        alert("Cliente cadastrado com sucesso!");
+        showFeedback("Cliente cadastrado com sucesso!", "success");
       }
 
       setIsClientFormOpen(false);
@@ -239,7 +256,7 @@ export default function App() {
       
     } catch (error) {
       console.error("Erro ao salvar cliente:", error);
-      alert("Erro ao salvar o cliente. Verifique se o telefone tem formato correto.");
+      showFeedback("Não foi possível salvar o cliente. Verifique se os dados estão corretos.", "error");
     }
   };
 
@@ -478,6 +495,12 @@ export default function App() {
         onClose={() => { setIsClientFormOpen(false); setEditingClient(null); }} 
         onSave={handleSaveClient} 
         client={editingClient} // <-- Removido o as any
+      />
+      <FeedbackModal
+        isOpen={feedback.isOpen}
+        onClose={() => setFeedback({ ...feedback, isOpen: false })}
+        message={feedback.message}
+        type={feedback.type}
       />
     </div>
   );

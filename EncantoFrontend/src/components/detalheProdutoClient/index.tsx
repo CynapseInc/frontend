@@ -3,6 +3,7 @@ import { ShoppingCart, Heart, ChevronRight, Clock, Info, Package, Ruler, Weight,
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { useParams, useNavigate } from 'react-router-dom';
 import { produtoService } from '../../services/ProdutoService';
+import FeedbackModal from '../ui/FeedbackModal';
 import './detalhe-index.css'
 
 export default function App() {
@@ -16,6 +17,19 @@ export default function App() {
   const [quantity, setQuantity] = useState(1);
   const [customName, setCustomName] = useState('');
   const [customAge, setCustomAge] = useState('');
+  const [feedback, setFeedback] = useState<{
+        isOpen: boolean;
+        message: string;
+        type: 'success' | 'error';
+      }>({
+        isOpen: false,
+        message: '',
+        type: 'success'
+      });
+    
+      const showFeedback = (message: string, type: 'success' | 'error') => {
+        setFeedback({ isOpen: true, message, type });
+      };
 
   // ==========================================
   // BUSCAR DETALHES DO PRODUTO NA API
@@ -79,6 +93,7 @@ export default function App() {
         setProduct(mappedProduct);
         
       } catch (error) {
+        showFeedback('Erro ao carregar os detalhes do produto.', 'error');
         console.error("Erro ao carregar os detalhes do produto:", error);
       } finally {
         setLoading(false);
@@ -132,10 +147,10 @@ export default function App() {
     existingCart.push(cartItem);
     localStorage.setItem('encanto_carrinho', JSON.stringify(existingCart));
 
-    alert('Produto adicionado ao carrinho com sucesso!');
-    
+    setTimeout(() => {  
+    showFeedback('Produto adicionado ao carrinho com sucesso!', 'success');
     navigate('/carrinho');
-  };
+  }, 2000);
 
   return (
     <div className="min-h-screen bg-[#F9F9F9]">
@@ -392,6 +407,13 @@ export default function App() {
           </div>
         </div>
       </div>
+      <FeedbackModal
+              isOpen={feedback.isOpen}
+              onClose={() => setFeedback({ ...feedback, isOpen: false })}
+              message={feedback.message}
+              type={feedback.type}
+            />
     </div>
   );
+}
 }

@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { Search, Pencil, Trash2, Plus, Filter } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import FeedbackModal from '../ui/FeedbackModal';
 import EmployeeModal from './modals/EmployeeModal';
 import DeleteConfirmDialog from './modals/DeleteConfirmDialog';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
@@ -17,6 +18,19 @@ export default function App() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingEmployee, setEditingEmployee] = useState<Funcionario | null>(null);
   const [deleteEmployee, setDeleteEmployee] = useState<Funcionario | null>(null);
+  const [feedback, setFeedback] = useState<{
+        isOpen: boolean;
+        message: string;
+        type: 'success' | 'error';
+      }>({
+        isOpen: false,
+        message: '',
+        type: 'success'
+      });
+    
+      const showFeedback = (message: string, type: 'success' | 'error') => {
+        setFeedback({ isOpen: true, message, type });
+      };
   
   const itemsPerPage = 8;
   const filters = ['Todos', 'Administrador', 'Social Media', 'Manufatura']; // Ajuste estes cargos conforme os do seu backend
@@ -43,6 +57,7 @@ export default function App() {
 
         setEmployees(funcionariosFormatados);
       } catch (error) {
+        showFeedback('Erro ao carregar funcionários.', 'error');
         console.error("Erro ao procurar funcionários:", error);
       }
     };
@@ -80,6 +95,7 @@ export default function App() {
       setEmployees([...employees, { ...novoUsuario, status: 'Ativo' }]);
       setIsModalOpen(false);
     } catch (error) {
+      showFeedback('Erro ao criar funcionário.', 'error');
       console.error("Erro ao criar funcionário:", error);
     }
   };
@@ -102,6 +118,7 @@ export default function App() {
       setIsModalOpen(false);
       setEditingEmployee(null);
     } catch (error) {
+      showFeedback('Erro ao atualizar funcionário.', 'error');
        console.error("Erro ao atualizar funcionário:", error);
     }
   };
@@ -113,6 +130,7 @@ export default function App() {
         setEmployees(employees.filter(emp => emp.id !== deleteEmployee.id));
         setDeleteEmployee(null);
       } catch (error) {
+        showFeedback('Erro ao deletar funcionário.', 'error');
         console.error("Erro ao apagar funcionário:", error);
       }
     }
@@ -336,6 +354,12 @@ export default function App() {
         onConfirm={handleDeleteEmployee}
         employeeName={deleteEmployee?.name || ''}
       />
+      <FeedbackModal
+              isOpen={feedback.isOpen}
+              onClose={() => setFeedback({ ...feedback, isOpen: false })}
+              message={feedback.message}
+              type={feedback.type}
+            />
     </div>
   );
 }

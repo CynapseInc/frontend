@@ -6,6 +6,7 @@ import ClientListModal from '../modals-global/ClientListModal';
 import ClientFormModal from '../modals-global/ClientFormModal';
 import AddProductModal from '../modals-global/AddProductModal';
 import { useParams, useNavigate } from 'react-router-dom';
+import FeedbackModal from '../ui/FeedbackModal';
 
 // Serviços
 import { pedidoService } from '../../services/PedidoService';
@@ -71,6 +72,19 @@ export default function App() {
   const [isClientFormOpen, setIsClientFormOpen] = useState(false);
   const [isAddProductModalOpen, setIsAddProductModalOpen] = useState(false);
   const [editingClient, setEditingClient] = useState<Cliente | null>(null);
+  const [feedback, setFeedback] = useState<{
+      isOpen: boolean;
+      message: string;
+      type: 'success' | 'error';
+    }>({
+      isOpen: false,
+      message: '',
+      type: 'success'
+    });
+  
+    const showFeedback = (message: string, type: 'success' | 'error') => {
+      setFeedback({ isOpen: true, message, type });
+    };
 
   // ==========================================
   // BUSCAR DADOS DA API
@@ -139,7 +153,8 @@ export default function App() {
 
       } catch (error) {
         console.error("Erro ao carregar dados do pedido:", error);
-        alert("Erro ao carregar os detalhes do pedido.");
+
+        showFeedback('Erro ao carregar os detalhes do pedido.', 'error');
       } finally {
         setIsLoading(false);
       }
@@ -178,7 +193,7 @@ export default function App() {
       updateLastModified();
     } catch (error) {
       console.error("Erro ao atualizar quantidade", error);
-      alert("Erro ao atualizar quantidade do produto no banco.");
+      showFeedback('Erro ao atualizar quantidade do produto.', 'error');
     }
   };
 
@@ -192,7 +207,7 @@ export default function App() {
          updateLastModified();
       } catch (error) {
          console.error("Erro ao remover produto", error);
-         alert("Erro ao remover o produto do pedido.");
+         showFeedback('Erro ao remover o produto do pedido.', 'error');
       }
     }
   };
@@ -200,7 +215,7 @@ export default function App() {
   const handleAddProduct = async (product: Product) => {
     const exists = selectedProducts.find(sp => sp.product.id === product.id);
     if (exists) {
-      alert('Produto já adicionado ao pedido');
+      showFeedback('Produto já adicionado ao pedido', 'error');
       return;
     }
 
@@ -229,7 +244,7 @@ export default function App() {
       updateLastModified();
     } catch (error) {
        console.error("Erro ao adicionar produto", error);
-       alert("Erro ao adicionar o produto ao pedido.");
+       showFeedback('Erro ao adicionar o produto ao pedido.', 'error');
     }
   };
 
@@ -253,7 +268,7 @@ export default function App() {
 
   const handleSaveChanges = async () => {
     if (!selectedClientId) {
-      alert('Por favor, selecione um cliente'); return;
+      showFeedback('Por favor, selecione um cliente', 'error'); return;
     }
     
     try {
@@ -277,11 +292,11 @@ export default function App() {
       }
 
       updateLastModified();
-      alert('Alterações salvas com sucesso!');
+      showFeedback('Alterações salvas com sucesso!', 'success');
       navigate('/kanban'); // Opcional: Redirecionar após salvar
     } catch (error) {
       console.error("Erro ao salvar alterações", error);
-      alert("Erro ao salvar o pedido.");
+      showFeedback('Erro ao salvar o pedido.', 'error');
     }
   };
 
@@ -298,7 +313,7 @@ export default function App() {
       setEditingClient(null);
     } catch(e) {
       console.error(e);
-      alert("Erro ao salvar cliente.");
+      showFeedback('Erro ao salvar cliente.', 'error');
     }
   };
 
@@ -539,6 +554,12 @@ export default function App() {
       <ClientListModal isOpen={isClientListOpen} onClose={() => setIsClientListOpen(false)} clients={clients as any} onEdit={(c: any) => { setEditingClient(c); setIsClientFormOpen(true); setIsClientListOpen(false); }} />
       <ClientFormModal isOpen={isClientFormOpen} onClose={() => { setIsClientFormOpen(false); setEditingClient(null); }} onSave={handleSaveClient} client={editingClient as any} />
       <AddProductModal isOpen={isAddProductModalOpen} onClose={() => setIsAddProductModalOpen(false)} products={allProducts as any} selectedProducts={selectedProducts as any} onAddProduct={handleAddProduct} />
+      <FeedbackModal
+        isOpen={feedback.isOpen}
+        onClose={() => setFeedback({ ...feedback, isOpen: false })}
+        message={feedback.message}
+        type={feedback.type}
+      />
     </div>
   );
 }

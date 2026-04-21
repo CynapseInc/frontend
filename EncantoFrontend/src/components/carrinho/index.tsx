@@ -2,11 +2,25 @@ import React, { useState, useEffect } from 'react';
 import { Trash2, ShoppingBag, ArrowLeft, ArrowRight, Package } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
+import FeedbackModal from '../ui/FeedbackModal';
 import './index.css';
 
 export default function App() {
   const navigate = useNavigate();
   const [cartItems, setCartItems] = useState<any[]>([]);
+  const [feedback, setFeedback] = useState<{
+        isOpen: boolean;
+        message: string;
+        type: 'success' | 'error';
+      }>({
+        isOpen: false,
+        message: '',
+        type: 'success'
+      });
+    
+      const showFeedback = (message: string, type: 'success' | 'error') => {
+        setFeedback({ isOpen: true, message, type });
+      };
 
   // 1. Carregar o carrinho do LocalStorage ao abrir a página
   useEffect(() => {
@@ -53,7 +67,8 @@ export default function App() {
   const handleCheckout = () => {
     if (cartItems.length === 0) return;
     // Aqui você vai decidir como finalizar: enviar para o WhatsApp ou abrir uma tela de Login/Cadastro de Cliente
-    alert('Redirecionando para finalização do pedido...');
+      
+    showFeedback('Redirecionando para finalização do pedido!', 'success');
     console.log("Itens prontos para checkout:", cartItems);
   };
 
@@ -224,6 +239,12 @@ export default function App() {
           </div>
         )}
       </div>
+      <FeedbackModal
+        isOpen={feedback.isOpen}
+        onClose={() => setFeedback({ ...feedback, isOpen: false })}
+        message={feedback.message}
+        type={feedback.type}
+      />
     </div>
   );
 }

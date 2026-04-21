@@ -3,6 +3,7 @@ import DeleteConfirmDialog from "./modais/DeleteConfirmDialog"
 import { Search, Pencil, Plus, Filter, Image as ImageIcon, Trash2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
+import FeedbackModal from '../ui/FeedbackModal';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { useNavigate } from 'react-router-dom';
 import { produtoService } from '../../services/ProdutoService';
@@ -22,6 +23,19 @@ export default function App() {
   const [themes, setThemes] = useState<string[]>(['Todos']);
   const [items, setItems] = useState<string[]>(['Todos']);
   const [categories, setCategories] = useState<string[]>(['Todos']);
+  const [feedback, setFeedback] = useState<{
+      isOpen: boolean;
+      message: string;
+      type: 'success' | 'error';
+    }>({
+      isOpen: false,
+      message: '',
+      type: 'success'
+    });
+  
+    const showFeedback = (message: string, type: 'success' | 'error') => {
+      setFeedback({ isOpen: true, message, type });
+    };
 
   const itemsPerPage = 8;
 
@@ -46,6 +60,7 @@ export default function App() {
         setCategories(['Todos', ...uniqueCategories]);
 
       } catch (error) {
+        showFeedback('Erro ao buscar produtos. Tente novamente mais tarde.', 'error');
         console.error("Erro ao buscar produtos:", error);
       }
     };
@@ -86,6 +101,7 @@ export default function App() {
           setProducts(products.filter(prod => prod.id !== deleteProduct.id));
           setDeleteProduct(null);
         } catch (error) {
+          showFeedback('Erro ao excluir produto. Tente novamente mais tarde.', 'error');
           console.error("Erro ao apagar Produto:", error);
         }
       }
@@ -276,6 +292,12 @@ export default function App() {
         onClose={() => setDeleteProduct(null)}
         onConfirm={handleDeleteProduct}
         productTitulo={deleteProduct?.titulo || ''}
+      />
+      <FeedbackModal
+        isOpen={feedback.isOpen}
+        onClose={() => setFeedback({ ...feedback, isOpen: false })}
+        message={feedback.message}
+        type={feedback.type}
       />
     </div>
   );

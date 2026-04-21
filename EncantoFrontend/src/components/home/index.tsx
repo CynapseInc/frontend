@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Package, Calendar, Eye, Send, Search, X, Trash2 } from 'lucide-react';import { Button } from '../ui/button';
 import { useNavigate } from 'react-router-dom';
-
+import FeedbackModal from '../ui/FeedbackModal';
 // Serviços
 import { pedidoService } from '../../services/PedidoService';
 import { produtoService } from '../../services/ProdutoService';
@@ -43,6 +43,19 @@ export function HomeCalendar() {
   // Estado para guardar os pedidos reais da API
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [feedback, setFeedback] = useState<{
+    isOpen: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>({
+    isOpen: false,
+    message: '',
+    type: 'success'
+  });
+
+  const showFeedback = (message: string, type: 'success' | 'error') => {
+    setFeedback({ isOpen: true, message, type });
+  };
 
   // ==========================================
   // BUSCAR DADOS INICIAIS DA API
@@ -191,7 +204,7 @@ export function HomeCalendar() {
 
   const handleMarkAsSent = (orderId: string) => {
     // Aqui no futuro poderá integrar com a API para mudar diretamente para o status de 'Enviado'
-    alert(`O pedido PED-${orderId.padStart(3, '0')} deve ser movido no Kanban!`);
+    showFeedback(`O pedido PED-${orderId.padStart(3, '0')} deve ser movido no Kanban!`, 'success');
     navigate('/kanban');
   };
 
@@ -204,14 +217,14 @@ export function HomeCalendar() {
       try {
         await pedidoService.mudarEstado(orderId);
         setOrders(orders.filter(order => order.id !== orderId));
-        alert('Pedido arquivado com sucesso!');
+        showFeedback('Pedido arquivado com sucesso!', 'success');
         
         if (selectedOrders.length <= 1) {
           setIsModalOpen(false);
         }
       } catch (error) {
         console.error("Erro ao arquivar pedido:", error);
-        alert('Ocorreu um erro ao tentar arquivar o pedido.');
+        showFeedback('Ocorreu um erro ao tentar arquivar o pedido. Tente novamente.', 'error');
       }
     }
   };
@@ -626,6 +639,13 @@ export function HomeCalendar() {
       >
         <Plus className="size-8" style={{ color: 'white' }} />
       </button>
+
+      <FeedbackModal
+        isOpen={feedback.isOpen}
+        onClose={() => setFeedback({ ...feedback, isOpen: false })}
+        message={feedback.message}
+        type={feedback.type}
+      />
     </div>
   );
 }
