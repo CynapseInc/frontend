@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 // import { FormEvent } from 'react';
 import { Heart, Lock, Mail, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import EncantoLogo from '../../assets/logoEncanto.png';
 import axios from 'axios';
 import api from '../../provider/api';
 import './index.css';
@@ -90,16 +91,12 @@ export default function App() {
       <div className="max-w-md w-full mx-auto">
         <div className="bg-white/95 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-[#D8E2DC] p-8 md:p-12">
           {/* Logo */}
-          <div className="flex flex-col items-center mb-6">
-            <div className="w-20 h-20 bg-gradient-to-br from-[#FFCAD4] to-[#F4ACB7] rounded-3xl flex items-center justify-center shadow-xl mb-4 transform hover:scale-105 transition-transform">
-              <Heart className="w-10 h-10 text-white fill-white" />
-            </div>
-            <h1 className="text-[#F4ACB7] text-center mb-1">Encanto</h1>
-            <p className="text-[#9D8189] text-center">Personalizados</p>
+          <div className="flex items-center justify-center mb-2">
+            <img src={EncantoLogo} alt="Encanto Logo" className="w-50 h-24 mr-3" />
           </div>
 
           {/* Title */}
-          <div className="text-center mb-8">
+          <div className="text-center mb-6">
             <h2 className="text-[#6D6875] mb-2">Área do Administrador</h2>
             <p className="text-[#9D8189]">Entre com suas credenciais</p>
           </div>
@@ -230,16 +227,6 @@ export default function App() {
             <p className="text-[#9D8189] text-sm">
               Acesso exclusivo para administradores
             </p>
-          </div>
-        </div>
-
-        <div className="mt-6 bg-gradient-to-br from-[#FFCAD4]/10 to-[#FFE5D9]/30 backdrop-blur-sm rounded-2xl p-4 border-2 border-[#FFCAD4]/30">
-          <p className="text-[#6D6875] text-sm text-center mb-2">
-            <strong>Demo:</strong> Use as credenciais para teste
-          </p>
-          <div className="text-[#9D8189] text-xs text-center space-y-1">
-            <p>E-mail: <span className="text-[#F4ACB7]">admin@encanto.com</span></p>
-            <p>Senha: <span className="text-[#F4ACB7]">admin123</span></p>
           </div>
         </div>
       </div>

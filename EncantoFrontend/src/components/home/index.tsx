@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { ChevronLeft, ChevronRight, Plus, Package, Calendar, Eye, Send, Search, X, Trash2 } from 'lucide-react';import { Button } from '../ui/button';
+import { ChevronLeft, ChevronRight, Plus, Package, Calendar, Eye, Send, Search, X, Trash2 } from 'lucide-react';
+import { Button } from '../ui/button';
 import { useNavigate } from 'react-router-dom';
 import FeedbackModal from '../ui/FeedbackModal';
+import ConfirmModal from '../ui/ConfirmModal';
 // Serviços
 import { pedidoService } from '../../services/PedidoService';
 import { produtoService } from '../../services/ProdutoService';
@@ -43,6 +45,8 @@ export function HomeCalendar() {
   // Estado para guardar os pedidos reais da API
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Estados para os Modais de Feedback e Confirmação
   const [feedback, setFeedback] = useState<{
     isOpen: boolean;
     message: string;
@@ -52,6 +56,9 @@ export function HomeCalendar() {
     message: '',
     type: 'success'
   });
+
+  // Estado para guardar qual pedido está sendo excluído no ConfirmModal
+  const [orderToDelete, setOrderToDelete] = useState<string | null>(null);
 
   const showFeedback = (message: string, type: 'success' | 'error') => {
     setFeedback({ isOpen: true, message, type });
@@ -203,29 +210,38 @@ export function HomeCalendar() {
   };
 
   const handleMarkAsSent = (orderId: string) => {
-    // Aqui no futuro poderá integrar com a API para mudar diretamente para o status de 'Enviado'
     showFeedback(`O pedido PED-${orderId.padStart(3, '0')} deve ser movido no Kanban!`, 'success');
-    navigate('/kanban');
+    setTimeout(() => {
+      navigate('/kanban');
+    }, 1500);
   };
 
   const handleViewDetails = (orderId: string) => {
     navigate(`/pedidos/detalhes/${orderId}`);
   };
 
-  const handleDeleteOrder = async (orderId: string) => {
-    if (window.confirm('Tem a certeza que deseja arquivar/excluir este pedido? Ele sairá do calendário e do Kanban.')) {
-      try {
-        await pedidoService.mudarEstado(orderId);
-        setOrders(orders.filter(order => order.id !== orderId));
-        showFeedback('Pedido arquivado com sucesso!', 'success');
-        
-        if (selectedOrders.length <= 1) {
-          setIsModalOpen(false);
-        }
-      } catch (error) {
-        console.error("Erro ao arquivar pedido:", error);
-        showFeedback('Ocorreu um erro ao tentar arquivar o pedido. Tente novamente.', 'error');
+  // Função que apenas abre o modal e guarda o ID
+  const handleDeleteOrderClick = (orderId: string) => {
+    setOrderToDelete(orderId);
+  };
+
+  // Função que de fato exclui quando o usuário clica em "Sim" no modal
+  const confirmDeleteOrder = async () => {
+    if (!orderToDelete) return;
+
+    try {
+      await pedidoService.mudarEstado(orderToDelete);
+      setOrders(orders.filter(order => order.id !== orderToDelete));
+      showFeedback('Pedido arquivado com sucesso!', 'success');
+      
+      if (selectedOrders.length <= 1) {
+        setIsModalOpen(false);
       }
+    } catch (error) {
+      console.error("Erro ao arquivar pedido:", error);
+      showFeedback('Ocorreu um erro ao tentar arquivar o pedido. Tente novamente.', 'error');
+    } finally {
+      setOrderToDelete(null); // Limpa o estado depois que termina
     }
   };
 
@@ -602,7 +618,7 @@ export function HomeCalendar() {
                         Detalhes do Pedido
                       </Button>
                       <button
-                        onClick={() => handleDeleteOrder(order.id)}
+                        onClick={() => handleDeleteOrderClick(order.id)}
                         className="h-10 px-4 rounded-md flex items-center justify-center transition-all hover:bg-red-50 group"
                         style={{ backgroundColor: 'white', border: '1px solid #ffcdd2' }}
                         title="Arquivar/Excluir Pedido"
@@ -645,6 +661,16 @@ export function HomeCalendar() {
         onClose={() => setFeedback({ ...feedback, isOpen: false })}
         message={feedback.message}
         type={feedback.type}
+      />
+
+      {/* Modal de Confirmação para Exclusão */}
+      <ConfirmModal
+        isOpen={orderToDelete !== null}
+        onClose={() => setOrderToDelete(null)}
+        onConfirm={confirmDeleteOrder}
+        title="Arquivar Pedido"
+        message="Tem certeza que deseja arquivar/excluir este pedido? Ele sairá do calendário e do Kanban."
+        confirmText="Sim, arquivar"
       />
     </div>
   );
