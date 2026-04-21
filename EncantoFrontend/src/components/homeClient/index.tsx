@@ -1,97 +1,48 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Heart, Star, ChevronLeft, ChevronRight, Instagram, Facebook, Send, Phone, Mail, MapPin } from 'lucide-react';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import './index-home-client.css'
 
+import { produtoService } from '../../services/ProdutoService';
+import type { ProdutoResponse } from '../../interfaces/Produto';
+import { useNavigate } from 'react-router-dom';
 
 export default function App() {
+  const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  const [cartCount] = useState(3);
+  
+  const [products, setProducts] = useState<ProdutoResponse[]>([]);
+  const [categories, setCategories] = useState<string[]>(['Todos']);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const categories = [
-    'Todos',
-    'Eventos Corporativos',
-    'Aniversários',
-    'Casamentos',
-    'Infantis',
-    'Outros'
-  ];
+  useEffect(() => {
+    const fetchProdutos = async () => {
+      try {
+        setIsLoading(true);
+        const data = await produtoService.listarTodos(); 
+        
+        const produtosAtivos = data.filter(p => p.ativo !== false);
+        setProducts(produtosAtivos);
 
-  const products = [
-    {
-      id: 1,
-      name: 'Caneca Personalizada Premium',
-      price: 35.00,
-      oldPrice: 45.00,
-      category: 'Todos',
-      image: 'https://images.unsplash.com/photo-1759158963837-ce2f1524b813?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjdXN0b20lMjBtdWclMjBwZXJzb25hbGl6ZWR8ZW58MXx8fHwxNzYzMjIyMzU2fDA&ixlib=rb-4.1.0&q=80&w=1080',
-      rating: 5
-    },
-    {
-      id: 2,
-      name: 'Kit Festa Aniversário Completo',
-      price: 120.00,
-      oldPrice: 150.00,
-      category: 'Aniversários',
-      image: 'https://images.unsplash.com/photo-1741969494307-55394e3e4071?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxiaXJ0aGRheSUyMHBhcnR5JTIwZGVjb3JhdGlvbnxlbnwxfHx8fDE3NjMyMjIzNTd8MA&ixlib=rb-4.1.0&q=80&w=1080',
-      rating: 5
-    },
-    {
-      id: 3,
-      name: 'Lembranças para Casamento',
-      price: 85.00,
-      oldPrice: 110.00,
-      category: 'Casamentos',
-      image: 'https://images.unsplash.com/photo-1558929993-a441a66fd1cb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3ZWRkaW5nJTIwc291dmVuaXJzJTIwZWxlZ2FudHxlbnwxfHx8fDE3NjMyMjIzNTd8MA&ixlib=rb-4.1.0&q=80&w=1080',
-      rating: 5
-    },
-    {
-      id: 4,
-      name: 'Brindes Corporativos Premium',
-      price: 45.00,
-      oldPrice: 60.00,
-      category: 'Eventos Corporativos',
-      image: 'https://images.unsplash.com/photo-1762504381997-3ddd51f135b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb3Jwb3JhdGUlMjBnaWZ0cyUyMHByb2Zlc3Npb25hbHxlbnwxfHx8fDE3NjMyMjIzNTd8MA&ixlib=rb-4.1.0&q=80&w=1080',
-      rating: 5
-    },
-    {
-      id: 5,
-      name: 'Decoração Festa Infantil',
-      price: 95.00,
-      oldPrice: 120.00,
-      category: 'Infantis',
-      image: 'https://images.unsplash.com/photo-1762912913371-ccc0a5fca0ae?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjaGlsZHJlbiUyMHBhcnR5JTIwZGVjb3JhdGlvbnxlbnwxfHx8fDE3NjMyMjIzNTh8MA&ixlib=rb-4.1.0&q=80&w=1080',
-      rating: 5
-    },
-    {
-      id: 6,
-      name: 'Kit Presente Personalizado',
-      price: 55.00,
-      oldPrice: 70.00,
-      category: 'Outros',
-      image: 'https://images.unsplash.com/photo-1760557658200-5e6230cbd13c?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxwZXJzb25hbGl6ZWQlMjBnaWZ0cyUyMGNlbGVicmF0aW9ufGVufDF8fHx8MTc2MzIyMjM1Nnww&ixlib=rb-4.1.0&q=80&w=1080',
-      rating: 5
-    },
-    {
-      id: 7,
-      name: 'Camisetas Personalizadas',
-      price: 38.00,
-      oldPrice: 50.00,
-      category: 'Eventos Corporativos',
-      image: 'https://images.unsplash.com/photo-1762504381997-3ddd51f135b8?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHxjb3Jwb3JhdGUlMjBnaWZ0cyUyMHByb2Zlc3Npb25hbHxlbnwxfHx8fDE3NjMyMjIzNTd8MA&ixlib=rb-4.1.0&q=80&w=1080',
-      rating: 5
-    },
-    {
-      id: 8,
-      name: 'Convites Elegantes',
-      price: 65.00,
-      oldPrice: 85.00,
-      category: 'Casamentos',
-      image: 'https://images.unsplash.com/photo-1558929993-a441a66fd1cb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx3ZWRkaW5nJTIwc291dmVuaXJzJTIwZWxlZ2FudHxlbnwxfHx8fDE3NjMyMjIzNTd8MA&ixlib=rb-4.1.0&q=80&w=1080',
-      rating: 5
-    }
-  ];
+        const categoriasUnicas = new Set<string>();
+        produtosAtivos.forEach(p => {
+          const categoria = p.tema?.categoriaTema?.titulo;
+          if (categoria) {
+            categoriasUnicas.add(categoria);
+          }
+        });
+        
+        setCategories(['Todos', ...Array.from(categoriasUnicas)]);
+      } catch (error) {
+        console.error('Erro ao carregar produtos:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchProdutos();
+  }, []);
 
   const testimonials = [
     {
@@ -122,7 +73,7 @@ export default function App() {
 
   const filteredProducts = selectedCategory === 'Todos' 
     ? products 
-    : products.filter(p => p.category === selectedCategory);
+    : products.filter(p => p.tema?.categoriaTema?.titulo === selectedCategory);
 
   const nextTestimonial = () => {
     setCurrentTestimonial((prev) => (prev + 1) % testimonials.length);
@@ -134,9 +85,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-[#F9F9F9]">
-      {/* Navbar */}
-      
-
       {/* Hero Section */}
       <section id="home" className="relative bg-gradient-to-br from-[#FFE5D9] via-[#F9F9F9] to-[#D8E2DC] py-24 overflow-hidden">
         {/* Decorative Elements */}
@@ -244,49 +192,73 @@ export default function App() {
 
           {/* Products Grid */}
           <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-            {filteredProducts.slice(0, 8).map((product) => (
-              <div key={product.id} className="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 group border-2 border-[#D8E2DC]">
-                <div className="relative overflow-hidden">
-                  <ImageWithFallback
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                  <button className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:scale-110 shadow-lg">
-                    <Heart className="w-5 h-5 text-[#F4ACB7]" />
-                  </button>
+            {isLoading ? (
+              <p className="col-span-full text-center text-[#9D8189]">A carregar produtos maravilhosos...</p>
+            ) : filteredProducts.length === 0 ? (
+              <p className="col-span-full text-center text-[#9D8189]">Nenhum produto encontrado nesta categoria.</p>
+            ) : (
+              filteredProducts.slice(0, 8).map((product) => {
+                const imageUrl = product.fotos && product.fotos.length > 0 
+                  ? product.fotos[0].foto 
+                  : 'https://via.placeholder.com/300x300?text=Sem+Foto';
                   
-                  {/* Rating Badge */}
-                  <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-xl flex items-center gap-1 shadow-lg">
-                    <Star className="w-4 h-4 fill-[#F4ACB7] text-[#F4ACB7]" />
-                    <span className="text-[#6D6875]">{product.rating}.0</span>
+                const precoVenda = product.item?.precoVenda || 0;
+                const precoPromocional = product.item?.precoPromocional || 0;
+                const temDesconto = precoPromocional > 0 && precoPromocional < precoVenda;
+
+                return (
+                  <div key={product.id} className="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 group border-2 border-[#D8E2DC]">
+                    <div className="relative overflow-hidden">
+                      <ImageWithFallback
+                        src={imageUrl}
+                        alt={product.titulo}
+                        className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
+                      />
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                      <button className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:scale-110 shadow-lg">
+                        <Heart className="w-5 h-5 text-[#F4ACB7]" />
+                      </button>
+                      
+                      {/* Rating Badge */}
+                      <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-xl flex items-center gap-1 shadow-lg">
+                        <Star className="w-4 h-4 fill-[#F4ACB7] text-[#F4ACB7]" />
+                        <span className="text-[#6D6875]">5.0</span>
+                      </div>
+                    </div>
+                    
+                    <div className="p-6">
+                      <h3 className="text-[#6D6875] mb-3 truncate" title={product.titulo}>{product.titulo}</h3>
+                      
+                      <div className="flex items-center gap-3 mb-4">
+                      {temDesconto ? (
+                        <>
+                        <span className="text-[#9D8189] line-through text-sm">
+                          R$ {precoVenda.toFixed(2)}
+                        </span>
+                        <span className="text-[#F4ACB7] font-bold text-lg">
+                          R$ {precoPromocional.toFixed(2)}
+                        </span>
+                        </>
+                      ) : (
+                      <span className="text-[#F4ACB7] font-bold text-lg">
+                        R$ {precoVenda.toFixed(2)}
+                      </span>
+                    )}
+                    </div>
+                      
+                      <button className="w-full bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white py-4 rounded-xl hover:shadow-lg transition-all font-semibold">
+                        Peça já
+                      </button>
+                    </div>
                   </div>
-                </div>
-                
-                <div className="p-6">
-                  <h3 className="text-[#6D6875] mb-3">{product.name}</h3>
-                  
-                  <div className="flex items-center gap-3 mb-4">
-                    <span className="text-[#9D8189] line-through text-sm">
-                      R$ {product.oldPrice.toFixed(2)}
-                    </span>
-                    <span className="text-[#F4ACB7]">
-                      R$ {product.price.toFixed(2)}
-                    </span>
-                  </div>
-                  
-                  <button className="w-full bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white py-4 rounded-xl hover:shadow-lg transition-all">
-                    Peça já
-                  </button>
-                </div>
-              </div>
-            ))}
+                );
+              })
+            )}
           </div>
 
           {/* View All Button */}
           <div className="text-center">
-            <button className="bg-white border-3 border-[#F4ACB7] text-[#F4ACB7] px-12 py-5 rounded-2xl hover:bg-[#F4ACB7] hover:text-white transition-all shadow-lg hover:shadow-xl text-lg">
+            <button onClick={() => navigate('/pesquisa-produtos')} className="bg-white border-3 border-[#F4ACB7] text-[#F4ACB7] px-12 py-5 rounded-2xl hover:bg-[#F4ACB7] hover:text-white transition-all shadow-lg hover:shadow-xl text-lg">
               Conheça todos os produtos
             </button>
           </div>
