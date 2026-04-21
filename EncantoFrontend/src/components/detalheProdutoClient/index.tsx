@@ -151,6 +151,7 @@ export default function App() {
     showFeedback('Produto adicionado ao carrinho com sucesso!', 'success');
     navigate('/carrinho');
   }, 2000);
+  };
 
   return (
     <div className="min-h-screen bg-[#F9F9F9]">
@@ -415,5 +416,4 @@ export default function App() {
             />
     </div>
   );
-}
 }
