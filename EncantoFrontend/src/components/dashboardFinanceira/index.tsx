@@ -188,11 +188,11 @@ export function DashFinanceira() {
   
 
   return (
-    <div className={styles.conteudo}>
-      
-      {/* Cabeçalho */}
+    <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
+  <div className={`w-full max-w-[1600px] mx-auto px-8 py-10 box-border ${styles.conteudo}`}>
+
       <div className={styles.cabecalho}>
-        <h1 className={styles.titulo}>Controle Financeiro</h1>
+        <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Controle Financeiro</h1>
         <p className={styles.textoSecundario}>
           Acompanhe suas receitas, despesas e indicadores financeiros
         </p>
@@ -249,6 +249,7 @@ export function DashFinanceira() {
         <ProximosPagamentos pagamentos={proximosPagamentos} />
       </div>
 
+    </div>
     </div>
   );
 }

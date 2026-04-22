@@ -12,7 +12,7 @@ export default function App() {
   const navigate = useNavigate();
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [currentTestimonial, setCurrentTestimonial] = useState(0);
-  
+
   const [products, setProducts] = useState<ProdutoResponse[]>([]);
   const [categories, setCategories] = useState<string[]>(['Todos']);
   const [isLoading, setIsLoading] = useState(true);
@@ -21,8 +21,8 @@ export default function App() {
     const fetchProdutos = async () => {
       try {
         setIsLoading(true);
-        const data = await produtoService.listarTodos(); 
-        
+        const data = await produtoService.listarTodos();
+
         const produtosAtivos = data.filter(p => p.ativo !== false);
         setProducts(produtosAtivos);
 
@@ -33,7 +33,7 @@ export default function App() {
             categoriasUnicas.add(categoria);
           }
         });
-        
+
         setCategories(['Todos', ...Array.from(categoriasUnicas)]);
       } catch (error) {
         console.error('Erro ao carregar produtos:', error);
@@ -72,8 +72,8 @@ export default function App() {
     }
   ];
 
-  const filteredProducts = selectedCategory === 'Todos' 
-    ? products 
+  const filteredProducts = selectedCategory === 'Todos'
+    ? products
     : products.filter(p => p.tema?.categoriaTema?.titulo === selectedCategory);
 
   const nextTestimonial = () => {
@@ -91,7 +91,7 @@ export default function App() {
         {/* Decorative Elements */}
         <div className="absolute top-20 left-10 w-32 h-32 bg-[#FFCAD4] rounded-full opacity-20 blur-3xl"></div>
         <div className="absolute bottom-20 right-20 w-40 h-40 bg-[#F4ACB7] rounded-full opacity-20 blur-3xl"></div>
-        
+
         <div className="w-full px-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left - Text */}
@@ -101,26 +101,28 @@ export default function App() {
                   ✨ Cada detalhe conta na hora de celebrar!
                 </p>
               </div>
-              
+
               <h1 className="text-[#6D6875] mb-6 leading-tight">
                 TRANSFORMAMOS <span className="text-[#F4ACB7]">LEMBRANÇAS</span> EM MOMENTOS <span className="text-[#F4ACB7]">INESQUECÍVEIS</span>
               </h1>
-              
+
               <p className="text-[#9D8189] text-xl leading-relaxed mb-6">
                 Na <strong className="text-[#F4ACB7]">Encanto Personalizados</strong> criamos peças personalizadas que encantam seus convidados e tornam seus momentos ainda mais especiais. Escolha, personalize e receba lembranças feitas com carinho e dedicação.
               </p>
-              
-              <div className="bg-gradient-to-r from-[#FFCAD4] to-[#F4ACB7] p-1 rounded-2xl mb-8 inline-block">
-                <div className="bg-white px-6 py-4 rounded-xl">
-                  <p className="text-[#6D6875]">
+
+              <div className="inline-block bg-gradient-to-r from-[#FFCAD4] to-[#F4ACB7] p-1 rounded-2xl mb-8">
+                <div className="bg-white px-5 py-2.5 rounded-xl">
+                  <p className="text-[#6D6875] m-0">
                     <strong>💝 Produtos únicos, feitos sob medida para você!</strong>
                   </p>
                 </div>
               </div>
-              
-              <button className="bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white px-10 py-5 rounded-2xl hover:shadow-2xl transition-all transform hover:scale-105 shadow-xl">
-                Conheça nossos produtos
-              </button>
+
+              <div className="block w-full">
+                <button className="bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white px-10 py-5 rounded-2xl hover:shadow-2xl transition-all transform hover:scale-105 shadow-xl font-bold">
+                  Conheça nossos produtos
+                </button>
+              </div>
             </div>
 
             {/* Right - Visual */}
@@ -134,7 +136,7 @@ export default function App() {
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#F4ACB7]/20 to-transparent"></div>
               </div>
-              
+
               {/* Floating badges */}
               <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-2xl border-2 border-[#FFCAD4]">
                 <div className="flex items-center gap-3">
@@ -147,7 +149,7 @@ export default function App() {
                   </div>
                 </div>
               </div>
-              
+
               <div className="absolute -top-6 -right-6 bg-white p-6 rounded-2xl shadow-2xl border-2 border-[#FFCAD4]">
                 <div className="flex items-center gap-2">
                   {[...Array(5)].map((_, i) => (
@@ -180,81 +182,80 @@ export default function App() {
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}
-                className={`px-8 py-4 rounded-2xl transition-all text-lg ${
-                  selectedCategory === category
+                className={`px-8 py-4 rounded-2xl transition-all text-lg ${selectedCategory === category
                     ? 'bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white shadow-xl scale-105'
                     : 'bg-[#F9F9F9] text-[#6D6875] hover:bg-[#FFE5D9] border-2 border-[#D8E2DC]'
-                }`}
+                  }`}
               >
                 {category}
               </button>
             ))}
           </div>
-{/* Products Grid - Cartões 100% Quadrados */}
-<div className="max-w-7xl mx-auto grid grid-cols-4 gap-4 mb-12 px-4">
-  {isLoading ? (
-    <p className="col-span-full text-center text-[#9D8189]">A carregar produtos...</p>
-  ) : filteredProducts.length === 0 ? (
-    <p className="col-span-full text-center text-[#9D8189]">Nenhum produto encontrado.</p>
-  ) : (
-    filteredProducts.slice(0, 8).map((product) => {
-      const imageUrl = product.fotos && product.fotos.length > 0 
-        ? product.fotos[0].foto 
-        : 'https://via.placeholder.com/300x300?text=Sem+Foto';
-        
-      const precoVenda = product.item?.precoVenda || 0;
-      const precoPromocional = product.item?.precoPromocional || 0;
-      const temDesconto = precoPromocional > 0 && precoPromocional < precoVenda;
+          {/* Products Grid - Cartões 100% Quadrados */}
+          <div className="max-w-7xl mx-auto grid grid-cols-4 gap-4 mb-12 px-4">
+            {isLoading ? (
+              <p className="col-span-full text-center text-[#9D8189]">A carregar produtos...</p>
+            ) : filteredProducts.length === 0 ? (
+              <p className="col-span-full text-center text-[#9D8189]">Nenhum produto encontrado.</p>
+            ) : (
+              filteredProducts.slice(0, 8).map((product) => {
+                const imageUrl = product.fotos && product.fotos.length > 0
+                  ? product.fotos[0].foto
+                  : 'https://via.placeholder.com/300x300?text=Sem+Foto';
 
-      return (
-        <div key={product.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all hover:-translate-y-1 group border border-[#D8E2DC] flex flex-col aspect-square">
-          
-          <div className="relative flex-1 w-full overflow-hidden">
-            <ImageWithFallback
-              src={imageUrl}
-              alt={product.titulo}
-              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            />
-            
-            <div className="absolute bottom-1.5 left-1.5 bg-white/95 backdrop-blur-sm px-2.5 py-1.5 rounded flex items-center gap-1 shadow-sm z-10">
-              <Star className="w-2.5 h-2.5 fill-[#F4ACB7] text-[#F4ACB7]" />
-              <span className="text-[#6D6875] text-[9px] font-bold">5.0</span>
-            </div>
+                const precoVenda = product.item?.precoVenda || 0;
+                const precoPromocional = product.item?.precoPromocional || 0;
+                const temDesconto = precoPromocional > 0 && precoPromocional < precoVenda;
+
+                return (
+                  <div key={product.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all hover:-translate-y-1 group border border-[#D8E2DC] flex flex-col aspect-square">
+
+                    <div className="relative flex-1 w-full overflow-hidden">
+                      <ImageWithFallback
+                        src={imageUrl}
+                        alt={product.titulo}
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      />
+
+                      <div className="absolute bottom-1.5 left-1.5 bg-white/95 backdrop-blur-sm px-2.5 py-1.5 rounded flex items-center gap-1 shadow-sm z-10">
+                        <Star className="w-2.5 h-2.5 fill-[#F4ACB7] text-[#F4ACB7]" />
+                        <span className="text-[#6D6875] text-[9px] font-bold">5.0</span>
+                      </div>
+                    </div>
+
+                    <div className="p-2.5 flex flex-col justify-between gap-1.5 shrink-0 bg-white">
+                      <h4 className="text-[#6D6875] text-[11px] font-bold line-clamp-1 leading-tight mb-1.5" title={product.titulo}>
+                        {product.titulo}
+                      </h4>
+
+                      <div className="gap-1.5 flex flex-col">
+                        <div className="flex items-center gap-2 mb-1.5">
+                          {temDesconto ? (
+                            <>
+                              <span className="text-[#9D8189] line-through text-[9px]">
+                                R$ {precoVenda.toFixed(2)}
+                              </span>
+                              <span className="text-[#F4ACB7] font-bold text-[9px]" style={{ fontWeight: 'bold' }}>
+                                R$ {precoPromocional.toFixed(2)}
+                              </span>
+                            </>
+                          ) : (
+                            <span className="text-[#F4ACB7] font-bold text-[9px]">
+                              R$ {precoVenda.toFixed(2)}
+                            </span>
+                          )}
+                        </div>
+
+                        <button className="w-full bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white py-1 rounded hover:shadow-sm transition-all text-[9px] font-bold uppercase tracking-wide">
+                          Peça já
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })
+            )}
           </div>
-          
-          <div className="p-2.5 flex flex-col justify-between gap-1.5 shrink-0 bg-white">
-            <h4 className="text-[#6D6875] text-[11px] font-bold line-clamp-1 leading-tight mb-1.5" title={product.titulo}>
-              {product.titulo}
-            </h4>
-            
-            <div className="gap-1.5 flex flex-col">
-              <div className="flex items-center gap-2 mb-1.5">
-                {temDesconto ? (
-                  <>
-                    <span className="text-[#9D8189] line-through text-[9px]">
-                      R$ {precoVenda.toFixed(2)}
-                    </span>
-                    <span className="text-[#F4ACB7] font-bold text-[9px]" style={{fontWeight:'bold'}}>
-                      R$ {precoPromocional.toFixed(2)}
-                    </span>
-                  </>
-                ) : (
-                  <span className="text-[#F4ACB7] font-bold text-[9px]">
-                    R$ {precoVenda.toFixed(2)}
-                  </span>
-                )}
-              </div>
-              
-              <button className="w-full bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white py-1 rounded hover:shadow-sm transition-all text-[9px] font-bold uppercase tracking-wide">
-                Peça já
-              </button>
-            </div>
-          </div>
-        </div>
-      );
-    })
-  )}
-</div>
 
           {/* View All Button */}
           <div className="text-center">
@@ -284,9 +285,8 @@ export default function App() {
               {testimonials.map((testimonial, index) => (
                 <div
                   key={testimonial.id}
-                  className={`bg-white rounded-3xl p-8 shadow-xl border-2 border-[#D8E2DC] transition-all ${
-                    index === currentTestimonial ? 'scale-105 border-[#F4ACB7]' : 'scale-100'
-                  }`}
+                  className={`bg-white rounded-3xl p-8 shadow-xl border-2 border-[#D8E2DC] transition-all ${index === currentTestimonial ? 'scale-105 border-[#F4ACB7]' : 'scale-100'
+                    }`}
                 >
                   <div className="flex items-center gap-4 mb-6">
                     <div className="w-16 h-16 rounded-full overflow-hidden border-4 border-[#FFCAD4] shadow-lg">
@@ -304,13 +304,13 @@ export default function App() {
                       </p>
                     </div>
                   </div>
-                  
+
                   <div className="flex gap-1 mb-4">
                     {[...Array(testimonial.rating)].map((_, i) => (
                       <Star key={i} className="w-5 h-5 fill-[#F4ACB7] text-[#F4ACB7]" />
                     ))}
                   </div>
-                  
+
                   <p className="text-[#6D6875] leading-relaxed">
                     "{testimonial.text}"
                   </p>
@@ -338,9 +338,8 @@ export default function App() {
                 <button
                   key={index}
                   onClick={() => setCurrentTestimonial(index)}
-                  className={`h-3 rounded-full transition-all ${
-                    currentTestimonial === index ? 'bg-[#F4ACB7] w-10' : 'bg-[#D8E2DC] w-3'
-                  }`}
+                  className={`h-3 rounded-full transition-all ${currentTestimonial === index ? 'bg-[#F4ACB7] w-10' : 'bg-[#D8E2DC] w-3'
+                    }`}
                 />
               ))}
             </div>
@@ -351,9 +350,9 @@ export default function App() {
       {/* Footer */}
       <footer id="contato" className="bg-gradient-to-br from-[#6D6875] to-[#9D8189] py-12">
         <div className="max-w-7xl mx-auto px-8">
-          
+
           <div className="grid grid-cols-4 gap-8 mb-8">
-            
+
             <div className="flex flex-col">
               <img src={EncantoLogo} alt="Encanto Personalizados" className="w-40 object-contain mb-4" />
               <p className="text-[#D8E2DC] text-sm leading-relaxed">
@@ -424,7 +423,7 @@ export default function App() {
               © 2025 Encanto Personalizados. Todos os direitos reservados. Feito com 💖
             </p>
           </div>
-          
+
         </div>
       </footer>
     </div>

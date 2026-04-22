@@ -299,7 +299,7 @@ export function HomeCalendar() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
-      <div className="w-full px-[3vw] py-[4vh] box-border">
+      <div className="w-full max-w-[1600px] mx-auto px-8 py-10 box-border">
         
         {/* Cabeçalho */}
         <div className="mb-8">

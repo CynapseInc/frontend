@@ -109,7 +109,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
-      <div className="w-full px-[4vw] py-[4vh] box-border">
+      <div className="w-full max-w-[1600px] mx-auto px-8 py-10 box-border">
 
         <div className="mb-10">
           <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Produtos</h1>

@@ -156,7 +156,7 @@ export default function App() {
   const currentProducts = sortedProducts.slice(startIndex, endIndex);
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9]">
+    <div className="pesquisa-client-wrapper min-h-screen bg-[#F9F9F9]">
 
       <div className="bg-gradient-to-br from-[#FFE5D9] to-[#F9F9F9] py-12 border-b-2 border-[#D8E2DC]">
         <div className="w-full px-8">

@@ -148,7 +148,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
-      <div className="max-w-[1400px] mx-auto px-8 py-12">
+      <div className="w-full max-w-[1600px] mx-auto px-8 py-10 box-border">
         
         {/* Cabeçalho */}
         <div className="mb-10">
