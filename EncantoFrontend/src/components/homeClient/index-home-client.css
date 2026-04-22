@@ -852,6 +852,27 @@
   .border-white\/20 {
     border-color: #fff3;
   }
+/* src/components/homeClient/index-home-client.css */
+
+/* Remove o espaçamento forçado pelo App.css apenas quando a Home Client estiver ativa */
+:has(.home-client-wrapper) {
+  padding: 0 !important;
+  max-width: none !important;
+  margin: 0 !important;
+}
+
+.home-client-wrapper {
+  /* Garante que o fundo cubra toda a largura se o #root tiver restrições */
+  width: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+/* Ajustes finos para os títulos na grelha menor */
+.home-client-wrapper h4 {
+  font-size: 1rem;
+  line-height: 1.25rem;
+}
 
   @supports (color: color-mix(in lab, red, red)) {
     .border-white\/20 {

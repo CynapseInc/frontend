@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Heart, Star, ChevronLeft, ChevronRight, Instagram, Facebook, Send, Phone, Mail, MapPin } from 'lucide-react';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
+import EncantoLogo from '../../assets/logoEncanto.png';
 import './index-home-client.css'
 
 import { produtoService } from '../../services/ProdutoService';
@@ -84,7 +85,7 @@ export default function App() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9]">
+    <div className="home-client-wrapper min-h-screen bg-[#F9F9F9]">
       {/* Hero Section */}
       <section id="home" className="relative bg-gradient-to-br from-[#FFE5D9] via-[#F9F9F9] to-[#D8E2DC] py-24 overflow-hidden">
         {/* Decorative Elements */}
@@ -161,9 +162,9 @@ export default function App() {
       </section>
 
       {/* Nossos Favoritos */}
-      <section id="produtos" className="py-24 bg-white">
+      <section id="produtos" className="py-24  bg-white">
         <div className="w-full px-8">
-          <div className="text-center mb-16">
+          <div className="text-center mb-12">
             <div className="inline-block bg-[#FFE5D9] px-6 py-3 rounded-full mb-4">
               <p className="text-[#F4ACB7]">🎁 Seleção Especial</p>
             </div>
@@ -174,7 +175,7 @@ export default function App() {
           </div>
 
           {/* Category Filter */}
-          <div className="flex flex-wrap gap-4 justify-center mb-16">
+          <div className="flex flex-wrap gap-4 justify-center mb-12">
             {categories.map((category) => (
               <button
                 key={category}
@@ -189,72 +190,71 @@ export default function App() {
               </button>
             ))}
           </div>
+{/* Products Grid - Cartões 100% Quadrados */}
+<div className="max-w-7xl mx-auto grid grid-cols-4 gap-4 mb-12 px-4">
+  {isLoading ? (
+    <p className="col-span-full text-center text-[#9D8189]">A carregar produtos...</p>
+  ) : filteredProducts.length === 0 ? (
+    <p className="col-span-full text-center text-[#9D8189]">Nenhum produto encontrado.</p>
+  ) : (
+    filteredProducts.slice(0, 8).map((product) => {
+      const imageUrl = product.fotos && product.fotos.length > 0 
+        ? product.fotos[0].foto 
+        : 'https://via.placeholder.com/300x300?text=Sem+Foto';
+        
+      const precoVenda = product.item?.precoVenda || 0;
+      const precoPromocional = product.item?.precoPromocional || 0;
+      const temDesconto = precoPromocional > 0 && precoPromocional < precoVenda;
 
-          {/* Products Grid */}
-          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8 mb-16">
-            {isLoading ? (
-              <p className="col-span-full text-center text-[#9D8189]">A carregar produtos maravilhosos...</p>
-            ) : filteredProducts.length === 0 ? (
-              <p className="col-span-full text-center text-[#9D8189]">Nenhum produto encontrado nesta categoria.</p>
-            ) : (
-              filteredProducts.slice(0, 8).map((product) => {
-                const imageUrl = product.fotos && product.fotos.length > 0 
-                  ? product.fotos[0].foto 
-                  : 'https://via.placeholder.com/300x300?text=Sem+Foto';
-                  
-                const precoVenda = product.item?.precoVenda || 0;
-                const precoPromocional = product.item?.precoPromocional || 0;
-                const temDesconto = precoPromocional > 0 && precoPromocional < precoVenda;
-
-                return (
-                  <div key={product.id} className="bg-white rounded-3xl overflow-hidden shadow-lg hover:shadow-2xl transition-all hover:-translate-y-2 group border-2 border-[#D8E2DC]">
-                    <div className="relative overflow-hidden">
-                      <ImageWithFallback
-                        src={imageUrl}
-                        alt={product.titulo}
-                        className="w-full h-64 object-cover group-hover:scale-110 transition-transform duration-500"
-                      />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                      <button className="absolute top-4 right-4 bg-white/90 backdrop-blur-sm p-3 rounded-full opacity-0 group-hover:opacity-100 transition-all hover:scale-110 shadow-lg">
-                        <Heart className="w-5 h-5 text-[#F4ACB7]" />
-                      </button>
-                      
-                      {/* Rating Badge */}
-                      <div className="absolute bottom-4 left-4 bg-white/95 backdrop-blur-sm px-3 py-2 rounded-xl flex items-center gap-1 shadow-lg">
-                        <Star className="w-4 h-4 fill-[#F4ACB7] text-[#F4ACB7]" />
-                        <span className="text-[#6D6875]">5.0</span>
-                      </div>
-                    </div>
-                    
-                    <div className="p-6">
-                      <h3 className="text-[#6D6875] mb-3 truncate" title={product.titulo}>{product.titulo}</h3>
-                      
-                      <div className="flex items-center gap-3 mb-4">
-                      {temDesconto ? (
-                        <>
-                        <span className="text-[#9D8189] line-through text-sm">
-                          R$ {precoVenda.toFixed(2)}
-                        </span>
-                        <span className="text-[#F4ACB7] font-bold text-lg">
-                          R$ {precoPromocional.toFixed(2)}
-                        </span>
-                        </>
-                      ) : (
-                      <span className="text-[#F4ACB7] font-bold text-lg">
-                        R$ {precoVenda.toFixed(2)}
-                      </span>
-                    )}
-                    </div>
-                      
-                      <button className="w-full bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white py-4 rounded-xl hover:shadow-lg transition-all font-semibold">
-                        Peça já
-                      </button>
-                    </div>
-                  </div>
-                );
-              })
-            )}
+      return (
+        <div key={product.id} className="bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all hover:-translate-y-1 group border border-[#D8E2DC] flex flex-col aspect-square">
+          
+          <div className="relative flex-1 w-full overflow-hidden">
+            <ImageWithFallback
+              src={imageUrl}
+              alt={product.titulo}
+              className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            />
+            
+            <div className="absolute bottom-1.5 left-1.5 bg-white/95 backdrop-blur-sm px-2.5 py-1.5 rounded flex items-center gap-1 shadow-sm z-10">
+              <Star className="w-2.5 h-2.5 fill-[#F4ACB7] text-[#F4ACB7]" />
+              <span className="text-[#6D6875] text-[9px] font-bold">5.0</span>
+            </div>
           </div>
+          
+          <div className="p-2.5 flex flex-col justify-between gap-1.5 shrink-0 bg-white">
+            <h4 className="text-[#6D6875] text-[11px] font-bold line-clamp-1 leading-tight mb-1.5" title={product.titulo}>
+              {product.titulo}
+            </h4>
+            
+            <div className="gap-1.5 flex flex-col">
+              <div className="flex items-center gap-2 mb-1.5">
+                {temDesconto ? (
+                  <>
+                    <span className="text-[#9D8189] line-through text-[9px]">
+                      R$ {precoVenda.toFixed(2)}
+                    </span>
+                    <span className="text-[#F4ACB7] font-bold text-[9px]" style={{fontWeight:'bold'}}>
+                      R$ {precoPromocional.toFixed(2)}
+                    </span>
+                  </>
+                ) : (
+                  <span className="text-[#F4ACB7] font-bold text-[9px]">
+                    R$ {precoVenda.toFixed(2)}
+                  </span>
+                )}
+              </div>
+              
+              <button className="w-full bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white py-1 rounded hover:shadow-sm transition-all text-[9px] font-bold uppercase tracking-wide">
+                Peça já
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    })
+  )}
+</div>
 
           {/* View All Button */}
           <div className="text-center">
@@ -349,85 +349,82 @@ export default function App() {
       </section>
 
       {/* Footer */}
-      <footer id="contato" className="bg-gradient-to-br from-[#6D6875] to-[#9D8189] text-white py-16">
-        <div className="w-full px-8">
-          <div className="grid md:grid-cols-4 gap-12 mb-12">
-            {/* Logo & Description */}
-            <div className="md:col-span-2">
-              <div className="flex items-center gap-3 mb-6">
-                <div className="w-12 h-12 bg-gradient-to-br from-[#FFCAD4] to-[#F4ACB7] rounded-xl flex items-center justify-center shadow-lg">
-                  <Heart className="w-6 h-6 text-white fill-white" />
-                </div>
-                <div>
-                  <h3 className="text-white">Encanto Personalizados</h3>
-                </div>
-              </div>
-              <p className="text-[#D8E2DC] leading-relaxed mb-6">
-                Transformando momentos em lembranças inesquecíveis. Criamos peças personalizadas com carinho, qualidade e dedicação para tornar seus eventos ainda mais especiais.
+      <footer id="contato" className="bg-gradient-to-br from-[#6D6875] to-[#9D8189] py-12">
+        <div className="max-w-7xl mx-auto px-8">
+          
+          <div className="grid grid-cols-4 gap-8 mb-8">
+            
+            <div className="flex flex-col">
+              <img src={EncantoLogo} alt="Encanto Personalizados" className="w-40 object-contain mb-4" />
+              <p className="text-[#D8E2DC] text-sm leading-relaxed">
+                Transformando momentos em lembranças inesquecíveis. Criamos peças personalizadas com carinho e dedicação.
               </p>
-              <div className="flex gap-4">
-                <a href="#" className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-[#FFCAD4] transition-all shadow-lg">
-                  <Instagram className="w-6 h-6" />
+            </div>
+
+            <div className="flex flex-col">
+              <h4 className="text-white font-bold mb-4">Nossas Redes</h4>
+              <div className="flex gap-3">
+                <a href="#" style={{ color: 'white' }} className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-[#FFCAD4] hover:text-[#6D6875] transition-all shadow-sm">
+                  <Instagram className="w-5 h-5" />
                 </a>
-                <a href="#" className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-[#FFCAD4] transition-all shadow-lg">
-                  <Facebook className="w-6 h-6" />
+                <a href="#" style={{ color: 'white' }} className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-[#FFCAD4] hover:text-[#6D6875] transition-all shadow-sm">
+                  <Facebook className="w-5 h-5" />
                 </a>
-                <a href="#" className="w-12 h-12 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-[#FFCAD4] transition-all shadow-lg">
-                  <Send className="w-6 h-6" />
+                <a href="#" style={{ color: 'white' }} className="w-10 h-10 bg-white/10 backdrop-blur-sm rounded-xl flex items-center justify-center hover:bg-[#FFCAD4] hover:text-[#6D6875] transition-all shadow-sm">
+                  <Send className="w-5 h-5" />
                 </a>
               </div>
             </div>
 
-            {/* Menu */}
-            <div>
-              <h4 className="text-white mb-6">Menu</h4>
-              <ul className="space-y-4">
+            <div className="flex flex-col">
+              <h4 className="text-white font-bold mb-4">Menu</h4>
+              <ul className="space-y-2">
                 <li>
-                  <a href="#home" className="text-[#D8E2DC] hover:text-[#FFCAD4] transition-colors flex items-center gap-2">
+                  <a href="#home" style={{ color: '#D8E2DC' }} className="hover:!text-[#FFCAD4] transition-colors flex items-center gap-2 text-sm">
                     → Home
                   </a>
                 </li>
                 <li>
-                  <a href="#produtos" className="text-[#D8E2DC] hover:text-[#FFCAD4] transition-colors flex items-center gap-2">
+                  <a href="#produtos" style={{ color: '#D8E2DC' }} className="hover:!text-[#FFCAD4] transition-colors flex items-center gap-2 text-sm">
                     → Produtos
                   </a>
                 </li>
                 <li>
-                  <a href="#contato" className="text-[#D8E2DC] hover:text-[#FFCAD4] transition-colors flex items-center gap-2">
+                  <a href="#contato" style={{ color: '#D8E2DC' }} className="hover:!text-[#FFCAD4] transition-colors flex items-center gap-2 text-sm">
                     → Contato
                   </a>
                 </li>
               </ul>
             </div>
 
-            {/* Contact */}
-            <div>
-              <h4 className="text-white mb-6">Contato</h4>
-              <ul className="space-y-4">
-                <li className="flex items-start gap-3 text-[#D8E2DC]">
-                  <Phone className="w-5 h-5 mt-1 text-[#FFCAD4]" />
+            <div className="flex flex-col">
+              <h4 className="text-white font-bold mb-4">Contato</h4>
+              <ul className="space-y-3">
+                <li className="flex items-start gap-3 text-[#D8E2DC] text-sm">
+                  <Phone className="w-4 h-4 mt-0.5 text-[#FFCAD4]" />
                   <div>
-                    <p className="text-white">Telefone</p>
+                    <p className="text-white font-bold">Telefone</p>
                     <p>(11) 98765-4321</p>
                   </div>
                 </li>
-                <li className="flex items-start gap-3 text-[#D8E2DC]">
-                  <Mail className="w-5 h-5 mt-1 text-[#FFCAD4]" />
+                <li className="flex items-start gap-3 text-[#D8E2DC] text-sm">
+                  <Mail className="w-4 h-4 mt-0.5 text-[#FFCAD4]" />
                   <div>
-                    <p className="text-white">Email</p>
+                    <p className="text-white font-bold">Email</p>
                     <p>contato@encanto.com.br</p>
                   </div>
                 </li>
               </ul>
             </div>
+
           </div>
 
-          {/* Copyright */}
-          <div className="border-t border-white/20 pt-8 text-center">
-            <p className="text-[#D8E2DC]">
+          <div className="border-t border-white/20 pt-6 text-center">
+            <p className="text-[#D8E2DC] text-sm">
               © 2025 Encanto Personalizados. Todos os direitos reservados. Feito com 💖
             </p>
           </div>
+          
         </div>
       </footer>
     </div>

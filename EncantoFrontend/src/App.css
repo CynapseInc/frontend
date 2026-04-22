@@ -18,7 +18,7 @@ body, html {
 /* O espaço onde as suas páginas vão ser renderizadas */
 .conteudo-padrao {
   width: 100vw;
-  padding: 4vh 4vw; /* O seu padrão de respiro! 4% nas laterais, 4% no topo/fundo */
+  padding: 1vh 3vw; /* O seu padrão de respiro! 4% nas laterais, 4% no topo/fundo */
   box-sizing: border-box;
   flex: 1; /* Faz o conteúdo esticar para preencher a tela */
 }
