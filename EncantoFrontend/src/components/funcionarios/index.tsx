@@ -8,7 +8,15 @@ import DeleteConfirmDialog from './modals/DeleteConfirmDialog';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { funcionarioService } from '../../services/FuncionarioService';
 import type { Funcionario } from '../../interfaces/Funcionario';
-import './index.css'
+import './index.css';
+
+const API_BASE_URL = 'http://localhost:8080';
+
+const getFotoUrl = (caminho?: string) => {
+  if (!caminho) return undefined;
+  if (caminho.startsWith('data:image') || caminho.startsWith('http')) return caminho;
+  return `${API_BASE_URL}${caminho}`;
+};
 
 export default function App() {
   const [employees, setEmployees] = useState<Funcionario[]>([]);
@@ -28,22 +36,19 @@ export default function App() {
         type: 'success'
       });
     
-      const showFeedback = (message: string, type: 'success' | 'error') => {
-        setFeedback({ isOpen: true, message, type });
-      };
+  const showFeedback = (message: string, type: 'success' | 'error') => {
+    setFeedback({ isOpen: true, message, type });
+  };
   
   const itemsPerPage = 8;
-  const filters = ['Todos', 'Administrador', 'Social Media', 'Manufatura']; // Ajuste estes cargos conforme os do seu backend
+  const filters = ['Todos', 'Administrador', 'Social Media', 'Manufatura'];
 
-  // 1. Busca os dados à API
   useEffect(() => {
     const fetchFuncionarios = async () => {
       try {
         const dados = await funcionarioService.listarTodos();
-        const totalElements = dados.totalElements || dados.length || 0;
-        const funcionarios = dados.content || [];
+        const funcionarios = dados.content || dados || [];
 
-        
         const funcionariosFormatados: Funcionario[] = funcionarios.map((usuario: any) => ({
           id: usuario.id,
           name: usuario.name, 
@@ -58,14 +63,12 @@ export default function App() {
         setEmployees(funcionariosFormatados);
       } catch (error) {
         showFeedback('Erro ao carregar funcionários.', 'error');
-        console.error("Erro ao procurar funcionários:", error);
       }
     };
 
     fetchFuncionarios();
   }, []);
 
-  // 2. Filtrar funcionários (Alterado para emp.cargo)
   const filteredEmployees = employees.filter(emp => {
     const matchesSearch = emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          emp.email.toLowerCase().includes(searchTerm.toLowerCase());
@@ -73,14 +76,12 @@ export default function App() {
     return matchesSearch && matchesFilter;
   });
 
-  // Paginação
   const totalPages = Math.ceil(filteredEmployees.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const currentEmployees = filteredEmployees.slice(startIndex, endIndex);
 
-  // 3. Funções de CRUD
-  const handleAddEmployee = async (employee: Funcionario) => {
+  const handleAddEmployee = async (employee: Funcionario, file?: File) => {
     try {
       const dadosBackend = {
         name: employee.name,
@@ -90,17 +91,21 @@ export default function App() {
         dataNasc: employee.dataNasc,
         cargo: employee.cargo
       };
-      console.log(dadosBackend)
-      const novoUsuario = await funcionarioService.criar(dadosBackend);
+      
+      let novoUsuario = await funcionarioService.criar(dadosBackend);
+
+      if (file) {
+        novoUsuario = await funcionarioService.uploadFoto(novoUsuario.id, file);
+      }
+
       setEmployees([...employees, { ...novoUsuario, status: 'Ativo' }]);
       setIsModalOpen(false);
     } catch (error) {
       showFeedback('Erro ao criar funcionário.', 'error');
-      console.error("Erro ao criar funcionário:", error);
     }
   };
 
-  const handleEditEmployee = async (employee: Funcionario) => {
+  const handleEditEmployee = async (employee: Funcionario, file?: File) => {
     try {
       const dadosBackend = {
         name: employee.name, 
@@ -113,13 +118,17 @@ export default function App() {
 
       if (!employee.id) return;
 
-      await funcionarioService.atualizar(employee.id, dadosBackend);
-      setEmployees(employees.map(emp => emp.id === employee.id ? { ...employee, status: 'Ativo' } : emp));
+      let usuarioAtualizado = await funcionarioService.atualizar(employee.id, dadosBackend);
+
+      if (file) {
+        usuarioAtualizado = await funcionarioService.uploadFoto(employee.id, file);
+      }
+
+      setEmployees(employees.map(emp => emp.id === employee.id ? { ...usuarioAtualizado, status: 'Ativo' } : emp));
       setIsModalOpen(false);
       setEditingEmployee(null);
     } catch (error) {
       showFeedback('Erro ao atualizar funcionário.', 'error');
-       console.error("Erro ao atualizar funcionário:", error);
     }
   };
 
@@ -131,7 +140,6 @@ export default function App() {
         setDeleteEmployee(null);
       } catch (error) {
         showFeedback('Erro ao deletar funcionário.', 'error');
-        console.error("Erro ao apagar funcionário:", error);
       }
     }
   };
@@ -150,13 +158,11 @@ export default function App() {
     <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
       <div className="w-full max-w-[1600px] mx-auto px-8 py-10 box-border">
         
-        {/* Cabeçalho */}
         <div className="mb-10">
           <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Funcionários</h1>
           <p className="text-[17px]" style={{ color: '#9D8189' }}>Gerencie toda a sua equipa num só lugar</p>
         </div>
 
-        {/* Barra de pesquisa e filtros */}
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
           <div className="flex items-center justify-between gap-6 mb-5">
             <div className="flex-1 max-w-md relative">
@@ -211,7 +217,6 @@ export default function App() {
           </div>
         </div>
 
-        {/* Tabela */}
         <div className="bg-white rounded-lg shadow-sm overflow-hidden" style={{ border: '1px solid #D8E2DC' }}>
           <table className="w-full">
             <thead>
@@ -223,7 +228,7 @@ export default function App() {
               </tr>
             </thead>
             <tbody>
-              {employees.map((employee, index) => (
+              {currentEmployees.map((employee, index) => (
                 <tr 
                   key={employee.id}
                   className="border-b transition-colors hover:bg-opacity-50"
@@ -234,7 +239,7 @@ export default function App() {
                       <div className="size-10 rounded-full flex items-center justify-center shrink-0 overflow-hidden" style={{ backgroundColor: '#FFE5D9' }}>
                         {employee.foto ? (
                           <ImageWithFallback 
-                            src={employee.foto} 
+                            src={getFotoUrl(employee.foto)} 
                             alt={employee.name}
                             className="size-full object-cover"
                           />
@@ -291,7 +296,6 @@ export default function App() {
           </table>
         </div>
 
-        {/* Controlos de Paginação */}
         <div className="flex items-center justify-between mt-6">
           <p className="text-[15px]" style={{ color: '#9D8189' }}>
             Mostrando {startIndex + 1} a {Math.min(endIndex, filteredEmployees.length)} de {filteredEmployees.length} funcionários
@@ -336,7 +340,6 @@ export default function App() {
         </div>
       </div>
 
-      {/* Modal de adicionar/editar */}
       <EmployeeModal
         isOpen={isModalOpen}
         onClose={() => {
@@ -347,7 +350,6 @@ export default function App() {
         employee={editingEmployee}
       />
 
-      {/* Dialogo de confirmação de exclusão */}
       <DeleteConfirmDialog
         isOpen={!!deleteEmployee}
         onClose={() => setDeleteEmployee(null)}
@@ -355,11 +357,11 @@ export default function App() {
         employeeName={deleteEmployee?.name || ''}
       />
       <FeedbackModal
-              isOpen={feedback.isOpen}
-              onClose={() => setFeedback({ ...feedback, isOpen: false })}
-              message={feedback.message}
-              type={feedback.type}
-            />
+        isOpen={feedback.isOpen}
+        onClose={() => setFeedback({ ...feedback, isOpen: false })}
+        message={feedback.message}
+        type={feedback.type}
+      />
     </div>
   );
 }

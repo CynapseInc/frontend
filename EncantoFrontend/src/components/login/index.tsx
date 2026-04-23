@@ -44,37 +44,37 @@ export default function App() {
       const data = response.data;
       
       sessionStorage.setItem('encanto_token', data.token);
-      
       sessionStorage.setItem('encanto_user', JSON.stringify({
+         id: data.userId,
          nome: data.nome || 'Administrador', 
          email: data.email || email,
-         cargo: data.cargo || 'Administrador' 
+         cargo: data.cargo || 'Administrador',
+         foto: data.foto
       }));
-      
       
       setTimeout(() => {
           navigate('/home');
       }, 1000); 
 
-  } catch (err: any) {
-    console.error('Erro interno:', err); 
+    } catch (err: any) {
+      console.error('Erro interno:', err); 
 
-    if (err.response) {
-      if (err.response.status === 401 || err.response.status === 404) {
-      setError('E-mail ou senha incorretos.');
-    } else if (err.response.status === 403) {
-      setError('Você não tem permissão para acessar esta área.');
-    } else {
-      setError('Ocorreu um problema no sistema. Tente novamente.');
+      if (err.response) {
+        if (err.response.status === 401 || err.response.status === 404) {
+          setError('E-mail ou senha incorretos.');
+        } else if (err.response.status === 403) {
+          setError('Você não tem permissão para acessar esta área.');
+        } else {
+          setError('Ocorreu um problema no sistema. Tente novamente.');
+        }
+      } else if (err.request) {
+        setError('Não foi possível conectar ao sistema. Verifique sua conexão ou tente novamente em instantes.');
+      } else {
+        setError('Ocorreu um erro inesperado. Tente novamente mais tarde.');
+      }
+    } finally {
+      setIsLoading(false);
     }
-  } else if (err.request) {
-    setError('Não foi possível conectar ao sistema. Verifique sua conexão ou tente novamente em instantes.');
-  } else {
-    setError('Ocorreu um erro inesperado. Tente novamente mais tarde.');
-  }
-} finally {
-  setIsLoading(false);
-}
   };
 
 

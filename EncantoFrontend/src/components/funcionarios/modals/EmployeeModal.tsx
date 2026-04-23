@@ -2,17 +2,16 @@ import { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../../ui/dialog';
 import { X, Upload } from 'lucide-react';
 import { ImageWithFallback } from '../../figma/ImageWithFallback';
-import type { Funcionario } from '../../../interfaces/Funcionario'; // Importando a interface correta
+import type { Funcionario } from '../../../interfaces/Funcionario';
 
 interface EmployeeModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (employee: Funcionario) => void;
+  onSave: (employee: Funcionario, file?: File) => void;
   employee?: Funcionario | null;
 }
 
 export default function EmployeeModal({ isOpen, onClose, onSave, employee }: EmployeeModalProps) {
-  // Atualizando os campos para bater com a interface Funcionario
   const [formData, setFormData] = useState<Partial<Funcionario>>({
     name: '',
     cpf: '',
@@ -25,11 +24,11 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
   });
   const [confirmPassword, setConfirmPassword] = useState('');
   const [passwordError, setPasswordError] = useState('');
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
 
   useEffect(() => {
     if (employee) {
       setFormData(employee);
-      // Backend geralmente não devolve a senha, então deixamos vazio na edição até que ele digite uma nova
       setConfirmPassword(''); 
     } else {
       setFormData({
@@ -45,14 +44,16 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
       setConfirmPassword('');
     }
     setPasswordError('');
+    setSelectedFile(null);
   }, [employee, isOpen]);
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
+      setSelectedFile(file);
       const reader = new FileReader();
       reader.onloadend = () => {
-        setFormData({ ...formData, foto: reader.result as string }); // Atualizado para 'foto'
+        setFormData({ ...formData, foto: reader.result as string });
       };
       reader.readAsDataURL(file);
     }
@@ -61,19 +62,17 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Validar senhas
-    if (formData.senha !== confirmPassword) { // Atualizado para 'senha'
+    if (formData.senha !== confirmPassword) {
       setPasswordError('As senhas não coincidem');
       return;
     }
     
-    // Na edição, a senha pode ser opcional. Na criação, é obrigatória.
     const isEditing = !!employee?.id;
     const hasRequiredFields = formData.name && formData.cpf && formData.email;
     const hasPasswordIfNew = isEditing || formData.senha;
     
     if (hasRequiredFields && hasPasswordIfNew) {
-      onSave(formData as Funcionario);
+      onSave(formData as Funcionario, selectedFile || undefined);
       setFormData({
         name: '',
         cpf: '',
@@ -86,6 +85,7 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
       });
       setConfirmPassword('');
       setPasswordError('');
+      setSelectedFile(null);
     }
   };
 
@@ -102,7 +102,6 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
           Preencha os dados do funcionário
         </DialogDescription>
         
-        {/* Header */}
         <div className="px-8 py-6 border-b" style={{ borderColor: '#D8E2DC' }}>
           <div className="flex items-center justify-between">
             <h2 className="text-[28px]" style={{ color: '#6D6875' }}>
@@ -120,7 +119,6 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
 
         <form onSubmit={handleSubmit}>
           <div className="px-8 py-6">
-            {/* Upload de imagem */}
             <div className="mb-6 flex justify-center">
               <label 
                 htmlFor="image-upload"
@@ -131,10 +129,10 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
                     className="size-28 rounded-full flex items-center justify-center overflow-hidden border-2 transition-all group-hover:border-[#F4ACB7]"
                     style={{ 
                       backgroundColor: '#FFE5D9',
-                      borderColor: formData.foto ? '#F4ACB7' : '#D8E2DC' // Atualizado para 'foto'
+                      borderColor: formData.foto ? '#F4ACB7' : '#D8E2DC'
                     }}
                   >
-                    {formData.foto ? ( // Atualizado para 'foto'
+                    {formData.foto ? (
                       <ImageWithFallback 
                         src={formData.foto} 
                         alt="Preview" 
@@ -159,7 +157,6 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
             </div>
 
             <div className="grid grid-cols-2 gap-x-6 gap-y-5">
-              {/* Nome completo */}
               <div className="col-span-2">
                 <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
                   Nome completo
@@ -179,7 +176,6 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
                 />
               </div>
 
-              {/* CPF */}
               <div>
                 <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
                   CPF
@@ -199,14 +195,13 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
                 />
               </div>
 
-              {/* Data de nascimento */}
               <div>
                 <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
                   Data de nascimento
                 </label>
                 <input
                   type="date"
-                  value={formData.dataNasc} // Atualizado para 'dataNasc'
+                  value={formData.dataNasc}
                   onChange={(e) => setFormData({ ...formData, dataNasc: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-md border text-[15px] focus:outline-none focus:border-[#F4ACB7] transition-colors"
                   style={{ 
@@ -217,7 +212,6 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
                 />
               </div>
 
-              {/* E-mail */}
               <div>
                 <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
                   E-mail
@@ -237,13 +231,12 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
                 />
               </div>
 
-              {/* Cargo */}
               <div>
                 <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
                   Cargo
                 </label>
                 <select
-                  value={formData.cargo} // Atualizado para 'cargo'
+                  value={formData.cargo}
                   onChange={(e) => setFormData({ ...formData, cargo: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-md border text-[15px] focus:outline-none focus:border-[#F4ACB7] transition-colors"
                   style={{ 
@@ -258,7 +251,6 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
                 </select>
               </div>
 
-              {/* Senha */}
               <div>
                 <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
                   {employee ? 'Nova Senha (opcional)' : 'Senha'}
@@ -266,7 +258,7 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
                 <input
                   type="password"
                   placeholder="Mínimo 8 caracteres"
-                  value={formData.senha} // Atualizado para 'senha'
+                  value={formData.senha}
                   onChange={(e) => {
                     setFormData({ ...formData, senha: e.target.value });
                     setPasswordError('');
@@ -277,11 +269,10 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
                     borderColor: passwordError ? '#F4ACB7' : '#D8E2DC',
                     color: '#6D6875'
                   }}
-                  required={!employee} // Obrigatório apenas se estiver criando um novo
+                  required={!employee}
                 />
               </div>
 
-              {/* Confirmar Senha */}
               <div>
                 <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
                   Confirmar senha
@@ -300,11 +291,10 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
                     borderColor: passwordError ? '#F4ACB7' : '#D8E2DC',
                     color: '#6D6875'
                   }}
-                  required={!employee || !!formData.senha} // Obrigatório se for novo ou se tiver preenchido a nova senha
+                  required={!employee || !!formData.senha}
                 />
               </div>
 
-              {/* Situação */}
               <div className="col-span-2">
                 <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
                   Situação
@@ -324,7 +314,6 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
                 </select>
               </div>
 
-              {/* Mensagem de erro */}
               {passwordError && (
                 <div className="col-span-2">
                   <p className="text-[14px]" style={{ color: '#F4ACB7' }}>
@@ -335,7 +324,6 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
             </div>
           </div>
 
-          {/* Footer com botões */}
           <div className="px-8 py-5 border-t flex justify-end gap-3" style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC' }}>
             <button
               type="button"
