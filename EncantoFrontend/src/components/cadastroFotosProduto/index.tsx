@@ -5,6 +5,7 @@ import { fotoProdutoService } from '../../services/FotoProdutoService';
 import { produtoService } from '../../services/ProdutoService';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import FeedbackModal from '../ui/FeedbackModal';
+import ConfirmModal from '../ui/ConfirmModal'; // <-- IMPORT DO CONFIRM MODAL
 import './index-fotos.css';
 
 export default function CadastroFotosProduto() {
@@ -16,6 +17,13 @@ export default function CadastroFotosProduto() {
   const [previewUrls, setPreviewUrls] = useState<string[]>([]);
   const [isUploading, setIsUploading] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // <-- ESTADO PARA CONTROLAR O MODAL DE EXCLUSÃO
+  const [deleteModal, setDeleteModal] = useState<{ isOpen: boolean; fotoId: number | null }>({
+    isOpen: false,
+    fotoId: null
+  });
+
   const [feedback, setFeedback] = useState<{
     isOpen: boolean;
     message: string;
@@ -50,21 +58,23 @@ export default function CadastroFotosProduto() {
     fetchExistingPhotos();
   }, [id]);
 
-  // 2. EXCLUIR FOTO QUE JÁ ESTÁ NO BANCO
-  const handleDeleteExistingPhoto = async (fotoId: number) => {
-    if (!confirm('Tem a certeza que deseja excluir esta foto permanentemente?')) return;
+  // 2. FUNÇÃO ATUALIZADA: AGORA É CHAMADA PELO MODAL DE CONFIRMAÇÃO
+  const confirmDeleteExistingPhoto = async () => {
+    const fotoId = deleteModal.fotoId;
+    if (!id || fotoId === null) return;
+    
     try {
-      if (!id) return; // Proteção de segurança do React
-      
       await fotoProdutoService.deletarFoto(id, fotoId);
       
-      // MUDANÇA AQUI: Forçamos a conversão de ambos para String para evitar conflitos de tipagem
       setExistingPhotos(prev => prev.filter(f => String(f.id) !== String(fotoId)));
       showFeedback('Foto excluída com sucesso!', 'success');
       
     } catch (error) {
       console.error("Erro ao excluir foto:", error);
-      showFeedback('Erro ao excluir foto. Verifique a consola.', 'error');
+      showFeedback('Erro ao excluir foto. Verifique o console.', 'error');
+    } finally {
+      // Fecha o modal após o sucesso ou erro
+      setDeleteModal({ isOpen: false, fotoId: null });
     }
   };
 
@@ -84,7 +94,7 @@ export default function CadastroFotosProduto() {
 
   const handleUpload = async () => {
     if (selectedFiles.length === 0) {
-      navigate('/lista-produtos'); // Se não tiver foto nova pra subir, só volta pra lista
+      navigate('/lista-produtos'); 
       return;
     }
     
@@ -142,7 +152,8 @@ export default function CadastroFotosProduto() {
                     <ImageWithFallback src={foto.foto} alt="Foto do produto" className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
                       <button 
-                        onClick={() => handleDeleteExistingPhoto(foto.id)}
+                        // <-- AQUI MUDAMOS PARA ABRIR O MODAL EM VEZ DE EXCLUIR DIRETO
+                        onClick={() => setDeleteModal({ isOpen: true, fotoId: foto.id })}
                         className="bg-white p-3 rounded-full text-red-500 hover:scale-110 transition-transform shadow-lg"
                         title="Excluir Foto"
                       >
@@ -155,6 +166,8 @@ export default function CadastroFotosProduto() {
             </div>
           )}
 
+          {/* ... [O RESTO DO CONTEÚDO CONTINUA IGUAL (ÁREA DE NOVAS FOTOS, ETC)] ... */}
+          
           {/* ÁREA DE NOVAS FOTOS */}
           <h3 className="text-[#6D6875] text-[18px] mb-4"><strong>Adicionar Novas Fotos</strong></h3>
           <div 
@@ -221,12 +234,24 @@ export default function CadastroFotosProduto() {
           </div>
         </div>
       </div>
+      
+      {/* MODAIS AQUI NO FINAL */}
       <FeedbackModal
-              isOpen={feedback.isOpen}
-              onClose={() => setFeedback({ ...feedback, isOpen: false })}
-              message={feedback.message}
-              type={feedback.type}
-            />
+        isOpen={feedback.isOpen}
+        onClose={() => setFeedback({ ...feedback, isOpen: false })}
+        message={feedback.message}
+        type={feedback.type}
+      />
+
+      <ConfirmModal
+        isOpen={deleteModal.isOpen}
+        onClose={() => setDeleteModal({ isOpen: false, fotoId: null })}
+        onConfirm={confirmDeleteExistingPhoto}
+        title="Excluir Foto"
+        message="Tem certeza que deseja excluir esta foto permanentemente? Esta ação não pode ser desfeita."
+        confirmText="Sim, excluir"
+        cancelText="Cancelar"
+      />
     </div>
   );
 }

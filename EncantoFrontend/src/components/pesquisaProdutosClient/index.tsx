@@ -25,7 +25,7 @@ export default function App() {
   const [showFilters, setShowFilters] = useState(false);
   
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(24);
+  const [itemsPerPage, setItemsPerPage] = useState(12);
   const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
 
   const navigate = useNavigate();
@@ -178,7 +178,7 @@ export default function App() {
       </div>
 
       <div className="w-full px-8 py-8">
-        <div className="flex gap-8">
+          <div className="flex gap-8">
            <aside className={`${showFilters ? 'block' : 'hidden'} md:block w-36 shrink-0`}>
             <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-[#D8E2DC] sticky top-24">
               <div className="flex items-center justify-between mb-6">
@@ -373,45 +373,93 @@ export default function App() {
             </div>
 
             {currentProducts.length > 0 ? (
-              <div className={`grid gap-6 mb-8 ${viewMode === 'grid' ? 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'}`}>
-                {currentProducts.map((product) => (
-                  <div key={product.id} className={`bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-2xl transition-all hover:-translate-y-1 group border-2 border-[#D8E2DC] ${viewMode === 'list' ? 'flex gap-6' : ''}`}>
-                    <div className={`relative overflow-hidden ${viewMode === 'list' ? 'w-64' : ''}`}>
-                      <ImageWithFallback src={product.image} alt={product.name} className={`w-full object-cover group-hover:scale-110 transition-transform duration-500 ${viewMode === 'list' ? 'h-full' : 'h-64'}`} />
-                      <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                      
-                      <div className="absolute top-3 left-3 flex flex-col gap-2">
-                        {product.isPromo && <span className="bg-[#FFE5D9] text-[#F4ACB7] px-3 py-1 rounded-lg text-sm flex items-center gap-1 shadow-lg"><Tag className="w-3 h-3" /> Promo</span>}
-                        {!product.inStock && <span className="bg-red-100 text-red-500 px-3 py-1 rounded-lg text-sm flex items-center gap-1 shadow-lg">Esgotado</span>}
-                      </div>
-
-                      <div className="absolute top-3 right-3 flex flex-col gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <button onClick={() => setQuickViewProduct(product)} className="bg-white/95 backdrop-blur-sm p-3 rounded-full hover:scale-110 transition-all shadow-lg">
-                          <Eye className="w-5 h-5 text-[#F4ACB7]" />
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className={`p-6 ${viewMode === 'list' ? 'flex-1 flex flex-col justify-between' : ''}`}>
-                      <div>
-                        <h3 className="text-[#6D6875] mb-2">{product.name}</h3>
-                        <p className="text-[#9D8189] text-sm mb-4 line-clamp-2">{product.description}</p>
-                      </div>
-
-                      <div>
-                        <div className="flex items-center gap-3 mb-4">
-                          {product.oldPrice && (
-                            <span className="text-[#9D8189] line-through text-sm">R$ {product.oldPrice.toFixed(2)}</span>
+              /* ESTA DIV NOVA CONTROLA APENAS O TAMANHO DOS CARDS E CENTRALIZA-OS */
+              <div className={viewMode === 'grid' ? 'max-w-7xl mx-auto' : 'w-full'}>
+                
+                <div className={`grid gap-4 mb-8 ${viewMode === 'grid' ? 'grid-cols-4' : 'grid-cols-1'}`}>
+                  {currentProducts.map((product) => (
+                    <div 
+                      key={product.id} 
+                      className={`bg-white overflow-hidden shadow-sm hover:shadow-md transition-all hover:-translate-y-1 group border border-[#D8E2DC] ${
+                        viewMode === 'list' ? 'rounded-2xl flex gap-6' : 'rounded-xl flex flex-col aspect-square'
+                      }`}
+                    >
+                      {/* Área da Imagem */}
+                      <div className={`relative overflow-hidden ${viewMode === 'list' ? 'w-64 shrink-0' : 'flex-1 w-full'}`}>
+                        <ImageWithFallback 
+                          src={product.image} 
+                          alt={product.name} 
+                          className={`w-full object-cover group-hover:scale-105 transition-transform duration-500 ${
+                            viewMode === 'list' ? 'h-full' : 'absolute inset-0 h-full'
+                          }`} 
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+                        
+                        {/* Badges */}
+                        <div className={`absolute flex flex-col gap-1.5 z-10 ${viewMode === 'list' ? 'top-3 left-3' : 'bottom-2 left-2'}`}>
+                          {product.isPromo && (
+                            <span className="bg-[#FFE5D9] text-[#F4ACB7] px-2 py-0.5 rounded text-[10px] flex items-center gap-1 shadow-sm font-bold">
+                              <Tag className="w-2.5 h-2.5" /> Promo
+                            </span>
                           )}
-                          <span className="text-[#F4ACB7] font-bold">R$ {product.price.toFixed(2)}</span>
+                          {!product.inStock && (
+                            <span className="bg-red-100 text-red-500 px-2 py-0.5 rounded text-[10px] flex items-center gap-1 shadow-sm font-bold">
+                              Esgotado
+                            </span>
+                          )}
                         </div>
-                        <button onClick={() => handlePecaJaClick(product.id)} disabled={!product.inStock} className="w-full bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white py-3 rounded-xl hover:shadow-lg transition-all disabled:opacity-50">
-                          {product.inStock ? 'Peça já' : 'Indisponível'}
-                        </button>
+
+                        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
+                          <button 
+                            onClick={() => setQuickViewProduct(product)} 
+                            className="bg-white/95 backdrop-blur-sm p-2 rounded-full hover:scale-110 transition-all shadow-sm"
+                          >
+                            <Eye className="w-4 h-4 text-[#F4ACB7]" />
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Área de Informações */}
+                      <div className={`bg-white ${viewMode === 'list' ? 'p-6 flex-1 flex flex-col justify-between' : 'p-3 flex flex-col justify-between shrink-0'}`}>
+                        <div>
+                          <h3 className={`text-[#6D6875] font-bold ${viewMode === 'list' ? 'mb-2 text-base' : 'text-[16px] line-clamp-1 leading-tight mb-1.5'}`} title={product.name}>
+                            {product.name}
+                          </h3>
+                          {viewMode === 'list' && <p className="text-[#9D8189] text-sm mb-4 line-clamp-2">{product.description}</p>}
+                        </div>
+
+                        <div className={`${viewMode === 'grid' ? 'flex flex-col' : ''}`}>
+                          <div className={`flex items-center gap-2 ${viewMode === 'list' ? 'mb-4' : 'mb-2'}`}>
+                            {product.oldPrice ? (
+                              <>
+                                <span className={`text-[#9D8189] line-through ${viewMode === 'list' ? 'text-sm' : 'text-[9px]'}`}>
+                                  R$ {product.oldPrice.toFixed(2)}
+                                </span>
+                                <span className={`text-[#F4ACB7] font-bold ${viewMode === 'list' ? 'text-lg' : 'text-[9px]'}`}>
+                                  R$ {product.price.toFixed(2)}
+                                </span>
+                              </>
+                            ) : (
+                              <span className={`text-[#F4ACB7] font-bold ${viewMode === 'list' ? 'text-lg' : 'text-[11px]'}`}>
+                                R$ {product.price.toFixed(2)}
+                              </span>
+                            )}
+                          </div>
+                          
+                          <button 
+                            onClick={() => handlePecaJaClick(product.id)} 
+                            disabled={!product.inStock} 
+                            className={`w-full bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white transition-all uppercase font-bold disabled:opacity-50 ${
+                              viewMode === 'list' ? 'py-3 rounded-xl text-sm' : 'py-1.5 rounded-lg text-[10px]'
+                            }`}
+                          >
+                            {product.inStock ? 'Peça já' : 'Esgotado'}
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             ) : (
               <div className="bg-white rounded-2xl p-16 text-center shadow-lg border-2 border-[#D8E2DC]">
