@@ -43,7 +43,7 @@ export default function DeleteStatusTypeDialog({ isOpen, onClose, onConfirm, sta
                 Tem certeza que deseja excluir o status <strong style={{ color: '#F4ACB7' }}>"{statusTypeName}"</strong>?
               </p>
               <p className="text-[14px]" style={{ color: '#9D8189' }}>
-                Esta ação não pode ser desfeita e todos os pedidos neste status precisarão ser realocados.
+                Esta ação não pode ser desfeita.
               </p>
             </div>
           </div>

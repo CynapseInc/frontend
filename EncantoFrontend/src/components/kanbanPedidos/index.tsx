@@ -357,9 +357,16 @@ export default function Kanban() {
         <StatusTypeListModal
           isOpen={isStatusTypeListOpen}
           onClose={() => setIsStatusTypeListOpen(false)}
-          statusTypes={statusTypes} // Removido o as any
+          statusTypes={statusTypes}
           onEdit={openEditStatusTypeModal}
-          onDelete={(statusType) => setDeleteStatusType(statusType)}
+          onDelete={(statusType) => {
+            const pedidosNoStatus = getOrdersByStatus(statusType.id);
+            if (pedidosNoStatus.length > 0) {
+              showFeedback("Não é possível excluir um status que contém pedidos. Mova os pedidos primeiro.", "error");
+            } else {
+              setDeleteStatusType(statusType);
+            }
+          }}
         />
 
         <DeleteStatusTypeDialog
