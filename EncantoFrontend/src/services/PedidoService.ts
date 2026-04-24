@@ -1,8 +1,8 @@
 import api from '../provider/api';
 
 export const pedidoService = {
-  listarTodos: async (page = 0, ativa = true, search = '') => {
-    let url = `/pedidos?page=${page}&ativa=${ativa}`;
+  listarTodos: async (page = 0, size = 500, ativa = true, search = '') => {
+    let url = `/pedidos?page=${page}&size=${size}&ativa=${ativa}`; // Adicione &size=${size} na URL
     if (search) url += `&search=${search}`;
     
     const { data } = await api.get(url);

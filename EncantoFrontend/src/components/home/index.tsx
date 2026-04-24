@@ -71,14 +71,19 @@ export function HomeCalendar() {
     const fetchDashboardData = async () => {
       setIsLoading(true);
       try {
-        const [pedidosData, produtosData, statusData] = await Promise.all([
-          pedidoService.listarTodos(),
-          produtoService.listarTodos(),
+        const [pedidosData, produtosResponse, statusData] = await Promise.all([
+          pedidoService.listarTodos(0, 500), // Busca até 500 pedidos
+          produtoService.listarTodos(0, 500), // Busca até 500 produtos
           statusPedidoService.listarTodos()
         ]);
 
+        // CORREÇÃO AQUI: Extrair o array .content caso a API retorne um objeto paginado
+        const produtosData = Array.isArray(produtosResponse) 
+          ? produtosResponse 
+          : (produtosResponse?.content || []);
+
         const mappedOrders: Order[] = pedidosData.map((p: any) => {
-          // 1. Cruzar produtos do pedido com o catálogo para ter os nomes
+          // Agora o produtosData.find() vai funcionar perfeitamente!
           const nomesProdutos = p.produtos?.map((prod: any) => {
             const catalogoProd = produtosData.find((cat: any) => cat.id === prod.idProduto);
             return catalogoProd ? catalogoProd.titulo : `Produto #${prod.idProduto}`;

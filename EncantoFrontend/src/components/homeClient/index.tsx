@@ -21,13 +21,20 @@ export default function App() {
     const fetchProdutos = async () => {
       try {
         setIsLoading(true);
-        const data = await produtoService.listarTodos();
+        // 1. Passamos 0 e 500 para trazer até 500 produtos na página inicial
+        const data = await produtoService.listarTodos(0, 500);
 
-        const produtosAtivos = data.filter(p => p.ativo !== false);
+        // 2. Extraímos o array 'content' de forma segura
+        const listaProdutos = Array.isArray(data) 
+          ? data 
+          : (data?.content || []);
+
+        // 3. Fazemos o .filter na nova lista extraída
+        const produtosAtivos = listaProdutos.filter((p: any) => p.ativo !== false);
         setProducts(produtosAtivos);
 
         const categoriasUnicas = new Set<string>();
-        produtosAtivos.forEach(p => {
+        produtosAtivos.forEach((p: any) => {
           const categoria = p.tema?.categoriaTema?.titulo;
           if (categoria) {
             categoriasUnicas.add(categoria);
@@ -178,7 +185,8 @@ export default function App() {
 
           {/* Category Filter */}
           <div className="flex flex-wrap gap-4 justify-center mb-12">
-            {categories.map((category) => (
+            {/* O slice(0, 6) pega apenas os 6 primeiros itens do array */}
+            {categories.slice(0, 7).map((category) => (
               <button
                 key={category}
                 onClick={() => setSelectedCategory(category)}

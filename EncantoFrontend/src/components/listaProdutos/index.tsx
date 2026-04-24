@@ -18,6 +18,8 @@ export default function App() {
   const [selectedTheme, setSelectedTheme] = useState('Todos');
   const [selectedItem, setSelectedItem] = useState('Todos');
   const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalElements, setTotalElements] = useState(0);
   const navigate = useNavigate();
 
   const [themes, setThemes] = useState<string[]>(['Todos']);
@@ -37,36 +39,29 @@ export default function App() {
       setFeedback({ isOpen: true, message, type });
     };
 
-  const itemsPerPage = 8;
+  const itemsPerPage = 10;
 
   useEffect(() => {
-    const fetchProdutos = async () => {
-      try {
-        const dados = await produtoService.listarTodos();
-        
-        if (!dados || !Array.isArray(dados)) {
-          setProducts([]);
-          return;
-        }
-
-        setProducts(dados);
-
-        const uniqueThemes = Array.from(new Set(dados.map(p => p.tema?.descricao || 'Sem tema')));
-        const uniqueItems = Array.from(new Set(dados.map(p => p.item?.descricao || 'Sem item')));
-        const uniqueCategories = Array.from(new Set(dados.map(p => p.tema?.categoriaTema?.titulo || 'Sem Categoria')));
-        
-        setThemes(['Todos', ...uniqueThemes]);
-        setItems(['Todos', ...uniqueItems]);
-        setCategories(['Todos', ...uniqueCategories]);
-
-      } catch (error) {
-        showFeedback('Erro ao buscar produtos. Tente novamente mais tarde.', 'error');
-        console.error("Erro ao buscar produtos:", error);
+  const fetchProducts = async () => {
+    try {
+      const data = await produtoService.listarTodos(currentPage - 1, 10, searchTerm);
+      
+      if (data && data.content) {
+        setProducts(data.content);
+        setTotalPages(data.totalPages); 
+        setTotalElements(data.totalElements || data.content.length); // <-- Adicione isto
+      } else {
+        setProducts(Array.isArray(data) ? data : []);
+        setTotalPages(1); 
+        setTotalElements(Array.isArray(data) ? data.length : 0); // <-- Adicione isto
       }
-    };
+    } catch (error) {
+      console.error("Erro ao buscar produtos:", error);
+    }
+  };
 
-    fetchProdutos();
-  }, []);
+  fetchProducts();
+}, [currentPage, searchTerm]);
 
   const filteredProducts = products.filter(product => {
     const nome = product.titulo || '';
@@ -82,10 +77,11 @@ export default function App() {
     return matchesSearch && matchesCategory && matchesTheme && matchesItem;
   });
 
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const endIndex = startIndex + itemsPerPage;
-  const currentProducts = filteredProducts.slice(startIndex, endIndex);
+  // const startIndex = (currentPage - 1) * itemsPerPage;
+  // const endIndex = startIndex + itemsPerPage;
+  // const currentProducts = filteredProducts.slice(startIndex, endIndex);
+
+  const currentProducts = filteredProducts;
 
   const handleEditProduct = (productId: number) => {
     navigate(`/produtos/editar/${productId}`); 
@@ -217,7 +213,7 @@ export default function App() {
                         {fotoUrl ? (
                           <ImageWithFallback onClick={() => navigate(`/produtos/fotos/${product.id}`)} src={fotoUrl} alt={product.titulo} className="w-full h-full object-cover" style={{ cursor: "pointer"}}/>
                         ) : (
-                          <div className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 text-xs">Sem Foto</div>
+                          <div onClick={() => navigate(`/produtos/fotos/${product.id}`)} className="w-full h-full flex items-center justify-center bg-gray-100 text-gray-400 text-xs cursor-pointer">Sem Foto</div>
                         )}
                       </div>
                     </td>
@@ -274,7 +270,7 @@ export default function App() {
 
         <div className="flex items-center justify-between mt-6">
           <p className="text-[15px]" style={{ color: '#9D8189' }}>
-            Mostrando {startIndex + 1} a {Math.min(endIndex, filteredProducts.length)} de {filteredProducts.length} produtos
+            Mostrando {((currentPage - 1) * itemsPerPage) + 1} a {Math.min(currentPage * itemsPerPage, totalElements)} de {totalElements} produtos
           </p>
           {totalPages > 1 && (
              <div className="flex items-center gap-2">

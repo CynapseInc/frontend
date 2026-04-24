@@ -33,13 +33,20 @@ export default function App() {
   useEffect(() => {
     const fetchCatalog = async () => {
       try {
-        const produtosData = await produtoService.listarTodos();
+        // 1. Passamos 0 (página) e 500 (tamanho) para trazer o catálogo inteiro
+        const produtosData = await produtoService.listarTodos(0, 500);
+
+        // 2. Extraímos o array 'content' com segurança
+        const listaProdutos = Array.isArray(produtosData) 
+          ? produtosData 
+          : (produtosData?.content || []);
 
         const catCount: Record<string, number> = {};
         const themeCount: Record<string, number> = {};
         const itemCount: Record<string, number> = {};
 
-        const formattedProducts = produtosData.map((p: any) => {
+        // 3. Fazemos o .map() na lista correta (listaProdutos)
+        const formattedProducts = listaProdutos.map((p: any) => {
           const precoVenda = p.item?.precoVenda || 0;
           const precoPromocional = p.item?.precoPromocional || 0;
           

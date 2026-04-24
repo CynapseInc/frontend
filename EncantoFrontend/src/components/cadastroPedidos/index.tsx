@@ -89,18 +89,27 @@ export default function App() {
   // ==========================================
   // BUSCAR DADOS INICIAIS DA API
   // ==========================================
+  // ==========================================
+  // BUSCAR DADOS INICIAIS DA API
+  // ==========================================
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [clientesData, produtosData, statusData] = await Promise.all([
+        const [clientesData, produtosResponse, statusData] = await Promise.all([
           clienteService.listarTodos(),
-          produtoService.listarTodos(),
+          produtoService.listarTodos(0, 500), // 1. Pedimos um limite alto de produtos
           statusPedidoService.listarTodos()
         ]);
 
         setClients(clientesData);
 
-        const produtosFormatados = produtosData.map((p: any) => ({
+        // 2. Extraímos o array 'content' de forma segura
+        const listaProdutos = Array.isArray(produtosResponse) 
+          ? produtosResponse 
+          : (produtosResponse?.content || []);
+
+        // 3. Fazemos o .map() na nova lista extraída
+        const produtosFormatados = listaProdutos.map((p: any) => ({
           id: p.id?.toString(),
           title: p.titulo,
           description: p.descricao,
@@ -113,6 +122,7 @@ export default function App() {
           unitWeight: p.item?.peso || 0,
           productionDays: p.item?.prazoProducao || 0
         }));
+        
         setProducts(produtosFormatados);
 
         setStatusTypes(statusData);

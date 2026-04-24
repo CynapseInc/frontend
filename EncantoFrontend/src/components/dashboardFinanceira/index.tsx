@@ -20,6 +20,10 @@ interface KPIs {
   totalDespesa?: string;
   totalLucro?: string;
   totalAPagar?: string;
+  varReceita?: number;
+  varDespesa?: number;
+  varLucro?: number;
+  varAPagar?: number;
 }
 
 interface EvolucaoMensalItem {
@@ -73,23 +77,25 @@ export function DashFinanceira() {
     return valor.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
   };
 
-  // Função para transformar dados de evolução mensal
+  // Função para transformar dados de evolução mensal (Corrigida para Fuso Horário)
   const transformarEvolucaoMensal = (dados: any[]) => {
     const meses: { [key: string]: any } = {};
     
     dados.forEach((item) => {
-      const mes = item.mesReferencia.split('-').slice(0, 2).join('-');
-      const mesIndex = new Date(item.mesReferencia).getMonth();
+      const partes = item.mesReferencia.split('-'); 
+      const mesAnoKey = `${partes[0]}-${partes[1]}`;
+      
+      const mesIndex = parseInt(partes[1], 10) - 1;
       const nomeMes = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'][mesIndex];
       
-      if (!meses[mes]) {
-        meses[mes] = { mes: nomeMes, receita: 0, despesa: 0 };
+      if (!meses[mesAnoKey]) {
+        meses[mesAnoKey] = { mes: nomeMes, receita: 0, despesa: 0 };
       }
       
       if (item.tipoMovimentacao === 'Receita') {
-        meses[mes].receita += item.valorMesAtual;
+        meses[mesAnoKey].receita += item.valorMesAtual;
       } else {
-        meses[mes].despesa += Math.abs(item.valorMesAtual);
+        meses[mesAnoKey].despesa += Math.abs(item.valorMesAtual);
       }
     });
     
@@ -132,24 +138,53 @@ export function DashFinanceira() {
     }));
   };
 
-  // Função para converter data no formato YYYY-MM para YYYY-MM-01
-  const converterDataParaAPI = (data: string): string => {
+  // Adiciona o dia 01 para o início do filtro
+  const converterDataInicioParaAPI = (data: string): string => {
     return data + '-01';
   };
 
-  // Função para buscar dados com filtros
+  // Calcula automaticamente se o mês acaba no dia 28, 30 ou 31 para o final do filtro
+  const converterDataFimParaAPI = (data: string): string => {
+    const [ano, mes] = data.split('-');
+    // O dia '0' no Javascript nos dá o último dia do mês exato
+    const ultimoDia = new Date(Number(ano), Number(mes), 0).getDate();
+    return `${data}-${ultimoDia.toString().padStart(2, '0')}`;
+  };
+
+  const obterMesAnterior = (dataStr: string) => {
+    const [ano, mes] = dataStr.split('-').map(Number);
+    const dataObj = new Date(ano, mes - 2, 1); 
+    return `${dataObj.getFullYear()}-${String(dataObj.getMonth() + 1).padStart(2, '0')}`;
+  };
+
+  const calcularVariacao = (atual: number, anterior: number): number => {
+    if (!anterior || anterior === 0) return atual > 0 ? 100 : 0;
+    return ((atual - anterior) / Math.abs(anterior)) * 100;
+  };
+  
+  const formatarTrend = (valor?: number) => {
+    if (valor === undefined) return '0.0%';
+    return `${valor > 0 ? '+' : ''}${valor.toFixed(1)}%`;
+  };
+
   const buscarDadosComFiltros = async () => {
     try {
-      const dataInicioFormatada = converterDataParaAPI(dataInicio);
-      const dataFimFormatada = converterDataParaAPI(dataFim);
+      const dataInicioFormatada = converterDataInicioParaAPI(dataInicio);
+      const dataFimFormatada = converterDataFimParaAPI(dataFim);
       
-      console.log('Buscando dados de', dataInicioFormatada, 'até', dataFimFormatada);
+      const dataInicioAntFormatada = converterDataInicioParaAPI(obterMesAnterior(dataInicio));
+      const dataFimAntFormatada = converterDataFimParaAPI(obterMesAnterior(dataFim));
       
-      const data = await dashFinanceiraService.listarDashFinanceiros(dataInicioFormatada, dataFimFormatada);
+      const [data, dataAnterior] = await Promise.all([
+        dashFinanceiraService.listarDashFinanceiros(dataInicioFormatada, dataFimFormatada),
+        dashFinanceiraService.listarDashFinanceiros(dataInicioAntFormatada, dataFimAntFormatada)
+      ]);
 
-      console.log('Dados recebidos da API:', data);
+      const varReceita = calcularVariacao(data.kpi.totalReceita, dataAnterior.kpi.totalReceita);
+      const varDespesa = calcularVariacao(Math.abs(data.kpi.totalDespesa), Math.abs(dataAnterior.kpi.totalDespesa));
+      const varLucro = calcularVariacao(data.kpi.totalLucro, dataAnterior.kpi.totalLucro);
+      const varAPagar = calcularVariacao(Math.abs(data.kpi.totalAPagar), Math.abs(dataAnterior.kpi.totalAPagar));
 
-      // Formatar KPIs
       const totalPagar = formatarValor(Math.abs(data.kpi.totalAPagar));
       const totalDespesa = formatarValor(Math.abs(data.kpi.totalDespesa));
       const totalLucro = formatarValor(data.kpi.totalLucro);
@@ -159,22 +194,17 @@ export function DashFinanceira() {
         totalReceita,
         totalDespesa,
         totalLucro,
-        totalAPagar: totalPagar
+        totalAPagar: totalPagar,
+        varReceita,
+        varDespesa,
+        varLucro,
+        varAPagar
       });
 
-      // Transformar e setar dados dos gráficos
-      const evolucaoMensalTransformada = transformarEvolucaoMensal(data.evolucaoMensal);
-      const despesasTransformadas = transformarDespesasCategoria(data.despesasPorCategoria);
-      const categoriasTransformadas = transformarCategoriasMaisVendidas(data.categoriasMaisVendidas);
-      const pagamentosTransformados = transformarProximosPagamentos(data.proximosPagamentos);
-
-      console.log('Evolução mensal transformada:', evolucaoMensalTransformada);
-      console.log('Próximos pagamentos transformados:', pagamentosTransformados);
-
-      setEvolucaoMensal(evolucaoMensalTransformada);
-      setDespesasPorCategoria(despesasTransformadas);
-      setCategoriasMaisVendidas(categoriasTransformadas);
-      setProximosPagamentos(pagamentosTransformados);
+      setEvolucaoMensal(transformarEvolucaoMensal(data.evolucaoMensal));
+      setDespesasPorCategoria(transformarDespesasCategoria(data.despesasPorCategoria));
+      setCategoriasMaisVendidas(transformarCategoriasMaisVendidas(data.categoriasMaisVendidas));
+      setProximosPagamentos(transformarProximosPagamentos(data.proximosPagamentos));
 
     } catch (error) {
       console.error('Erro ao buscar dados do dashboard financeiro:', error);
@@ -231,11 +261,36 @@ export function DashFinanceira() {
 </div>
 
       {/* Cards KPI usando Grid */}
+      {/* Cards KPI usando Grid */}
       <div className={styles.containerCards}>
-        <CardKPI icone={<LuDollarSign />} classeIconeCor="bg-[#FFCAD4]" porcentagem='+12.5%' textoAbaixo='vs mês anterior' tipo='positivo' titulo='Receitas' valor={kpis.totalReceita || 'R$ 0,00'} />
-        <CardKPI icone={<FiCreditCard />} classeIconeCor="bg-[#F4ACB7]" porcentagem='-5.3%' textoAbaixo='vs mês anterior' tipo='negativo' titulo='Despesas' valor={kpis.totalDespesa || 'R$ 0,00'} />
-        <CardKPI icone={<TfiWallet />} classeIconeCor="bg-[#9D8189]" porcentagem='+18.2%' textoAbaixo='vs mês anterior' tipo='positivo' titulo='Lucro' valor={kpis.totalLucro || 'R$ 0,00'} />
-        <CardKPI icone={<IoAlertOutline />} classeIconeCor="bg-[#FFE5D9]" porcentagem='-8.7%' textoAbaixo='vs mês anterior' tipo='negativo' titulo='A Pagar' valor={kpis.totalAPagar || 'R$ 0,00'} />
+        <CardKPI 
+          icone={<LuDollarSign />} classeIconeCor="bg-[#FFCAD4]" 
+          porcentagem={formatarTrend(kpis.varReceita)} 
+          textoAbaixo='vs mês anterior' 
+          tipo={(kpis.varReceita || 0) >= 0 ? 'positivo' : 'negativo'} 
+          titulo='Receitas' valor={kpis.totalReceita || 'R$ 0,00'} 
+        />
+        <CardKPI 
+          icone={<FiCreditCard />} classeIconeCor="bg-[#F4ACB7]" 
+          porcentagem={formatarTrend(kpis.varDespesa)} 
+          textoAbaixo='vs mês anterior' 
+          tipo={(kpis.varDespesa || 0) <= 0 ? 'positivo' : 'negativo'} 
+          titulo='Despesas' valor={kpis.totalDespesa || 'R$ 0,00'} 
+        />
+        <CardKPI 
+          icone={<TfiWallet />} classeIconeCor="bg-[#9D8189]" 
+          porcentagem={formatarTrend(kpis.varLucro)} 
+          textoAbaixo='vs mês anterior' 
+          tipo={(kpis.varLucro || 0) >= 0 ? 'positivo' : 'negativo'} 
+          titulo='Lucro' valor={kpis.totalLucro || 'R$ 0,00'} 
+        />
+        <CardKPI 
+          icone={<IoAlertOutline />} classeIconeCor="bg-[#FFE5D9]" 
+          porcentagem={formatarTrend(kpis.varAPagar)} 
+          textoAbaixo='vs mês anterior' 
+          tipo={(kpis.varAPagar || 0) <= 0 ? 'positivo' : 'negativo'} 
+          titulo='A Pagar' valor={kpis.totalAPagar || 'R$ 0,00'} 
+        />
       </div>
 
       {/* Gráficos usando Grid */}

@@ -2,14 +2,17 @@ import api from '../provider/api';
 import type { ProdutoResponse, ProdutoRequest } from '../interfaces/Produto';
 
 export const produtoService = {
-  listarTodos: async (): Promise<ProdutoResponse[]> => {
-    const { data } = await api.get('/produtos');
+  listarTodos: async (page: number = 0, size: number = 10, search?: string): Promise<any> => {
     
-    if (data && data.content && Array.isArray(data.content)) {
-      return data.content;
-    }
+    const { data } = await api.get('/produtos', {
+      params: { 
+        page: page,
+        size: size,
+        search: search
+      }
+    });
     
-    return Array.isArray(data) ? data : [];
+    return data; 
   },
   
   buscarPorId: async (id: string | number): Promise<ProdutoResponse> => {
