@@ -11,7 +11,6 @@ import DeleteTransactionDialog from './modals/DeleteTransactionDialog';
 import DeleteCategoryDialog from './modals/DeleteCategoryDialog';
 import DeleteCounterpartyDialog from './modals/DeleteCounterpartyDialog';
 
-
 import './index-cadastro-mov.css'
 import { movimentacaoService } from '../../services/MovimentacaoService';
 import { categoriaMovService } from '../../services/CategoriaMov';
@@ -63,71 +62,6 @@ const mockCounterparties: Counterparty[] = [
   { id: '6', name: 'Elo7 Brasil', contractType: 'Empresa', segment: 'E-commerce', description: 'Marketplace de produtos artesanais' },
 ];
 
-// const mockTransactions: Transaction[] = [
-//   {
-//     id: '1',
-//     counterpartyId: '1',
-//     counterpartyName: 'Ana Carolina Silva',
-//     description: 'Salário mensal',
-//     category: 'Pagamento de Funcionário',
-//     value: -3500.00,
-//     date: '2024-01-05',
-//     type: 'Despesa',
-//   },
-//   {
-//     id: '2',
-//     counterpartyId: '2',
-//     counterpartyName: 'Shopee Brasil',
-//     description: '20 Cadernos Hello Kit',
-//     category: 'Venda de Produto',
-//     value: 500.00,
-//     date: '2024-01-10',
-//     type: 'Receita',
-//   },
-//   {
-//     id: '3',
-//     counterpartyId: '3',
-//     counterpartyName: 'Tecidos Premium Ltda',
-//     description: 'Compra de tecidos para produção',
-//     category: 'Fornecedor',
-//     value: -1200.00,
-//     date: '2024-01-12',
-//     type: 'Despesa',
-//   },
-//   {
-//     id: '4',
-//     counterpartyId: '4',
-//     counterpartyName: 'Instagram Store',
-//     description: '2 Canecas Corintians',
-//     category: 'Venda de Produto',
-//     value: 60.00,
-//     date: '2024-01-15',
-//     type: 'Receita',
-//   },
-//   {
-//     id: '5',
-//     counterpartyId: '5',
-//     counterpartyName: 'João Silva - Designer',
-//     description: 'Criação de artes personalizadas',
-//     category: 'Prestador de Serviço',
-//     value: -800.00,
-//     date: '2024-01-18',
-//     type: 'Despesa',
-//   },
-//   {
-//     id: '6',
-//     counterpartyId: '6',
-//     counterpartyName: 'Elo7 Brasil',
-//     description: '100 Cadernos Frozen',
-//     category: 'Venda de Produto',
-//     value: 1000.00,
-//     date: '2024-01-20',
-//     type: 'Receita',
-//   },
-// ];
-
-
-
 export default function App() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [categories, setCategories] = useState<Category[]>(mockCategories);
@@ -159,111 +93,88 @@ export default function App() {
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const [totalElements, setTotalElements] = useState(0);
- 
-
-
 
   const gerarPaginas = (currentPage: number, totalPages: number) => {
-  const maxPages = 7;
-  const pages: (number | string)[] = [];
+    const maxPages = 7;
+    const pages: (number | string)[] = [];
 
-  if (totalPages <= maxPages) {
-    return Array.from({ length: totalPages }, (_, i) => i + 1);
-  }
+    if (totalPages <= maxPages) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
 
-  const start = Math.max(2, currentPage - 2);
-  const end = Math.min(totalPages - 1, currentPage + 2);
+    const start = Math.max(2, currentPage - 2);
+    const end = Math.min(totalPages - 1, currentPage + 2);
 
-  pages.push(1);
+    pages.push(1);
 
-  if (start > 2) {
-    pages.push('...');
-  }
+    if (start > 2) {
+      pages.push('...');
+    }
 
-  for (let i = start; i <= end; i++) {
-    pages.push(i);
-  }
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
 
-  if (end < totalPages - 1) {
-    pages.push('...');
-  }
+    if (end < totalPages - 1) {
+      pages.push('...');
+    }
 
-  pages.push(totalPages);
+    pages.push(totalPages);
 
-  return pages;
-};
+    return pages;
+  };
 
- const paginas = gerarPaginas(currentPage, totalPages);
-
+  const paginas = gerarPaginas(currentPage, totalPages);
 
   const carregarMovimentacoes = async () => {
-    const response = await movimentacaoService.listar({
-      search: searchTerm || undefined,
-      tipo: selectedFilter !== 'Todos' ? selectedFilter : undefined,
-      page: currentPage - 1
-    });
+    try {
+      const response = await movimentacaoService.listar({
+        search: searchTerm || undefined,
+        tipo: selectedFilter !== 'Todos' ? selectedFilter : undefined,
+        page: currentPage - 1
+      });
 
-    console.log('Resposta da API:', response);
-    setTransactions(response.content.map(mov => ({
-      id: mov.id.toString(),
-      counterpartyId: mov.id.toString(), 
-      counterpartyName: mov.descricao, 
-      description: mov.descricao,
-      category: mov.tipo, 
-      value: mov.valor,
-      date: mov.dataPagamento,
-      type: mov.tipo === 'Receita' ? 'Receita' : 'Despesa',
-      paymentStatus: mov.statusPagamento,
-      dueDate: mov.dataVencimento
-    }))); 
+      setTransactions(response.content.map((mov: any) => ({
+        id: mov.id.toString(),
+        counterpartyId: mov.idContraparte?.toString() || mov.id.toString(), 
+        counterpartyName: mov.descricao, 
+        description: mov.descricao,
+        category: mov.tipo, 
+        value: mov.valor,
+        date: mov.dataPagamento,
+        type: mov.tipo === 'Receita' ? 'Receita' : 'Despesa',
+        paymentStatus: mov.statusPagamento,
+        dueDate: mov.dataVencimento
+      }))); 
 
-    setTotalPages(response.totalPages);
-    setTotalElements(response.totalElements);
+      setTotalPages(response.totalPages);
+      setTotalElements(response.totalElements);
+    } catch (error) {
+      console.error('Erro ao carregar movimentações:', error);
+    }
   };
 
   useEffect(() => {
     carregarMovimentacoes();
   }, [searchTerm, selectedFilter, currentPage]);
 
-
-  
-  // const itemsPerPage = 8;
   const filters = ['Todos', 'Receita', 'Despesa'];
 
-  // Filtrar transações
-  const filteredTransactions = transactions.filter(transaction => {
-    const matchesSearch = transaction.counterpartyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         transaction.description.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesFilter = selectedFilter === 'Todos' || 
-                         (selectedFilter === 'Receitas' && transaction.type === 'Receita') ||
-                         (selectedFilter === 'Despesas' && transaction.type === 'Despesa');
-    return matchesSearch && matchesFilter;
-  });
-
-  // Paginação
-  // const totalPages = Math.ceil(filteredTransactions.length / itemsPerPage);
-  // const startIndex = (currentPage - 1) * itemsPerPage;
-
-  // Calcular total
-  const total = transactions.reduce((sum, t) => sum + t.value, 0);
+  // Calcular subtotal da página (soma receitas e subtrai despesas)
+  const total = transactions.reduce((sum, t) => {
+    return t.type === 'Despesa' ? sum - t.value : sum + t.value;
+  }, 0);
 
   // Category handlers
   const handleAddCategory = (category: Category) => {
-    
     const data = {
       descricao: category.name
     }
     categoriaMovService.cadastrar(data);
-    
-          
-
     setIsCategoryModalOpen(false);
   };
 
-  
-
   const handleEditCategory = (category: Category) => {
-    // setCategories(categories.map(cat => cat.id === category.id ? category : cat));
     const data = {
       descricao: category.name
     }
@@ -334,7 +245,6 @@ export default function App() {
       idContraparte: Number(transaction.counterpartyId),
       idCategoriaMovimentacao: Number(transaction.categoryId)
     });
-    // setTransactions([...transactions, { ...transaction, id: Date.now().toString() }]);
     setIsTransactionModalOpen(false);
   };
 
@@ -383,9 +293,6 @@ export default function App() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
-      {/* Navbar */}
-      
-
       <div className="w-full max-w-[1600px] mx-auto px-8 py-10 box-border">
         
         {/* Cabeçalho */}
@@ -398,34 +305,33 @@ export default function App() {
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
           <div className="flex items-center justify-between gap-6 mb-5">
             {/* Pesquisa */}
-            {/* Bloco de Pesquisa - Movimentação */}
-<div className="flex-1 max-w-md relative">
-  <Search 
-    className="absolute top-1/2 -translate-y-1/2" 
-    style={{ 
-      color: '#9D8189', 
-      left: '1vw', 
-      width: '1.2vw', 
-      height: '1.2vw',
-      pointerEvents: 'none'
-    }} 
-  />
-  <Input
-    placeholder="Buscar por nome ou descrição..."
-    value={searchTerm}
-    onChange={(e) => {
-      setSearchTerm(e.target.value);
-      setCurrentPage(1);
-    }}
-    className="h-11 text-[0.9vw]"
-    style={{ 
-      paddingLeft: '3.5vw', /* Força o texto a começar depois da lupa */
-      borderColor: '#D8E2DC',
-      backgroundColor: '#F9F9F9',
-      color: '#6D6875'
-    }}
-  />
-</div>
+            <div className="flex-1 max-w-md relative">
+              <Search 
+                className="absolute top-1/2 -translate-y-1/2" 
+                style={{ 
+                  color: '#9D8189', 
+                  left: '1vw', 
+                  width: '1.2vw', 
+                  height: '1.2vw',
+                  pointerEvents: 'none'
+                }} 
+              />
+              <Input
+                placeholder="Buscar por nome ou descrição..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1);
+                }}
+                className="h-11 text-[0.9vw]"
+                style={{ 
+                  paddingLeft: '3.5vw',
+                  borderColor: '#D8E2DC',
+                  backgroundColor: '#F9F9F9',
+                  color: '#6D6875'
+                }}
+              />
+            </div>
             
             {/* Botões */}
             <div className="flex gap-3">
@@ -503,30 +409,14 @@ export default function App() {
           <table className="w-full">
             <thead>
               <tr style={{ backgroundColor: '#FFE5D9', borderBottom: '1px solid #D8E2DC' }}>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>
-                  Nome
-                </th>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>
-                  Descrição
-                </th>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>
-                  Tipo de Contrato
-                </th>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>
-                  Categoria
-                </th>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>
-                  Valor
-                </th>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>
-                  Status
-                </th>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>
-                  Data
-                </th>
-                <th className="text-right px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>
-                  Ações
-                </th>
+                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Nome</th>
+                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Descrição</th>
+                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Tipo de Contrato</th>
+                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Categoria</th>
+                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Valor</th>
+                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Status</th>
+                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Data</th>
+                <th className="text-right px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -567,9 +457,9 @@ export default function App() {
                   </td>
                   <td className="px-6 py-4">
                     <span 
-                      className="text-[16px]"
+                      className="text-[16px] font-semibold"
                       style={{ 
-                        color: transaction.value > 0 ? '#4CAF50' : '#F4ACB7'
+                        color: transaction.type === 'Receita' ? '#4CAF50' : '#d2445a'
                       }}
                     >
                       {formatCurrency(transaction.value)}
@@ -585,8 +475,6 @@ export default function App() {
                       {new Date(transaction.date).toLocaleDateString('pt-BR')}
                     </span>
                   </td>
-                    
-                  
                   <td className="px-6 py-4">
                     <div className="flex gap-2 justify-end">
                       <button
@@ -619,100 +507,51 @@ export default function App() {
             <p className="text-[15px]" style={{ color: '#9D8189' }}>
               Mostrando {startIndex + 1} a {Math.min(endIndex, totalElements)} de {totalElements} movimentações
             </p>
-            <p className="text-[17px]" style={{ color: total >= 0 ? '#4CAF50' : '#F4ACB7' }}>
-              <strong>Total: {formatCurrency(total)}</strong>
+            <p className="text-[17px]" style={{ color: total >= 0 ? '#4CAF50' : '#d2445a' }}>
+              <strong>Subtotal: {formatCurrency(total)}</strong>
             </p>
           </div>
-          
-          {/* {totalPages > 1 && (
+
+          {totalPages > 1 && (
             <div className="flex items-center gap-2">
+              
               <button
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
                 className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
-                style={{
-                  backgroundColor: 'white',
-                  color: '#6D6875',
-                  border: '1px solid #D8E2DC'
-                }}
               >
                 Anterior
               </button>
-              
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+
+              {paginas.map((page, index) => (
                 <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
+                  key={index}
+                  onClick={() => typeof page === 'number' && setCurrentPage(page)}
+                  disabled={page === '...'}
                   className="px-4 py-2 rounded-md text-[15px] transition-all"
                   style={{
                     backgroundColor: currentPage === page ? '#F4ACB7' : 'white',
                     color: currentPage === page ? 'white' : '#6D6875',
-                    border: `1px solid ${currentPage === page ? '#F4ACB7' : '#D8E2DC'}`
+                    border: `1px solid ${currentPage === page ? '#F4ACB7' : '#D8E2DC'}`,
+                    cursor: page === '...' ? 'default' : 'pointer'
                   }}
                 >
                   {page}
                 </button>
               ))}
-              
+
               <button
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
                 className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
-                style={{
-                  backgroundColor: 'white',
-                  color: '#6D6875',
-                  border: '1px solid #D8E2DC'
-                }}
               >
                 Próximo
               </button>
             </div>
-          )} */}
-          {totalPages > 1 && (
-  <div className="flex items-center gap-2">
-    
-    {/* Anterior */}
-    <button
-      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-      disabled={currentPage === 1}
-      className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
-    >
-      Anterior
-    </button>
-
-    {/* Páginas */}
-    {paginas.map((page, index) => (
-      <button
-        key={index}
-        onClick={() => typeof page === 'number' && setCurrentPage(page)}
-        disabled={page === '...'}
-        className="px-4 py-2 rounded-md text-[15px] transition-all"
-        style={{
-          backgroundColor: currentPage === page ? '#F4ACB7' : 'white',
-          color: currentPage === page ? 'white' : '#6D6875',
-          border: `1px solid ${currentPage === page ? '#F4ACB7' : '#D8E2DC'}`,
-          cursor: page === '...' ? 'default' : 'pointer'
-        }}
-      >
-        {page}
-      </button>
-    ))}
-
-    {/* Próximo */}
-    <button
-      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-      disabled={currentPage === totalPages}
-      className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
-    >
-      Próximo
-    </button>
-
-  </div>
-)}
+          )}
         </div>
       </div>
 
-      {/* Modal de categoria */}
       <CategoryModal
         isOpen={isCategoryModalOpen}
         onClose={() => {
@@ -723,7 +562,6 @@ export default function App() {
         category={editingCategory}
       />
 
-      {/* Modal de contraparte */}
       <CounterpartyModal
         isOpen={isCounterpartyModalOpen}
         onClose={() => {
@@ -734,7 +572,6 @@ export default function App() {
         counterparty={editingCounterparty}
       />
 
-      {/* Modal de transação */}
       <TransactionModal
         isOpen={isTransactionModalOpen}
         onClose={() => {
@@ -747,7 +584,6 @@ export default function App() {
         counterparties={counterparties}
       />
 
-      {/* Modal de listagem de categorias */}
       <CategoryListModal
         isOpen={isCategoryListModalOpen}
         onClose={() => setIsCategoryListModalOpen(false)}
@@ -756,7 +592,6 @@ export default function App() {
         onDelete={(category) => setDeleteCategory(category)}
       />
 
-      {/* Modal de listagem de contrapartes */}
       <CounterpartyListModal
         isOpen={isCounterpartyListModalOpen}
         onClose={() => setIsCounterpartyListModalOpen(false)}
@@ -765,7 +600,6 @@ export default function App() {
         onDelete={(counterparty) => setDeleteCounterparty(counterparty)}
       />
 
-      {/* Dialog de confirmação de exclusão de transação */}
       <DeleteTransactionDialog
         isOpen={!!deleteTransaction}
         onClose={() => setDeleteTransaction(null)}
@@ -773,7 +607,6 @@ export default function App() {
         transactionName={deleteTransaction?.counterpartyName || ''}
       />
 
-      {/* Dialog de confirmação de exclusão de categoria */}
       <DeleteCategoryDialog
         isOpen={!!deleteCategory}
         onClose={() => setDeleteCategory(null)}
@@ -781,7 +614,6 @@ export default function App() {
         categoryName={deleteCategory?.name || ''}
       />
 
-      {/* Dialog de confirmação de exclusão de contraparte */}
       <DeleteCounterpartyDialog
         isOpen={!!deleteCounterparty}
         onClose={() => setDeleteCounterparty(null)}

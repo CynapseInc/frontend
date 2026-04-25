@@ -260,8 +260,6 @@ export function DashFinanceira() {
   }} classeCss={styles.botaoFiltro}>Aplicar Filtros</Button>
 </div>
 
-      {/* Cards KPI usando Grid */}
-      {/* Cards KPI usando Grid */}
       <div className={styles.containerCards}>
         <CardKPI 
           icone={<LuDollarSign />} classeIconeCor="bg-[#FFCAD4]" 

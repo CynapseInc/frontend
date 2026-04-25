@@ -110,15 +110,11 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
 
   const handleValueChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseFloat(e.target.value) || 0;
-    // Se for despesa, tornar negativo
-    const finalValue = formData.type === 'Despesa' ? -Math.abs(value) : Math.abs(value);
-    setFormData({ ...formData, value: finalValue });
+    setFormData({ ...formData, value: Math.abs(value) });
   };
 
   const handleTypeChange = (type: 'Receita' | 'Despesa') => {
-    const currentValue = Math.abs(formData.value || 0);
-    const finalValue = type === 'Despesa' ? -currentValue : currentValue;
-    setFormData({ ...formData, type, value: finalValue });
+    setFormData({ ...formData, type });
   };
 
   return (

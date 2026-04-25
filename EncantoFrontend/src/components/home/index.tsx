@@ -119,7 +119,6 @@ export function HomeCalendar() {
           };
         });
 
-        // Filtrar apenas pedidos que têm data de entrega definida
         setOrders(mappedOrders.filter(o => o.deliveryDate !== ''));
 
       } catch (error) {
@@ -251,6 +250,11 @@ export function HomeCalendar() {
   };
 
   const filteredOrders = orders.filter(order => {
+    const statusNormalizado = order.status.toLowerCase();
+    if (statusNormalizado === 'finalizado' || statusNormalizado === 'concluído' || statusNormalizado === 'concluido' || statusNormalizado === 'entregue') {
+      return false; 
+    }
+
     if (!itemFilter) return true;
     const searchTerm = itemFilter.toLowerCase();
     return (
