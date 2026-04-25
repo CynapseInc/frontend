@@ -140,6 +140,18 @@ export default function Kanban() {
   
   const [selectedOrder, setSelectedOrder] = useState<any | null>(null); // any temporário até arrumarmos o modal
   
+  // Estado para filtro de data
+  const [dataInicio, setDataInicio] = useState<string>(() => {
+    const hoje = new Date();
+    const primeiro = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
+    return primeiro.toISOString().split('T')[0];
+  });
+  
+  const [dataFim, setDataFim] = useState<string>(() => {
+    const hoje = new Date();
+    return hoje.toISOString().split('T')[0];
+  });
+  
   const [isOrderDetailOpen, setIsOrderDetailOpen] = useState(false);
   const [isStatusTypeModalOpen, setIsStatusTypeModalOpen] = useState(false);
   const [isStatusTypeListOpen, setIsStatusTypeListOpen] = useState(false);
@@ -167,7 +179,7 @@ export default function Kanban() {
       try {
         const [statusData, pedidosData] = await Promise.all([
           statusPedidoService.listarTodos(),
-          pedidoService.listarTodos()
+          pedidoService.listarTodos(0, 500, true, '', dataInicio, dataFim)
         ]);
 
         // Ordenar as colunas pela ordem do Kanban definida no banco
@@ -181,7 +193,7 @@ export default function Kanban() {
     };
 
     fetchKanbanData();
-  }, []);
+  }, [dataInicio, dataFim]);
 
   const handleOnClickInSeeDetails = (orderId: number) => {
     navigate(`/pedidos/detalhes/${orderId}`);
@@ -274,6 +286,35 @@ export default function Kanban() {
           <div className="mb-10">
             <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Pedidos</h1>
             <p className="text-[17px]" style={{ color: '#9D8189' }}>Gerencie seus pedidos de forma visual e organizada</p>
+          </div>
+
+          {/* Filtro de Data */}
+          <div className="mb-8 flex gap-4 items-end">
+            <div className="flex flex-col gap-2">
+              <label className="text-[14px]" style={{ color: '#6D6875' }}>
+                <strong>Data Inicial</strong>
+              </label>
+              <input
+                type="date"
+                value={dataInicio}
+                onChange={(e) => setDataInicio(e.target.value)}
+                className="px-3 py-2 border rounded-lg text-[14px]"
+                style={{ borderColor: '#D8E2DC', color: '#6D6875' }}
+              />
+            </div>
+            
+            <div className="flex flex-col gap-2">
+              <label className="text-[14px]" style={{ color: '#6D6875' }}>
+                <strong>Data Final</strong>
+              </label>
+              <input
+                type="date"
+                value={dataFim}
+                onChange={(e) => setDataFim(e.target.value)}
+                className="px-3 py-2 border rounded-lg text-[14px]"
+                style={{ borderColor: '#D8E2DC', color: '#6D6875' }}
+              />
+            </div>
           </div>
 
           {/* Botões de ação */}

@@ -71,8 +71,12 @@ export function HomeCalendar() {
     const fetchDashboardData = async () => {
       setIsLoading(true);
       try {
+        // Calcular data de início (primeiro dia do ano) e fim (hoje)
+        const inicioAno = `${todayObj.getFullYear()}-01-01`;
+        const hoje = todayStr;
+
         const [pedidosData, produtosResponse, statusData] = await Promise.all([
-          pedidoService.listarTodos(0, 500), // Busca até 500 pedidos
+          pedidoService.listarTodos(0, 500, true, '', inicioAno, hoje), // Busca pedidos do ano até hoje
           produtoService.listarTodos(0, 500), // Busca até 500 produtos
           statusPedidoService.listarTodos()
         ]);
