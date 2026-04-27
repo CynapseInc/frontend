@@ -77,7 +77,7 @@ export default function App() {
   const [temas, setTemas] = useState<{ id: number; descricao: string }[]>([]);
 
   useEffect(() => {
-    produtoService.listarTodos().then((data) => setProdutos(data)).catch(() => {});
+    produtoService.listarTodos(0, 1000).then((data) => setProdutos(data?.content ?? (Array.isArray(data) ? data : []))).catch(() => {});
     temaService.listarTodos().then((data) => setTemas(data)).catch(() => {});
   }, []);
 
