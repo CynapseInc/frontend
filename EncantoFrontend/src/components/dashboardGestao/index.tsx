@@ -1,21 +1,15 @@
 import { Card } from "./ui/card";
-import { 
-  Package, 
-  CheckCircle2, 
-  AlertCircle, 
-  Clock, 
-  PauseCircle, 
+import {
+  Package,
+  CheckCircle2,
+  AlertCircle,
+  Clock,
+  PauseCircle,
   RefreshCw,
-  Filter
+  Filter,
+  Loader2
 } from "lucide-react";
 import { Button } from "./ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "./ui/select";
 import { Input } from "./ui/input";
 import {
   Table,
@@ -25,7 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from "./ui/table";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useCallback } from "react";
 import {
   BarChart,
   Bar,
@@ -40,6 +34,9 @@ import {
 } from "recharts";
 
 import './index.css'
+import { dashFinanceiraService } from '../../services/DashboardGestao';
+import { produtoService } from '../../services/ProdutoService';
+import { temaService } from '../../services/TemaService';
 
 // Logo simples para Encanto Personalizados
 const EncantoLogo = () => (
@@ -51,57 +48,66 @@ const EncantoLogo = () => (
   </div>
 );
 
-// Dados completos de pedidos com datas
-const todosPedidos = [
-  { id: "PED-1234", cliente: "Tech Solutions Ltda", status: "Em Produção", diasParado: 8, responsavel: "Carlos Silva", produto: "Caneca Personalizada", tema: "Aniversário", tipo: "atrasado", mes: "Jan", dataCriacao: "2025-01-15", entregue: false },
-  { id: "PED-1189", cliente: "Indústria ABC", status: "Retrabalho", diasParado: 6, responsavel: "Ana Costa", produto: "Camiseta Estampada", tema: "Casamento", tipo: "retrabalho", mes: "Jan", dataCriacao: "2025-01-20", entregue: false },
-  { id: "PED-1156", cliente: "Comercial XYZ", status: "Qualidade", diasParado: 5, responsavel: "João Santos", produto: "Almofada Personalizada", tema: "Festa Infantil", tipo: "normal", mes: "Fev", dataCriacao: "2025-02-05", entregue: false },
-  { id: "PED-1098", cliente: "Distribuidora Nacional", status: "Em Produção", diasParado: 5, responsavel: "Maria Oliveira", produto: "Caneca Personalizada", tema: "Corporativo", tipo: "atrasado", mes: "Fev", dataCriacao: "2025-02-10", entregue: false },
-  { id: "PED-1045", cliente: "Varejo Express", status: "Retrabalho", diasParado: 4, responsavel: "Pedro Lima", produto: "Toalha Bordada", tema: "Aniversário", tipo: "retrabalho", mes: "Mar", dataCriacao: "2025-03-01", entregue: false },
-  { id: "PED-1032", cliente: "Magazine ABC", status: "Análise", diasParado: 3, responsavel: "Carlos Silva", produto: "Camiseta Estampada", tema: "Casamento", tipo: "normal", mes: "Mar", dataCriacao: "2025-03-15", entregue: false },
-  { id: "PED-1021", cliente: "Loja Central", status: "Em Produção", diasParado: 7, responsavel: "Ana Costa", produto: "Almofada Personalizada", tema: "Festa Infantil", tipo: "atrasado", mes: "Abr", dataCriacao: "2025-04-05", entregue: false },
-  
-  // Pedidos entregues
-  { id: "PED-1000", cliente: "Cliente A", status: "Entregue", diasParado: 0, responsavel: "Carlos Silva", produto: "Caneca Personalizada", tema: "Aniversário", tipo: "normal", mes: "Jan", dataCriacao: "2025-01-01", entregue: true },
-  { id: "PED-1001", cliente: "Cliente B", status: "Entregue", diasParado: 0, responsavel: "Ana Costa", produto: "Camiseta Estampada", tema: "Casamento", tipo: "normal", mes: "Jan", dataCriacao: "2025-01-02", entregue: true },
-  { id: "PED-1002", cliente: "Cliente C", status: "Entregue", diasParado: 0, responsavel: "João Santos", produto: "Almofada Personalizada", tema: "Festa Infantil", tipo: "normal", mes: "Jan", dataCriacao: "2025-01-03", entregue: true },
-  { id: "PED-1003", cliente: "Cliente D", status: "Entregue", diasParado: 0, responsavel: "Maria Oliveira", produto: "Toalha Bordada", tema: "Corporativo", tipo: "normal", mes: "Fev", dataCriacao: "2025-02-01", entregue: true },
-  { id: "PED-1004", cliente: "Cliente E", status: "Entregue", diasParado: 0, responsavel: "Pedro Lima", produto: "Caneca Personalizada", tema: "Aniversário", tipo: "normal", mes: "Fev", dataCriacao: "2025-02-05", entregue: true },
-  { id: "PED-1005", cliente: "Cliente F", status: "Entregue", diasParado: 0, responsavel: "Carlos Silva", produto: "Camiseta Estampada", tema: "Casamento", tipo: "normal", mes: "Mar", dataCriacao: "2025-03-01", entregue: true },
-  { id: "PED-1006", cliente: "Cliente G", status: "Entregue", diasParado: 0, responsavel: "Ana Costa", produto: "Almofada Personalizada", tema: "Festa Infantil", tipo: "normal", mes: "Mar", dataCriacao: "2025-03-05", entregue: true },
-  { id: "PED-1007", cliente: "Cliente H", status: "Entregue", diasParado: 0, responsavel: "João Santos", produto: "Toalha Bordada", tema: "Corporativo", tipo: "normal", mes: "Abr", dataCriacao: "2025-04-01", entregue: true },
-  { id: "PED-1008", cliente: "Cliente I", status: "Entregue", diasParado: 0, responsavel: "Maria Oliveira", produto: "Caneca Personalizada", tema: "Aniversário", tipo: "normal", mes: "Mai", dataCriacao: "2025-05-01", entregue: true },
-  { id: "PED-1009", cliente: "Cliente J", status: "Entregue", diasParado: 0, responsavel: "Pedro Lima", produto: "Camiseta Estampada", tema: "Casamento", tipo: "normal", mes: "Mai", dataCriacao: "2025-05-05", entregue: true },
-  { id: "PED-1010", cliente: "Cliente K", status: "Entregue", diasParado: 0, responsavel: "Carlos Silva", produto: "Almofada Personalizada", tema: "Festa Infantil", tipo: "normal", mes: "Jun", dataCriacao: "2025-06-01", entregue: true },
-  { id: "PED-1011", cliente: "Cliente L", status: "Entregue", diasParado: 0, responsavel: "Ana Costa", produto: "Toalha Bordada", tema: "Corporativo", tipo: "normal", mes: "Jun", dataCriacao: "2025-06-05", entregue: true },
-];
+interface DashData {
+  tiposPedido:                { id: number; origem: string; observacoes: string; status: string; tipoPedido: string }[];
+  retrabalhoQuantidadePorMes: { mes: string; quantidadePedidos: number }[];
+  leadtimePorEtapa:           { etapa: string; leadTime: number }[];
+  leadtimePorFuncionario:     { funcionario: string; leadTime: number; totalPedidos: number }[];
+  produtosMaisPedidos:        { id: number; produtoId: number; qtdProd: number }[];
+  leadtimeMensal:             { mes: string; leadTime: number }[];
+  pedidosPorMes:              { mes: string; totalCriados: number; totalEntregues: number }[];
+  cargaTrabalho:              { funcionario: string; emAndamento: number }[];
+  pedidosSemAtualizacao:      { id: number; cliente: string; status: string; diasParado: number; responsavel: string }[];
+}
 
 export default function App() {
-  const [filtroTipo, setFiltroTipo] = useState("todos");
-  const [filtroProduto, setFiltroProduto] = useState("todos");
-  const [filtroTema, setFiltroTema] = useState("todos");
-  const [filtroDataInicio, setFiltroDataInicio] = useState("");
-  const [filtroDataFim, setFiltroDataFim] = useState("");
+  const [filtroDataInicio, setFiltroDataInicio] = useState(() => {
+    const d = new Date();
+    d.setMonth(d.getMonth() - 3);
+    return d.toISOString().split('T')[0];
+  });
+  const [filtroDataFim, setFiltroDataFim] = useState(() => new Date().toISOString().split('T')[0]);
+  const [filtroTipo, setFiltroTipo] = useState('');
+  const [filtroProdutoId, setFiltroProdutoId] = useState('');
+  const [filtroTemaId, setFiltroTemaId] = useState('');
+  const [dashData, setDashData] = useState<DashData | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [produtos, setProdutos] = useState<{ id: number; titulo: string }[]>([]);
+  const [temas, setTemas] = useState<{ id: number; descricao: string }[]>([]);
 
-  // Aplicar filtros a todos os pedidos
-  const pedidosFiltrados = useMemo(() => {
-    return todosPedidos.filter((pedido) => {
-      if (filtroTipo !== "todos" && pedido.tipo !== filtroTipo) return false;
-      if (filtroProduto !== "todos" && pedido.produto !== filtroProduto) return false;
-      if (filtroTema !== "todos" && pedido.tema !== filtroTema) return false;
-      if (filtroDataInicio && pedido.dataCriacao < filtroDataInicio) return false;
-      if (filtroDataFim && pedido.dataCriacao > filtroDataFim) return false;
-      return true;
-    });
-  }, [filtroTipo, filtroProduto, filtroTema, filtroDataInicio, filtroDataFim]);
+  useEffect(() => {
+    produtoService.listarTodos(0, 1000).then((data) => setProdutos(data?.content ?? (Array.isArray(data) ? data : []))).catch(() => {});
+    temaService.listarTodos().then((data) => setTemas(data)).catch(() => {});
+  }, []);
 
-  // Calcular KPIs baseados nos pedidos filtrados
+  const fetchDash = useCallback(() => {
+    if (!filtroDataInicio || !filtroDataFim) return;
+    setLoading(true);
+    setError(null);
+    dashFinanceiraService
+      .listarDashFinanceiros(
+        filtroDataInicio,
+        filtroDataFim,
+        filtroTipo || undefined,
+        filtroProdutoId ? Number(filtroProdutoId) : undefined,
+        filtroTemaId ? Number(filtroTemaId) : undefined
+      )
+      .then((data) => setDashData(data))
+      .catch(() => setError('Erro ao carregar dados do dashboard.'))
+      .finally(() => setLoading(false));
+  }, [filtroDataInicio, filtroDataFim, filtroTipo, filtroProdutoId, filtroTemaId]);
+
+  useEffect(() => { fetchDash(); }, [fetchDash]);
+
+  // KPIs derivados de tiposPedido (lista de pedidos individuais retornada pela API)
   const kpis = useMemo(() => {
-    const total = pedidosFiltrados.length;
-    const entregues = pedidosFiltrados.filter(p => p.entregue).length;
-    const atrasados = pedidosFiltrados.filter(p => p.tipo === "atrasado").length;
-    const semAtualizacao = pedidosFiltrados.filter(p => !p.entregue && p.diasParado >= 4).length;
-    const retrabalho = pedidosFiltrados.filter(p => p.tipo === "retrabalho").length;
+    const pedidos = dashData?.tiposPedido ?? [];
+    const total = pedidos.length;
+    const entregues = pedidos.filter(p => p.status === 'Entregue').length;
+    const atrasados = pedidos.filter(p => p.tipoPedido === 'Atrasado').length;
+    const retrabalho = pedidos.filter(p => p.tipoPedido === 'Retrabalho').length;
+    const semAtualizacao = dashData?.pedidosSemAtualizacao.length ?? 0;
     const percentualEntregues = total > 0 ? ((entregues / total) * 100).toFixed(1) : 0;
     const percentualAtrasados = total > 0 ? ((atrasados / total) * 100).toFixed(1) : 0;
 
@@ -114,79 +120,55 @@ export default function App() {
       percentualEntregues,
       percentualAtrasados
     };
-  }, [pedidosFiltrados]);
+  }, [dashData]);
 
-  // Dados para gráficos baseados nos pedidos filtrados
   const pedidosMesData = useMemo(() => {
-    const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"];
-    return meses.map(mes => {
-      const pedidosDoMes = pedidosFiltrados.filter(p => p.mes === mes);
-      return {
-        mes,
-        criados: pedidosDoMes.length,
-        entregues: pedidosDoMes.filter(p => p.entregue).length
-      };
-    });
-  }, [pedidosFiltrados]);
+    return (dashData?.pedidosPorMes ?? []).map(p => ({
+      mes: p.mes,
+      criados: p.totalCriados,
+      entregues: p.totalEntregues,
+    }));
+  }, [dashData]);
 
-  const leadTimeData = [
-    { mes: "Jan", leadTime: 12.5 },
-    { mes: "Fev", leadTime: 11.8 },
-    { mes: "Mar", leadTime: 10.2 },
-    { mes: "Abr", leadTime: 11.5 },
-    { mes: "Mai", leadTime: 9.8 },
-    { mes: "Jun", leadTime: 9.2 },
-  ];
+  const leadTimeData = dashData?.leadtimeMensal ?? [];
 
-  const etapasProcessoData = [
-    { etapa: "Análise", dias: 2.5 },
-    { etapa: "Aprovação", dias: 1.8 },
-    { etapa: "Produção", dias: 5.2 },
-    { etapa: "Qualidade", dias: 1.5 },
-    { etapa: "Expedição", dias: 2.1 },
-  ];
+  // Rename leadTime → dias to match chart dataKey
+  const etapasProcessoData = useMemo(() => {
+    return (dashData?.leadtimePorEtapa ?? []).map(e => ({
+      etapa: e.etapa,
+      dias: e.leadTime,
+    }));
+  }, [dashData]);
 
   const retrabalhoData = useMemo(() => {
-    const meses = ["Jan", "Fev", "Mar", "Abr", "Mai", "Jun"];
-    return meses.map(mes => {
-      const retrabalhoDoMes = pedidosFiltrados.filter(p => p.mes === mes && p.tipo === "retrabalho");
-      return {
-        mes,
-        quantidade: retrabalhoDoMes.length
-      };
-    });
-  }, [pedidosFiltrados]);
+    return (dashData?.retrabalhoQuantidadePorMes ?? []).map(r => ({
+      mes: r.mes,
+      quantidade: r.quantidadePedidos,
+    }));
+  }, [dashData]);
 
   const pedidosConcluidosData = useMemo(() => {
-    const funcionarios = ["Carlos Silva", "Ana Costa", "João Santos", "Maria Oliveira", "Pedro Lima"];
-    return funcionarios.map(funcionario => {
-      const pedidosConcluidos = pedidosFiltrados.filter(p => p.responsavel === funcionario && p.entregue);
-      return {
-        funcionario,
-        pedidos: pedidosConcluidos.length
-      };
-    });
-  }, [pedidosFiltrados]);
+    return (dashData?.leadtimePorFuncionario ?? []).map(f => ({
+      funcionario: f.funcionario,
+      pedidos: f.totalPedidos,
+    }));
+  }, [dashData]);
 
   const cargaTrabalhoData = useMemo(() => {
-    const funcionarios = ["Carlos Silva", "Ana Costa", "João Santos", "Maria Oliveira", "Pedro Lima"];
-    return funcionarios.map(funcionario => {
-      const emAndamento = pedidosFiltrados.filter(p => p.responsavel === funcionario && !p.entregue);
-      return {
-        funcionario,
-        emAndamento: emAndamento.length
-      };
-    });
-  }, [pedidosFiltrados]);
+    return dashData?.cargaTrabalho ?? [];
+  }, [dashData]);
 
   const pedidosSemAtualizacao = useMemo(() => {
-    return pedidosFiltrados.filter(p => !p.entregue && p.diasParado >= 3);
-  }, [pedidosFiltrados]);
+    return dashData?.pedidosSemAtualizacao ?? [];
+  }, [dashData]);
+
+  // Último lead time mensal para o KPI "Tempo Médio de Entrega"
+  const ultimoLeadTime = leadTimeData.length > 0 ? leadTimeData[leadTimeData.length - 1].leadTime : null;
 
   return (
     <div className="min-h-screen bg-[#faf8f7]">
       {/* Header */}
-      
+
 
       <main className="p-6 max-w-[1600px] mx-auto space-y-6">
         {/* Page Title */}
@@ -195,65 +177,62 @@ export default function App() {
           <p className="text-neutral-400 mt-1">Visão geral operacional - Junho 2025</p>
         </div>
 
+        {error && <p className="text-red-500 text-sm">{error}</p>}
+
         {/* Filtros Globais */}
         <Card className="p-6 bg-white border-neutral-100 shadow-sm">
           <div className="flex items-center gap-2 mb-4">
             <Filter className="size-5 text-[#e67e96]" />
             <h3 className="text-neutral-800">Filtros da Dashboard</h3>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-            {/* Filtro de Tipo */}
+
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            {/* Tipo de Pedido */}
             <div className="space-y-2">
               <label className="text-sm text-neutral-600">Tipo de Pedido</label>
-              <Select value={filtroTipo} onValueChange={setFiltroTipo}>
-                <SelectTrigger className="bg-white border-neutral-200">
-                  <SelectValue placeholder="Selecione..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos</SelectItem>
-                  <SelectItem value="atrasado">Atrasados</SelectItem>
-                  <SelectItem value="retrabalho">Em Retrabalho</SelectItem>
-                  <SelectItem value="normal">Normal</SelectItem>
-                </SelectContent>
-              </Select>
+              <select
+                value={filtroTipo}
+                onChange={(e) => setFiltroTipo(e.target.value)}
+                className="w-full h-9 rounded-md border border-neutral-200 bg-white px-3 text-sm text-neutral-800 focus:outline-none focus:ring-1 focus:ring-[#e67e96]"
+              >
+                <option value="">Todos</option>
+                <option value="Normal">Normal</option>
+                <option value="Atrasado">Atrasado</option>
+                <option value="Retrabalho">Retrabalho</option>
+              </select>
             </div>
 
-            {/* Filtro de Produto */}
+            {/* Produto */}
             <div className="space-y-2">
               <label className="text-sm text-neutral-600">Produto</label>
-              <Select value={filtroProduto} onValueChange={setFiltroProduto}>
-                <SelectTrigger className="bg-white border-neutral-200">
-                  <SelectValue placeholder="Selecione..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos</SelectItem>
-                  <SelectItem value="Caneca Personalizada">Caneca Personalizada</SelectItem>
-                  <SelectItem value="Camiseta Estampada">Camiseta Estampada</SelectItem>
-                  <SelectItem value="Almofada Personalizada">Almofada Personalizada</SelectItem>
-                  <SelectItem value="Toalha Bordada">Toalha Bordada</SelectItem>
-                </SelectContent>
-              </Select>
+              <select
+                value={filtroProdutoId}
+                onChange={(e) => setFiltroProdutoId(e.target.value)}
+                className="w-full h-9 rounded-md border border-neutral-200 bg-white px-3 text-sm text-neutral-800 focus:outline-none focus:ring-1 focus:ring-[#e67e96]"
+              >
+                <option value="">Todos</option>
+                {produtos.map((p) => (
+                  <option key={p.id} value={p.id}>{p.titulo}</option>
+                ))}
+              </select>
             </div>
 
-            {/* Filtro de Tema */}
+            {/* Tema */}
             <div className="space-y-2">
               <label className="text-sm text-neutral-600">Tema</label>
-              <Select value={filtroTema} onValueChange={setFiltroTema}>
-                <SelectTrigger className="bg-white border-neutral-200">
-                  <SelectValue placeholder="Selecione..." />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="todos">Todos</SelectItem>
-                  <SelectItem value="Aniversário">Aniversário</SelectItem>
-                  <SelectItem value="Casamento">Casamento</SelectItem>
-                  <SelectItem value="Festa Infantil">Festa Infantil</SelectItem>
-                  <SelectItem value="Corporativo">Corporativo</SelectItem>
-                </SelectContent>
-              </Select>
+              <select
+                value={filtroTemaId}
+                onChange={(e) => setFiltroTemaId(e.target.value)}
+                className="w-full h-9 rounded-md border border-neutral-200 bg-white px-3 text-sm text-neutral-800 focus:outline-none focus:ring-1 focus:ring-[#e67e96]"
+              >
+                <option value="">Todos</option>
+                {temas.map((t) => (
+                  <option key={t.id} value={t.id}>{t.descricao}</option>
+                ))}
+              </select>
             </div>
 
-            {/* Filtro de Data Início */}
+            {/* Data Início */}
             <div className="space-y-2">
               <label className="text-sm text-neutral-600">Data Início</label>
               <Input
@@ -264,7 +243,7 @@ export default function App() {
               />
             </div>
 
-            {/* Filtro de Data Fim */}
+            {/* Data Fim */}
             <div className="space-y-2">
               <label className="text-sm text-neutral-600">Data Fim</label>
               <Input
@@ -276,28 +255,33 @@ export default function App() {
             </div>
           </div>
 
-          {/* Botão Limpar Filtros */}
-          <div className="mt-4 flex justify-end">
+          {/* Contador + Limpar Filtros */}
+          <div className="mt-4 flex items-center justify-between">
+            {loading ? (
+              <span className="flex items-center gap-2 text-sm text-neutral-400">
+                <Loader2 className="size-4 animate-spin text-[#e67e96]" />
+                Atualizando dados...
+              </span>
+            ) : (
+              <p className="text-sm text-neutral-500">
+                Exibindo <span className="text-[#e67e96] font-medium">{dashData?.tiposPedido.length ?? 0}</span> pedidos
+              </p>
+            )}
             <Button
               variant="outline"
               onClick={() => {
-                setFiltroTipo("todos");
-                setFiltroProduto("todos");
-                setFiltroTema("todos");
-                setFiltroDataInicio("");
-                setFiltroDataFim("");
+                const d = new Date();
+                d.setMonth(d.getMonth() - 3);
+                setFiltroDataInicio(d.toISOString().split('T')[0]);
+                setFiltroDataFim(new Date().toISOString().split('T')[0]);
+                setFiltroTipo('');
+                setFiltroProdutoId('');
+                setFiltroTemaId('');
               }}
               className="border-neutral-200 text-neutral-700 hover:bg-neutral-50"
             >
               Limpar Filtros
             </Button>
-          </div>
-
-          {/* Contador de Resultados */}
-          <div className="mt-4 pt-4 border-t border-neutral-100">
-            <p className="text-sm text-neutral-600">
-              Exibindo <span className="text-[#e67e96]">{pedidosFiltrados.length}</span> de {todosPedidos.length} pedidos
-            </p>
           </div>
         </Card>
 
@@ -313,7 +297,7 @@ export default function App() {
                 <Package className="size-5 text-[#e67e96]" />
               </div>
             </div>
-            <p className="text-neutral-400 text-sm mt-3">Filtrados</p>
+            <p className="text-neutral-400 text-sm mt-3">No período</p>
           </Card>
 
           <Card className="p-4 bg-white border-neutral-100 shadow-sm">
@@ -346,13 +330,16 @@ export default function App() {
             <div className="flex items-start justify-between">
               <div>
                 <p className="text-neutral-400 text-sm">Tempo Médio de Entrega</p>
-                <p className="text-neutral-800 mt-1">9.2 dias</p>
+                <p className="text-neutral-800 mt-1">
+                  {ultimoLeadTime !== null ? `${ultimoLeadTime} dias` : '—'}
+                </p>
               </div>
               <div className="bg-[#fce4e8] p-2 rounded-lg">
                 <Clock className="size-5 text-[#e67e96]" />
               </div>
             </div>
-            <p className="text-[#e67e96] text-sm mt-3">↓ 6% vs mês anterior</p>
+            {/* TODO: no comparison data in API */}
+            <p className="text-neutral-400 text-sm mt-3">Último mês do período</p>
           </Card>
 
           <Card className="p-4 bg-white border-neutral-100 shadow-sm">
@@ -385,7 +372,7 @@ export default function App() {
         {/* Gráficos Operacionais */}
         <div className="space-y-4">
           <h2 className="text-neutral-800">Gráficos Operacionais</h2>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Pedidos criados x entregues */}
             <Card className="p-6 bg-white border-neutral-100 shadow-sm">
@@ -395,12 +382,12 @@ export default function App() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis dataKey="mes" stroke="#a3a3a3" />
                   <YAxis stroke="#a3a3a3" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#fff', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#fff',
                       border: '1px solid #f0f0f0',
                       borderRadius: '8px'
-                    }} 
+                    }}
                   />
                   <Legend />
                   <Bar dataKey="criados" fill="#f7b4c4" name="Criados" radius={[4, 4, 0, 0]} />
@@ -417,18 +404,18 @@ export default function App() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis dataKey="mes" stroke="#a3a3a3" />
                   <YAxis stroke="#a3a3a3" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#fff', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#fff',
                       border: '1px solid #f0f0f0',
                       borderRadius: '8px'
-                    }} 
+                    }}
                   />
                   <Legend />
-                  <Line 
-                    type="monotone" 
-                    dataKey="leadTime" 
-                    stroke="#e67e96" 
+                  <Line
+                    type="monotone"
+                    dataKey="leadTime"
+                    stroke="#e67e96"
                     strokeWidth={3}
                     name="Tempo de Entrega"
                     dot={{ fill: '#e67e96', r: 5 }}
@@ -447,12 +434,12 @@ export default function App() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis type="number" stroke="#a3a3a3" />
                   <YAxis dataKey="etapa" type="category" stroke="#a3a3a3" width={100} />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#fff', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#fff',
                       border: '1px solid #f0f0f0',
                       borderRadius: '8px'
-                    }} 
+                    }}
                   />
                   <Bar dataKey="dias" fill="#e67e96" name="Dias" radius={[0, 4, 4, 0]} />
                 </BarChart>
@@ -467,12 +454,12 @@ export default function App() {
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
                   <XAxis dataKey="mes" stroke="#a3a3a3" />
                   <YAxis stroke="#a3a3a3" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#fff', 
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#fff',
                       border: '1px solid #f0f0f0',
                       borderRadius: '8px'
-                    }} 
+                    }}
                   />
                   <Bar dataKey="quantidade" fill="#e67e96" name="Pedidos Refeitos" radius={[4, 4, 0, 0]} />
                 </BarChart>
@@ -484,24 +471,24 @@ export default function App() {
         {/* Gráficos de Produtividade */}
         <div className="space-y-4">
           <h2 className="text-neutral-800">Produtividade da Equipe</h2>
-          
+
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Pedidos concluídos */}
             <Card className="p-6 bg-white border-neutral-100 shadow-sm">
               <h3 className="text-neutral-800 mb-4">Pedidos Concluídos por Funcionário</h3>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={pedidosConcluidosData}>
+                <BarChart data={pedidosConcluidosData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="funcionario" stroke="#a3a3a3" angle={-15} textAnchor="end" height={80} />
-                  <YAxis stroke="#a3a3a3" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#fff', 
+                  <XAxis type="number" stroke="#a3a3a3" />
+                  <YAxis dataKey="funcionario" type="category" stroke="#a3a3a3" width={120} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#fff',
                       border: '1px solid #f0f0f0',
                       borderRadius: '8px'
-                    }} 
+                    }}
                   />
-                  <Bar dataKey="pedidos" fill="#e67e96" name="Concluídos" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="pedidos" fill="#e67e96" name="Concluídos" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </Card>
@@ -510,18 +497,18 @@ export default function App() {
             <Card className="p-6 bg-white border-neutral-100 shadow-sm">
               <h3 className="text-neutral-800 mb-4">Carga de Trabalho Atual</h3>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={cargaTrabalhoData}>
+                <BarChart data={cargaTrabalhoData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="funcionario" stroke="#a3a3a3" angle={-15} textAnchor="end" height={80} />
-                  <YAxis stroke="#a3a3a3" />
-                  <Tooltip 
-                    contentStyle={{ 
-                      backgroundColor: '#fff', 
+                  <XAxis type="number" stroke="#a3a3a3" />
+                  <YAxis dataKey="funcionario" type="category" stroke="#a3a3a3" width={120} />
+                  <Tooltip
+                    contentStyle={{
+                      backgroundColor: '#fff',
                       border: '1px solid #f0f0f0',
                       borderRadius: '8px'
-                    }} 
+                    }}
                   />
-                  <Bar dataKey="emAndamento" fill="#f7b4c4" name="Em Andamento" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="emAndamento" fill="#f7b4c4" name="Em Andamento" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </Card>
@@ -531,15 +518,12 @@ export default function App() {
         {/* Tabela de Pedidos Sem Atualização */}
         <div className="space-y-4">
           <h2 className="text-neutral-800">Pedidos Sem Atualização</h2>
-          
           <Card className="bg-white border-neutral-100 shadow-sm overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow className="bg-[#faf8f7] border-neutral-100">
                   <TableHead className="text-neutral-800">ID</TableHead>
                   <TableHead className="text-neutral-800">Cliente</TableHead>
-                  <TableHead className="text-neutral-800">Produto</TableHead>
-                  <TableHead className="text-neutral-800">Tema</TableHead>
                   <TableHead className="text-neutral-800">Status Atual</TableHead>
                   <TableHead className="text-neutral-800">Dias Parado</TableHead>
                   <TableHead className="text-neutral-800">Responsável</TableHead>
@@ -551,8 +535,6 @@ export default function App() {
                     <TableRow key={pedido.id} className="border-neutral-100">
                       <TableCell className="text-neutral-800">{pedido.id}</TableCell>
                       <TableCell className="text-neutral-600">{pedido.cliente}</TableCell>
-                      <TableCell className="text-neutral-600">{pedido.produto}</TableCell>
-                      <TableCell className="text-neutral-600">{pedido.tema}</TableCell>
                       <TableCell>
                         <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-[#fce4e8] text-[#dc6b84] border border-[#f7b4c4]">
                           {pedido.status}
@@ -566,7 +548,7 @@ export default function App() {
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={7} className="text-center text-neutral-400 py-8">
+                    <TableCell colSpan={5} className="text-center text-neutral-400 py-8">
                       Nenhum pedido encontrado com os filtros selecionados
                     </TableCell>
                   </TableRow>
