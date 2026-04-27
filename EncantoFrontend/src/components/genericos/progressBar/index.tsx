@@ -1,4 +1,4 @@
-import styles from './ProgressBar.module.css';
+import styles from './progressBar.module.css';
 
 interface ProgressBarProps {
   progresso: number;
