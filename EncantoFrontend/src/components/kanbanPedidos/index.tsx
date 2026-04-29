@@ -35,7 +35,6 @@ function OrderCard({ order, onClick }: OrderCardProps) {
     }),
   }));
 
-  // Formatar a data limite para um formato amigável (DD/MM/YYYY)
   const dataLimiteFormatada = order.dataLimite 
     ? new Date(order.dataLimite).toLocaleDateString('pt-BR') 
     : 'Sem data';
@@ -44,7 +43,7 @@ function OrderCard({ order, onClick }: OrderCardProps) {
     <div
       ref={drag as any}
       onClick={() => onClick(order)}
-      className="p-4 rounded-lg shadow-sm cursor-pointer transition-all hover:shadow-md"
+      className="p-4 rounded-lg shadow-sm cursor-pointer transition-all hover:shadow-md shrink-0"
       style={{
         backgroundColor: 'white',
         border: '1px solid #D8E2DC',
@@ -97,20 +96,24 @@ function KanbanColumn({ status, orders, onDrop, onOrderClick }: KanbanColumnProp
     }),
   }), [onDrop, status.id]); 
 
-  // Fallback de cor caso o status não tenha cor definida no banco
   const columnColor = status.cor || '#F9F9F9';
 
   return (
     <div
       ref={drop as any}
-      className="flex-1 rounded-lg p-4 min-h-[600px] min-w-[280px]"
+      className="flex flex-col shrink-0 rounded-lg p-4"
       style={{
+        width: '320px',
+        // Aumentei o desconto de 280px para 360px.
+        // Isso vai reduzir a altura das colunas, removendo o scroll da página.
+        height: 'calc(100vh - 300px)', 
+        minHeight: '300px', // Reduzi para evitar forçar scroll em telas de notebook menores
         backgroundColor: isOver ? '#FFE5D9' : columnColor,
         border: '1px solid #D8E2DC',
         transition: 'background-color 0.2s ease',
       }}
     >
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex items-center justify-between mb-4 shrink-0">
         <h2 className="text-[20px]" style={{ color: '#6D6875' }}>
           <strong>{status.status}</strong>
         </h2>
@@ -122,7 +125,8 @@ function KanbanColumn({ status, orders, onDrop, onOrderClick }: KanbanColumnProp
         </span>
       </div>
 
-      <div className="space-y-3">
+      {/* AQUI FICA O SCROLL INTERNO DA COLUNA */}
+      <div className="flex-1 overflow-y-auto space-y-3 pr-2 pb-2 custom-scrollbar min-h-0">
         {orders.map(order => (
           <OrderCard key={order.id} order={order} onClick={onOrderClick} />
         ))}
@@ -137,20 +141,7 @@ function KanbanColumn({ status, orders, onDrop, onOrderClick }: KanbanColumnProp
 export default function Kanban() {
   const [orders, setOrders] = useState<PedidoResponse[]>([]);
   const [statusTypes, setStatusTypes] = useState<StatusPedidoResponse[]>([]);
-  
-  const [selectedOrder, setSelectedOrder] = useState<any | null>(null); // any temporário até arrumarmos o modal
-  
-  // Estado para filtro de data
-  const [dataInicio, setDataInicio] = useState<string>(() => {
-    const hoje = new Date();
-    const primeiro = new Date(hoje.getFullYear(), hoje.getMonth(), 1);
-    return primeiro.toISOString().split('T')[0];
-  });
-  
-  const [dataFim, setDataFim] = useState<string>(() => {
-    const hoje = new Date();
-    return hoje.toISOString().split('T')[0];
-  });
+  const [selectedOrder, setSelectedOrder] = useState<any | null>(null);
   
   const [isOrderDetailOpen, setIsOrderDetailOpen] = useState(false);
   const [isStatusTypeModalOpen, setIsStatusTypeModalOpen] = useState(false);
@@ -177,12 +168,18 @@ export default function Kanban() {
   useEffect(() => {
     const fetchKanbanData = async () => {
       try {
+        const hoje = new Date();
+        const trintaDiasAtras = new Date();
+        trintaDiasAtras.setDate(hoje.getDate() - 30);
+
+        const dataFim = hoje.toISOString().split('T')[0];
+        const dataInicio = trintaDiasAtras.toISOString().split('T')[0];
+
         const [statusData, pedidosData] = await Promise.all([
           statusPedidoService.listarTodos(),
           pedidoService.listarTodos(0, 500, true, '', dataInicio, dataFim)
         ]);
 
-        // Ordenar as colunas pela ordem do Kanban definida no banco
         const statusOrdenados = statusData.sort((a: any, b: any) => a.ordemKanban - b.ordemKanban);
         
         setStatusTypes(statusOrdenados);
@@ -193,16 +190,14 @@ export default function Kanban() {
     };
 
     fetchKanbanData();
-  }, [dataInicio, dataFim]);
+  }, []);
 
   const handleOnClickInSeeDetails = (orderId: number) => {
     navigate(`/pedidos/detalhes/${orderId}`);
   }
 
-  // 2. LÓGICA DE DRAG & DROP REAL
   const handleOrderDrop = async (orderId: number, newStatusId: number) => {
     try {
-      // Chamada à API para atualizar o status do pedido
       await pedidoService.mudarStatus(orderId, newStatusId);
 
       setOrders(prevOrders => prevOrders.map(order => {
@@ -228,10 +223,8 @@ export default function Kanban() {
     setIsOrderDetailOpen(true);
   };
 
-  // 3. GERENCIAR STATUS (COLUNAS)
   const handleAddStatusType = async (statusType: any) => {
     try {
-      // MUDANÇA AQUI: Passamos o statusType.name e statusType.color
       const novoStatus = await statusPedidoService.criar(statusType.name, statusType.color); 
       setStatusTypes([...statusTypes, novoStatus]);
       setIsStatusTypeModalOpen(false);
@@ -243,7 +236,6 @@ export default function Kanban() {
 
   const handleEditStatusType = async (statusType: any) => {
     try {
-      // MUDANÇA AQUI: Passamos também a cor na atualização
       const statusAtualizado = await statusPedidoService.atualizar(statusType.id, statusType.name, statusType.color);
       setStatusTypes(statusTypes.map(st => st.id === statusAtualizado.id ? statusAtualizado : st));
       setIsStatusTypeModalOpen(false);
@@ -273,48 +265,24 @@ export default function Kanban() {
     setIsStatusTypeListOpen(false);
   };
 
-// Filtrar pedidos por status usando a chave correta: idStatusPedido
   const getOrdersByStatus = (statusId: number) => {
     return orders.filter(order => order.statusAtual?.idStatusPedido === statusId);
   };
   
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
-        <div className="w-full max-w-[1600px] mx-auto px-8 py-10 box-border">
+      {/* Container Raiz */}
+      <div className="h-[calc(100vh-80px)] flex flex-col" style={{ backgroundColor: '#F9F9F9' }}>
+        
+        {/* 2. Mantive suas classes exatas na div principal, mas adicionei flex flex-col h-full para alinhar os filhos */}
+        <div className="w-full max-w-[1600px] mx-auto px-8 py-10 box-border flex flex-col h-full overflow-hidden">
+          
           {/* Cabeçalho */}
-          <div className="mb-10">
+          <div className="mb-6">
             <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Pedidos</h1>
-            <p className="text-[17px]" style={{ color: '#9D8189' }}>Gerencie seus pedidos de forma visual e organizada</p>
-          </div>
-
-          {/* Filtro de Data */}
-          <div className="mb-8 flex gap-4 items-end">
-            <div className="flex flex-col gap-2">
-              <label className="text-[14px]" style={{ color: '#6D6875' }}>
-                <strong>Data Inicial</strong>
-              </label>
-              <input
-                type="date"
-                value={dataInicio}
-                onChange={(e) => setDataInicio(e.target.value)}
-                className="px-3 py-2 border rounded-lg text-[14px]"
-                style={{ borderColor: '#D8E2DC', color: '#6D6875' }}
-              />
-            </div>
-            
-            <div className="flex flex-col gap-2">
-              <label className="text-[14px]" style={{ color: '#6D6875' }}>
-                <strong>Data Final</strong>
-              </label>
-              <input
-                type="date"
-                value={dataFim}
-                onChange={(e) => setDataFim(e.target.value)}
-                className="px-3 py-2 border rounded-lg text-[14px]"
-                style={{ borderColor: '#D8E2DC', color: '#6D6875' }}
-              />
-            </div>
+            <p className="text-[17px]" style={{ color: '#9D8189' }}>
+              Visão rápida dos pedidos nos últimos 30 dias
+            </p>
           </div>
 
           {/* Botões de ação */}
@@ -350,8 +318,8 @@ export default function Kanban() {
             </Button>
           </div>
 
-          {/* Kanban Board */}
-          <div className="flex gap-6 overflow-x-auto pb-4">
+          {/* Quadro Kanban (Scroll Horizontal de colunas de 320px) */}
+          <div className="flex flex-nowrap gap-6 overflow-x-auto pb-4 items-start custom-scrollbar w-full">
             {statusTypes.map(status => (
               <KanbanColumn
                 key={status.id}
@@ -370,7 +338,7 @@ export default function Kanban() {
           </div>
         </div>
 
-        {/* Modals - Temporariamente com "any" no selectedOrder até os adaptarmos ao novo modelo no próximo passo */}
+        {/* Modais */}
         {selectedOrder && (
           <OrderDetailModal
             isOpen={isOrderDetailOpen}
@@ -384,7 +352,6 @@ export default function Kanban() {
             onClickInSeeDetails={handleOnClickInSeeDetails}
           />
         )}
-
         <StatusTypeModal
           isOpen={isStatusTypeModalOpen}
           onClose={() => {
@@ -392,9 +359,8 @@ export default function Kanban() {
             setEditingStatusType(null);
           }}
           onSave={editingStatusType ? handleEditStatusType : handleAddStatusType}
-          statusType={editingStatusType} // Removido o as any
+          statusType={editingStatusType}
         />
-
         <StatusTypeListModal
           isOpen={isStatusTypeListOpen}
           onClose={() => setIsStatusTypeListOpen(false)}
@@ -409,7 +375,6 @@ export default function Kanban() {
             }
           }}
         />
-
         <DeleteStatusTypeDialog
           isOpen={!!deleteStatusType}
           onClose={() => setDeleteStatusType(null)}
@@ -417,11 +382,11 @@ export default function Kanban() {
           statusTypeName={deleteStatusType?.status || ''}
         />
         <FeedbackModal
-                isOpen={feedback.isOpen}
-                onClose={() => setFeedback({ ...feedback, isOpen: false })}
-                message={feedback.message}
-                type={feedback.type}
-              />
+          isOpen={feedback.isOpen}
+          onClose={() => setFeedback({ ...feedback, isOpen: false })}
+          message={feedback.message}
+          type={feedback.type}
+        />
       </div>
     </DndProvider>
   );
