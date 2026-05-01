@@ -50,7 +50,7 @@ interface StatusType {
 
 export default function App() {
   const navigate = useNavigate();
-  
+
   const [feedback, setFeedback] = useState<{
     isOpen: boolean;
     message: string;
@@ -65,7 +65,7 @@ export default function App() {
     setFeedback({ isOpen: true, message, type });
   };
 
-  const [clients, setClients] = useState<Cliente[]>([]);  
+  const [clients, setClients] = useState<Cliente[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
   const [statusTypes, setStatusTypes] = useState<StatusType[]>([]);
 
@@ -95,17 +95,20 @@ export default function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [clientesData, produtosResponse, statusData] = await Promise.all([
-          clienteService.listarTodos(),
-          produtoService.listarTodos(0, 500), // 1. Pedimos um limite alto de produtos
+        const [clientesResponse, produtosResponse, statusData] = await Promise.all([
+          clienteService.listarTodos(0, 500), // <-- Adicionado (0, 500)
+          produtoService.listarTodos(0, 500),
           statusPedidoService.listarTodos()
         ]);
 
-        setClients(clientesData);
+        const listaClientes = Array.isArray(clientesResponse)
+          ? clientesResponse
+          : (clientesResponse?.content || []);
+        setClients(listaClientes);
 
         // 2. Extraímos o array 'content' de forma segura
-        const listaProdutos = Array.isArray(produtosResponse) 
-          ? produtosResponse 
+        const listaProdutos = Array.isArray(produtosResponse)
+          ? produtosResponse
           : (produtosResponse?.content || []);
 
         // 3. Fazemos o .map() na nova lista extraída
@@ -114,7 +117,7 @@ export default function App() {
           title: p.titulo,
           description: p.descricao,
           imageUrl: p.fotos && p.fotos.length > 0 ? p.fotos[0].foto : '',
-          category: 'Diversos', 
+          category: 'Diversos',
           theme: p.tema?.descricao || 'Sem Tema',
           item: p.item?.descricao || 'Sem Item',
           unitPrice: p.item?.precoVenda || 0,
@@ -122,7 +125,7 @@ export default function App() {
           unitWeight: p.item?.peso || 0,
           productionDays: p.item?.prazoProducao || 0
         }));
-        
+
         setProducts(produtosFormatados);
 
         setStatusTypes(statusData);
@@ -163,8 +166,8 @@ export default function App() {
       return;
     }
 
-    const activePrice = product.promotionalPrice > 0 && product.promotionalPrice < product.unitPrice 
-      ? product.promotionalPrice 
+    const activePrice = product.promotionalPrice > 0 && product.promotionalPrice < product.unitPrice
+      ? product.promotionalPrice
       : product.unitPrice;
 
     const newSelected: SelectedProduct = {
@@ -217,7 +220,7 @@ export default function App() {
         observacoes: observations,
         origem: "Sistema/Balcão",
         clienteId: parseInt(selectedClientId),
-        usuarioId: 1, 
+        usuarioId: 1,
         produtos: selectedProducts.map(sp => ({
           idProduto: parseInt(sp.product.id),
           quantidade: sp.quantity
@@ -241,33 +244,21 @@ export default function App() {
     }
   };
 
-  // ==========================================
-  // CLIENTES (Funções visuais dos modais)
-  // ==========================================
-  // ==========================================
-  // SALVAR / ATUALIZAR CLIENTE NA API
-  // ==========================================
   const handleSaveClient = async (clientData: any) => {
     try {
-      if (clientData.id) {
-        await clienteService.atualizar(clientData.id, clientData);
-        showFeedback("Cliente atualizado com sucesso!", "success");
-      } else {
-        await clienteService.criar(clientData);
-        showFeedback("Cliente cadastrado com sucesso!", "success");
-      }
 
-      setIsClientFormOpen(false);
-      setEditingClient(null);
+      const clientesAtualizadosResponse = await clienteService.listarTodos(0, 500);
+      const listaAtualizada = Array.isArray(clientesAtualizadosResponse)
+        ? clientesAtualizadosResponse
+        : (clientesAtualizadosResponse?.content || []);
 
-      const clientesAtualizados = await clienteService.listarTodos();
-      setClients(clientesAtualizados);
-      
-      if (!clientData.id && clientesAtualizados.length > 0) {
-        const novoId = clientesAtualizados[clientesAtualizados.length - 1].id;
+      setClients(listaAtualizada);
+
+      if (!clientData.id && listaAtualizada.length > 0) {
+        const novoId = listaAtualizada[listaAtualizada.length - 1].id;
         setSelectedClientId(novoId.toString());
       }
-      
+
     } catch (error) {
       console.error("Erro ao salvar cliente:", error);
       showFeedback("Não foi possível salvar o cliente. Verifique se os dados estão corretos.", "error");
@@ -388,69 +379,70 @@ export default function App() {
               const temDesconto = product.promotionalPrice > 0 && product.promotionalPrice < product.unitPrice;
 
               return (
-              <div key={product.id} className="border rounded-xl overflow-hidden transition-all hover:shadow-md flex flex-col bg-white aspect-square" style={{ borderColor: '#D8E2DC' }}>
-                
-                <div className="relative flex-1 w-full overflow-hidden bg-gray-50">
-                  {product.imageUrl ? (
-                    <ImageWithFallback 
-                      src={product.imageUrl} 
-                      alt={product.title} 
-                      className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform" 
-                    />
-                  ) : (
-                    <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="text-gray-400 text-xs">Sem Foto</span>
-                    </div>
-                  )}  
-                  
-                  {temDesconto && (
-                     <div className="absolute top-1.5 left-1.5 bg-[#FFE5D9] text-[#F4ACB7] px-2 py-0.5 rounded text-[9px] flex items-center shadow-sm font-bold">
-                       Promo
-                     </div>
-                  )}
-                </div>
-                
-                <div className="p-3 flex flex-col justify-between shrink-0 bg-white">
-                  <div>
-                    <h3 className="text-[9px] font-bold mb-1 line-clamp-1 leading-tight" style={{ color: '#6D6875' }} title={product.title}>
-                      {product.title}
-                    </h3>
-                    <p className="text-[12px] mb-0 line-clamp-2 leading-tight" style={{ color: '#9D8189' }}>
-                      {product.description}
-                    </p>
+                <div key={product.id} className="border rounded-xl overflow-hidden transition-all hover:shadow-md flex flex-col bg-white aspect-square" style={{ borderColor: '#D8E2DC' }}>
+
+                  <div className="relative flex-1 w-full overflow-hidden bg-gray-50">
+                    {product.imageUrl ? (
+                      <ImageWithFallback
+                        src={product.imageUrl}
+                        alt={product.title}
+                        className="absolute inset-0 w-full h-full object-cover group-hover:scale-105 transition-transform"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center">
+                        <span className="text-gray-400 text-xs">Sem Foto</span>
+                      </div>
+                    )}
+
+                    {temDesconto && (
+                      <div className="absolute top-1.5 left-1.5 bg-[#FFE5D9] text-[#F4ACB7] px-2 py-0.5 rounded text-[9px] flex items-center shadow-sm font-bold">
+                        Promo
+                      </div>
+                    )}
                   </div>
-                  
-                  <div>
-                    <div className="flex items-center gap-1.5 mb-2">
-                      {temDesconto ? (
-                        <>
-                          <span className="text-[#9D8189] line-through text-[9px]">
+
+                  <div className="p-3 flex flex-col justify-between shrink-0 bg-white">
+                    <div>
+                      <h3 className="text-[9px] font-bold mb-1 line-clamp-1 leading-tight" style={{ color: '#6D6875' }} title={product.title}>
+                        {product.title}
+                      </h3>
+                      <p className="text-[12px] mb-0 line-clamp-2 leading-tight" style={{ color: '#9D8189' }}>
+                        {product.description}
+                      </p>
+                    </div>
+
+                    <div>
+                      <div className="flex items-center gap-1.5 mb-2">
+                        {temDesconto ? (
+                          <>
+                            <span className="text-[#9D8189] line-through text-[9px]">
+                              R$ {product.unitPrice.toFixed(2)}
+                            </span>
+                            <span className="text-[#F4ACB7] font-bold text-[9px]">
+                              R$ {product.promotionalPrice.toFixed(2)}
+                            </span>
+                          </>
+                        ) : (
+                          <span className="text-[11px] font-bold" style={{ color: '#F4ACB7' }}>
                             R$ {product.unitPrice.toFixed(2)}
                           </span>
-                          <span className="text-[#F4ACB7] font-bold text-[9px]">
-                            R$ {product.promotionalPrice.toFixed(2)}
-                          </span>
-                        </>
-                      ) : (
-                        <span className="text-[11px] font-bold" style={{ color: '#F4ACB7' }}>
-                          R$ {product.unitPrice.toFixed(2)}
-                        </span>
-                      )}
+                        )}
+                      </div>
+
+                      <Button
+                        onClick={() => handleSelectProduct(product)}
+                        disabled={selectedProducts.some(sp => sp.product.id === product.id)}
+                        className="w-full h-7 text-[9px] uppercase tracking-wide font-bold disabled:opacity-40 rounded"
+                        style={{ backgroundColor: '#F4ACB7', color: 'white' }}
+                      >
+                        {selectedProducts.some(sp => sp.product.id === product.id) ? 'Selecionado' : 'Selecionar'}
+                      </Button>
                     </div>
-                    
-                    <Button
-                      onClick={() => handleSelectProduct(product)}
-                      disabled={selectedProducts.some(sp => sp.product.id === product.id)}
-                      className="w-full h-7 text-[9px] uppercase tracking-wide font-bold disabled:opacity-40 rounded"
-                      style={{ backgroundColor: '#F4ACB7', color: 'white' }}
-                    >
-                      {selectedProducts.some(sp => sp.product.id === product.id) ? 'Selecionado' : 'Selecionar'}
-                    </Button>
                   </div>
                 </div>
-              </div>
-            )})}
-            
+              )
+            })}
+
             {filteredProducts.length === 0 && (
               <div className="col-span-4 text-center py-12">
                 <p className="text-[15px]" style={{ color: '#9D8189' }}>Nenhum produto encontrado com "{searchProduct}"</p>
@@ -463,17 +455,17 @@ export default function App() {
               <p className="text-sm" style={{ color: '#9D8189' }}>
                 Mostrando <strong>{startIndex + 1}</strong> a <strong>{Math.min(startIndex + itemsPerPage, filteredProducts.length)}</strong> de <strong>{filteredProducts.length}</strong> produtos
               </p>
-              
+
               <div className="flex items-center gap-2">
-                <button 
-                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} 
+                <button
+                  onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                   disabled={currentPage === 1}
                   className="px-3 py-1.5 rounded-md border text-sm disabled:opacity-50 hover:bg-gray-50 transition-colors"
                   style={{ borderColor: '#D8E2DC', color: '#6D6875' }}
                 >
                   Anterior
                 </button>
-                
+
                 <div className="flex gap-1">
                   {Array.from({ length: totalPages }, (_, i) => i + 1)
                     .filter(p => p === 1 || p === totalPages || Math.abs(currentPage - p) <= 1)
@@ -482,12 +474,12 @@ export default function App() {
                         return <span key={`ellipsis-${p}`} className="px-2 py-1 text-[#9D8189]">...</span>;
                       }
                       return (
-                        <button 
-                          key={p} 
+                        <button
+                          key={p}
                           onClick={() => setCurrentPage(p)}
                           className={`w-8 h-8 rounded-md flex items-center justify-center text-sm transition-colors ${currentPage === p ? 'font-bold' : ''}`}
-                          style={{ 
-                            backgroundColor: currentPage === p ? '#F4ACB7' : 'transparent', 
+                          style={{
+                            backgroundColor: currentPage === p ? '#F4ACB7' : 'transparent',
                             color: currentPage === p ? 'white' : '#6D6875',
                             border: currentPage === p ? 'none' : '1px solid #D8E2DC'
                           }}
@@ -495,11 +487,11 @@ export default function App() {
                           {p}
                         </button>
                       );
-                  })}
+                    })}
                 </div>
 
-                <button 
-                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} 
+                <button
+                  onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                   disabled={currentPage === totalPages}
                   className="px-3 py-1.5 rounded-md border text-sm disabled:opacity-50 hover:bg-gray-50 transition-colors"
                   style={{ borderColor: '#D8E2DC', color: '#6D6875' }}
@@ -520,12 +512,12 @@ export default function App() {
                 <div key={sp.product.id} className="border rounded-lg p-5" style={{ borderColor: '#D8E2DC', backgroundColor: '#F9F9F9' }}>
                   <div className="flex items-start gap-4 mb-4">
                     <div className="size-20 rounded-lg overflow-hidden flex-shrink-0 bg-white flex items-center justify-center border" style={{ borderColor: '#D8E2DC' }}>
-                       {sp.product.imageUrl ? 
-                       <ImageWithFallback 
-                       src={sp.product.imageUrl} 
-                       alt={sp.product.title} 
-                       className="w-full h-full object-cover" 
-                       /> : <span className="text-gray-300 text-xs">Sem foto</span>}
+                      {sp.product.imageUrl ?
+                        <ImageWithFallback
+                          src={sp.product.imageUrl}
+                          alt={sp.product.title}
+                          className="w-full h-full object-cover"
+                        /> : <span className="text-gray-300 text-xs">Sem foto</span>}
                     </div>
                     <div className="flex-1">
                       <h3 className="text-[17px] mb-1" style={{ color: '#6D6875' }}><strong>{sp.product.title}</strong></h3>
@@ -592,16 +584,16 @@ export default function App() {
         )}
       </div>
 
-      <ClientListModal 
-        isOpen={isClientListOpen} 
-        onClose={() => setIsClientListOpen(false)} 
+      <ClientListModal
+        isOpen={isClientListOpen}
+        onClose={() => setIsClientListOpen(false)}
         clients={clients}
-        onEdit={handleEditClient} 
+        onEdit={handleEditClient}
       />
-      <ClientFormModal 
-        isOpen={isClientFormOpen} 
-        onClose={() => { setIsClientFormOpen(false); setEditingClient(null); }} 
-        onSave={handleSaveClient} 
+      <ClientFormModal
+        isOpen={isClientFormOpen}
+        onClose={() => { setIsClientFormOpen(false); setEditingClient(null); }}
+        onSave={handleSaveClient}
         client={editingClient}
       />
       <FeedbackModal

@@ -7,7 +7,7 @@ interface EnderecoCliente {
 }
 
 interface Cliente {
-  id?: number; nome: string; telefone: string; email?: string;
+  id?: number; nome: string; telefone: string;
   enderecos: EnderecoCliente[];
 }
 
@@ -40,7 +40,6 @@ export default function ClientListModal({ isOpen, onClose, clients, onEdit }: Cl
                   <tr style={{ backgroundColor: '#F9F9F9' }}>
                     <th className="text-left p-4 text-[14px]" style={{ color: '#6D6875', borderBottom: '1px solid #D8E2DC' }}><strong>Nome</strong></th>
                     <th className="text-left p-4 text-[14px]" style={{ color: '#6D6875', borderBottom: '1px solid #D8E2DC' }}><strong>Telefone</strong></th>
-                    <th className="text-left p-4 text-[14px]" style={{ color: '#6D6875', borderBottom: '1px solid #D8E2DC' }}><strong>Email</strong></th>
                     <th className="text-left p-4 text-[14px]" style={{ color: '#6D6875', borderBottom: '1px solid #D8E2DC' }}><strong>Endereços</strong></th>
                     <th className="text-center p-4 text-[14px]" style={{ color: '#6D6875', borderBottom: '1px solid #D8E2DC' }}><strong>Ações</strong></th>
                   </tr>
@@ -50,7 +49,6 @@ export default function ClientListModal({ isOpen, onClose, clients, onEdit }: Cl
                     <tr key={client.id} className="hover:bg-gray-50 transition-colors" style={{ borderBottom: '1px solid #D8E2DC' }}>
                       <td className="p-4 text-[15px]" style={{ color: '#6D6875' }}><strong>{client.nome}</strong></td>
                       <td className="p-4 text-[15px]" style={{ color: '#9D8189' }}>{client.telefone}</td>
-                      <td className="p-4 text-[15px]" style={{ color: '#9D8189' }}>{client.email || '-'}</td>
                       <td className="p-4 text-[14px]" style={{ color: '#9D8189' }}>{client.enderecos?.length || 0} endereço(s)</td>
                       <td className="p-4 text-center">
                         <Button onClick={() => onEdit(client)} className="h-9 px-4 gap-2 text-[14px]" style={{ backgroundColor: '#F4ACB7', color: 'white' }}>

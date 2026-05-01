@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { X, Plus, Trash2, Edit2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
-import InputMask from 'react-input-mask';
 import FeedbackModal from '../ui/FeedbackModal';
 
 interface EnderecoCliente {
@@ -20,7 +19,6 @@ interface Cliente {
   id?: number;
   nome: string;
   telefone: string;
-  email?: string;
   enderecos: EnderecoCliente[];
 }
 
@@ -34,7 +32,6 @@ interface ClientFormModalProps {
 export default function ClientFormModal({ isOpen, onClose, onSave, client }: ClientFormModalProps) {
   const [nome, setNome] = useState('');
   const [telefone, setTelefone] = useState('');
-  const [email, setEmail] = useState('');
   const [enderecos, setEnderecos] = useState<EnderecoCliente[]>([]);
   
   const [editingAddressIndex, setEditingAddressIndex] = useState<number | null>(null);
@@ -88,7 +85,7 @@ export default function ClientFormModal({ isOpen, onClose, onSave, client }: Cli
   };
 
   useEffect(() => {
-  if (cep.length === 9) { // formato 00000-000
+  if (cep.length === 9) {
     buscarCep(cep);
   }
 }, [cep]);
@@ -97,7 +94,6 @@ export default function ClientFormModal({ isOpen, onClose, onSave, client }: Cli
     if (client) {
       setNome(client.nome || '');
       setTelefone(client.telefone || '');
-      setEmail(client.email || '');
       setEnderecos(client.enderecos || []);
     } else {
       resetForm();
@@ -105,7 +101,7 @@ export default function ClientFormModal({ isOpen, onClose, onSave, client }: Cli
   }, [client, isOpen]);
 
   const resetForm = () => {
-    setNome(''); setTelefone(''); setEmail(''); setEnderecos([]);
+    setNome(''); setTelefone(''); setEnderecos([]);
     resetAddressForm(); setShowAddressForm(false); setEditingAddressIndex(null);
   };
 
@@ -131,7 +127,6 @@ export default function ClientFormModal({ isOpen, onClose, onSave, client }: Cli
       id: client?.id,
       nome: nome.trim(),
       telefone: telefone.trim(),
-      email: email.trim(),
       enderecos,
     });
   };
@@ -195,10 +190,6 @@ export default function ClientFormModal({ isOpen, onClose, onSave, client }: Cli
                 <div>
                   <label className="block text-[14px] mb-2" style={{ color: '#6D6875' }}><strong>Telefone</strong> <span style={{ color: '#F4ACB7' }}>*</span></label>
                   <Input value={telefone} onChange={(e) => setTelefone(e.target.value)} placeholder="Sem traços ex: 5511987654321" className="h-11 text-[15px]" style={{ borderColor: '#D8E2DC', color: '#6D6875' }} required />
-                </div>
-                <div className="col-span-2">
-                  <label className="block text-[14px] mb-2" style={{ color: '#6D6875' }}><strong>Email</strong></label>
-                  <Input type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="cliente@email.com" className="h-11 text-[15px]" style={{ borderColor: '#D8E2DC', color: '#6D6875' }} />
                 </div>
               </div>
             </div>
