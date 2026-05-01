@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import { Plus, Settings } from 'lucide-react';
+import { useState, useEffect, useCallback, useRef } from 'react';
+import { Plus, Settings, GripVertical } from 'lucide-react';
 import { Button } from '../ui/button';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -75,48 +75,99 @@ function OrderCard({ order, onClick }: OrderCardProps) {
   );
 }
 
-// ==========================================
-// COMPONENTE DA COLUNA DO KANBAN
-// ==========================================
 interface KanbanColumnProps {
   status: StatusPedidoResponse;
+  index: number;
   orders: PedidoResponse[];
-  onDrop: (orderId: number, newStatusId: number) => void;
+  onDropOrder: (orderId: number, newStatusId: number) => void;
   onOrderClick: (order: PedidoResponse) => void;
+  moveColumn: (dragIndex: number, hoverIndex: number) => void;
+  saveColumnOrder: () => void;
 }
 
-function KanbanColumn({ status, orders, onDrop, onOrderClick }: KanbanColumnProps) {
-  const [{ isOver }, drop] = useDrop(() => ({
+function KanbanColumn({ status, index, orders, onDropOrder, onOrderClick, moveColumn, saveColumnOrder }: KanbanColumnProps) {
+  const ref = useRef<HTMLDivElement>(null);
+
+  const [{ isDraggingColumn }, dragColumn, previewColumn] = useDrag({
+    type: 'COLUMN',
+    item: { index, id: status.id },
+    collect: (monitor) => ({
+      isDraggingColumn: monitor.isDragging(),
+    }),
+    end: () => {
+      saveColumnOrder(); 
+    }
+  });
+
+  const [, dropColumn] = useDrop({
+    accept: 'COLUMN',
+    hover(item: any, monitor) {
+      if (!ref.current) return;
+      const dragIndex = item.index;
+      const hoverIndex = index;
+      if (dragIndex === hoverIndex) return;
+
+      const hoverBoundingRect = ref.current.getBoundingClientRect();
+      const hoverWidth = hoverBoundingRect.right - hoverBoundingRect.left;
+      
+      const triggerRight = hoverWidth * 0.15; 
+      const triggerLeft = hoverWidth * 0.15;
+
+      const clientOffset = monitor.getClientOffset();
+      if (!clientOffset) return;
+      
+      const hoverClientX = clientOffset.x - hoverBoundingRect.left;
+
+      if (dragIndex < hoverIndex && hoverClientX < triggerRight) return;
+      
+      if (dragIndex > hoverIndex && hoverClientX > triggerLeft) return;
+
+      moveColumn(dragIndex, hoverIndex);
+      item.index = hoverIndex;
+    },
+  });
+
+  const [{ isOverOrder }, dropOrder] = useDrop(() => ({
     accept: 'ORDER',
     drop: (item: { orderId: number }) => {
-      onDrop(item.orderId, status.id);
+      onDropOrder(item.orderId, status.id);
     },
     collect: (monitor) => ({
-      isOver: monitor.isOver(),
+      isOverOrder: monitor.isOver(),
     }),
-  }), [onDrop, status.id]); 
+  }), [onDropOrder, status.id]); 
 
   const columnColor = status.cor || '#F9F9F9';
 
+  dropOrder(dropColumn(previewColumn(ref)));
+
   return (
     <div
-      ref={drop as any}
+      ref={ref as any}
       className="flex flex-col shrink-0 rounded-lg p-4"
       style={{
-        width: '320px',
-        // Aumentei o desconto de 280px para 360px.
-        // Isso vai reduzir a altura das colunas, removendo o scroll da página.
+        width: '325px', 
         height: 'calc(100vh - 300px)', 
-        minHeight: '300px', // Reduzi para evitar forçar scroll em telas de notebook menores
-        backgroundColor: isOver ? '#FFE5D9' : columnColor,
+        minHeight: '300px', 
+        opacity: isDraggingColumn ? 0.4 : 1, 
+        backgroundColor: isOverOrder ? '#FFE5D9' : columnColor,
         border: '1px solid #D8E2DC',
         transition: 'background-color 0.2s ease',
       }}
     >
-      <div className="flex items-center justify-between mb-4 shrink-0">
-        <h2 className="text-[20px]" style={{ color: '#6D6875' }}>
-          <strong>{status.status}</strong>
-        </h2>
+      <div className="flex items-center justify-between mb-4 shrink-0 group">
+        <div className="flex items-center gap-2">
+          <div 
+            ref={dragColumn as any} 
+            className="cursor-grab active:cursor-grabbing p-2 hover:bg-black/10 rounded transition-colors flex items-center justify-center"
+            title="Arraste para reordenar"
+          >
+             <GripVertical className="size-6" style={{ color: '#9D8189' }} />
+          </div>
+          <h2 className="text-[20px]" style={{ color: '#6D6875' }}>
+            <strong>{status.status}</strong>
+          </h2>
+        </div>
         <span
           className="size-7 rounded-full flex items-center justify-center text-[14px]"
           style={{ backgroundColor: '#F4ACB7', color: 'white' }}
@@ -125,7 +176,6 @@ function KanbanColumn({ status, orders, onDrop, onOrderClick }: KanbanColumnProp
         </span>
       </div>
 
-      {/* AQUI FICA O SCROLL INTERNO DA COLUNA */}
       <div className="flex-1 overflow-y-auto space-y-3 pr-2 pb-2 custom-scrollbar min-h-0">
         {orders.map(order => (
           <OrderCard key={order.id} order={order} onClick={onOrderClick} />
@@ -135,9 +185,6 @@ function KanbanColumn({ status, orders, onDrop, onOrderClick }: KanbanColumnProp
   );
 }
 
-// ==========================================
-// COMPONENTE PRINCIPAL KANBAN
-// ==========================================
 export default function Kanban() {
   const [orders, setOrders] = useState<PedidoResponse[]>([]);
   const [statusTypes, setStatusTypes] = useState<StatusPedidoResponse[]>([]);
@@ -159,11 +206,12 @@ export default function Kanban() {
     type: 'success'
   });
 
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const navigate = useNavigate();
+
   const showFeedback = (message: string, type: 'success' | 'error') => {
     setFeedback({ isOpen: true, message, type });
   };
-
-  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchKanbanData = async () => {
@@ -196,6 +244,32 @@ export default function Kanban() {
     navigate(`/pedidos/detalhes/${orderId}`);
   }
 
+  const moveColumn = useCallback((dragIndex: number, hoverIndex: number) => {
+    setStatusTypes((prevStatusTypes) => {
+      const newStatuses = [...prevStatusTypes];
+      const draggedStatus = newStatuses[dragIndex];
+      newStatuses.splice(dragIndex, 1);
+      newStatuses.splice(hoverIndex, 0, draggedStatus);
+      return newStatuses;
+    });
+  }, []);
+
+  const saveColumnOrder = useCallback(() => {
+    setStatusTypes((currentStatuses) => {
+      const payload = currentStatuses.map((st, idx) => ({
+        id: st.id,
+        novaOrdemKanban: idx + 1
+      }));
+      
+      statusPedidoService.reordenarKanban(payload).catch(err => {
+        showFeedback("Erro ao salvar a ordem do Kanban.", "error");
+        console.error(err);
+      });
+
+      return currentStatuses.map((st, idx) => ({ ...st, ordemKanban: idx + 1 }));
+    });
+  }, []);
+
   const handleOrderDrop = async (orderId: number, newStatusId: number) => {
     try {
       await pedidoService.mudarStatus(orderId, newStatusId);
@@ -225,11 +299,17 @@ export default function Kanban() {
 
   const handleAddStatusType = async (statusType: any) => {
     try {
-      const novoStatus = await statusPedidoService.criar(statusType.name, statusType.color); 
+      const novaOrdem = statusTypes.length > 0 
+        ? Math.max(...statusTypes.map(st => st.ordemKanban || 0)) + 1 
+        : 1;
+
+      const novoStatus = await statusPedidoService.criar(statusType.name, statusType.color, novaOrdem); 
+      
       setStatusTypes([...statusTypes, novoStatus]);
       setIsStatusTypeModalOpen(false);
-    } catch (error) {
-      showFeedback('Erro ao criar status.', 'error');
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.response?.data || 'Erro ao criar status.';
+      showFeedback(errorMessage, 'error');
       console.error("Erro ao criar status", error);
     }
   };
@@ -240,9 +320,10 @@ export default function Kanban() {
       setStatusTypes(statusTypes.map(st => st.id === statusAtualizado.id ? statusAtualizado : st));
       setIsStatusTypeModalOpen(false);
       setEditingStatusType(null);
-    } catch (error) {
-      showFeedback('Erro ao atualizar status.', 'error');
-       console.error("Erro ao atualizar status", error);
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || error.response?.data || 'Erro ao atualizar status.';
+      showFeedback(errorMessage, 'error');
+      console.error("Erro ao atualizar status", error);
     }
   };
 
@@ -252,8 +333,9 @@ export default function Kanban() {
         await statusPedidoService.desativar(deleteStatusType.id);
         setStatusTypes(statusTypes.filter(st => st.id !== deleteStatusType.id));
         setDeleteStatusType(null);
-      } catch (error) {
-        showFeedback('Erro ao deletar status.', 'error');
+      } catch (error: any) {
+        const errorMessage = error.response?.data?.message || error.response?.data || 'Erro ao deletar status.';
+        showFeedback(errorMessage, 'error');
         console.error("Erro ao deletar status", error);
       }
     }
@@ -268,25 +350,40 @@ export default function Kanban() {
   const getOrdersByStatus = (statusId: number) => {
     return orders.filter(order => order.statusAtual?.idStatusPedido === statusId);
   };
+
+  // SCROLL SUAVE E SENSÍVEL
+  const handleDragOverContainer = (e: React.DragEvent) => {
+    e.preventDefault(); 
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const threshold = 300; 
+    const { left, right } = container.getBoundingClientRect();
+    const { clientX } = e;
+
+    if (clientX < left + threshold) {
+      const distance = (left + threshold) - clientX;
+      // Usando scrollBy nativo para um movimento muito mais cadenciado
+      container.scrollBy({ left: -(distance * 0.08), behavior: 'auto' });
+    } else if (clientX > right - threshold) {
+      const distance = clientX - (right - threshold);
+      container.scrollBy({ left: distance * 0.08, behavior: 'auto' });
+    }
+  };
   
   return (
     <DndProvider backend={HTML5Backend}>
-      {/* Container Raiz */}
       <div className="h-[calc(100vh-80px)] flex flex-col" style={{ backgroundColor: '#F9F9F9' }}>
-        
-        {/* 2. Mantive suas classes exatas na div principal, mas adicionei flex flex-col h-full para alinhar os filhos */}
         <div className="w-full max-w-[1600px] mx-auto px-8 py-10 box-border flex flex-col h-full overflow-hidden">
           
-          {/* Cabeçalho */}
-          <div className="mb-6">
+          <div className="mb-6 shrink-0">
             <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Pedidos</h1>
             <p className="text-[17px]" style={{ color: '#9D8189' }}>
               Visão rápida dos pedidos nos últimos 30 dias
             </p>
           </div>
 
-          {/* Botões de ação */}
-          <div className="flex gap-3 mb-8">
+          <div className="flex gap-3 mb-8 shrink-0">
             <Button 
               onClick={() => navigate("/pedidos/cadastro")}
               className="gap-2 h-11 px-5 text-[15px]"
@@ -318,15 +415,21 @@ export default function Kanban() {
             </Button>
           </div>
 
-          {/* Quadro Kanban (Scroll Horizontal de colunas de 320px) */}
-          <div className="flex flex-nowrap gap-6 overflow-x-auto pb-4 items-start custom-scrollbar w-full">
-            {statusTypes.map(status => (
+          <div 
+            ref={scrollContainerRef}
+            onDragOver={handleDragOverContainer}
+            className="flex flex-nowrap gap-6 overflow-x-auto pb-4 items-start custom-scrollbar w-full flex-1 min-h-0"
+          >
+            {statusTypes.map((status, index) => (
               <KanbanColumn
                 key={status.id}
                 status={status}
+                index={index}
                 orders={getOrdersByStatus(status.id)}
-                onDrop={handleOrderDrop}
+                onDropOrder={handleOrderDrop}
                 onOrderClick={handleOrderClick}
+                moveColumn={moveColumn}
+                saveColumnOrder={saveColumnOrder}
               />
             ))}
             
@@ -368,12 +471,12 @@ export default function Kanban() {
           onEdit={openEditStatusTypeModal}
           onDelete={(statusType) => {
             const pedidosNoStatus = getOrdersByStatus(statusType.id);
-            if (pedidosNoStatus.length > 0) {
-              showFeedback("Não é possível excluir um status que contém pedidos. Mova os pedidos primeiro.", "error");
-            } else {
-              setDeleteStatusType(statusType);
+              if (pedidosNoStatus.length > 0) {
+                showFeedback("Não é possível excluir um status que contém pedidos. Mova os pedidos primeiro.", "error");
+              } else {
+                setDeleteStatusType(statusType);
             }
-          }}
+        }}
         />
         <DeleteStatusTypeDialog
           isOpen={!!deleteStatusType}

@@ -3,6 +3,8 @@ import { X, User, Phone, Package, Calendar, Clock, FileText } from 'lucide-react
 import { Button } from '../../ui/button';
 import type { PedidoResponse, StatusPedidoResponse } from '../../../interfaces/Pedido';
 
+import { produtoService } from '../../../services/ProdutoService';
+
 interface OrderDetailModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -14,16 +16,46 @@ interface OrderDetailModalProps {
 
 export default function OrderDetailModal({ isOpen, onClose, order, statusTypes, onUpdateStatus, onClickInSeeDetails }: OrderDetailModalProps) {
   const [selectedStatusId, setSelectedStatusId] = useState('');
+  
+  const [productNames, setProductNames] = useState<Record<number, string>>({});
 
   useEffect(() => {
-    if (order && order.statusAtual?.status?.id) {
-      setSelectedStatusId(order.statusAtual.status.id.toString());
+    if (order && order.statusAtual?.idStatusPedido) {
+      setSelectedStatusId(order.statusAtual.idStatusPedido.toString());
     }
   }, [order]);
 
+  useEffect(() => {
+    const fetchProductNames = async () => {
+      if (!order?.produtos || !isOpen) return;
+      
+      const newNames = { ...productNames };
+      let hasChanges = false;
+
+      for (const prod of order.produtos) {
+        if (!newNames[prod.idProduto]) {
+          try {
+            const produto = await produtoService.buscarPorId(prod.idProduto); 
+            newNames[prod.idProduto] = produto.titulo; // Baseado na sua interface Produto.ts
+            hasChanges = true;
+          } catch (error) {
+            newNames[prod.idProduto] = `Produto ID: ${prod.idProduto}`;
+            hasChanges = true;
+          }
+        }
+      }
+
+      if (hasChanges) {
+        setProductNames(newNames);
+      }
+    };
+
+    fetchProductNames();
+  }, [order, isOpen]);
+
   if (!isOpen || !order) return null;
 
-  const currentStatus = statusTypes.find(st => st.id === order.statusAtual?.status?.id);
+const currentStatus = statusTypes.find(st => st.id === order.statusAtual?.idStatusPedido);
 
   const handleStatusChange = (newStatusId: string) => {
     setSelectedStatusId(newStatusId);
@@ -34,7 +66,6 @@ export default function OrderDetailModal({ isOpen, onClose, order, statusTypes, 
     onClickInSeeDetails(order.id);
   };
 
-  // Funções auxiliares para formatar as datas (lidar com os arrays de data do Spring Boot ou strings ISO)
   const formatarData = (dataStr?: string) => {
     if (!dataStr) return 'Não definida';
     return new Date(dataStr).toLocaleDateString('pt-BR');
@@ -55,7 +86,6 @@ export default function OrderDetailModal({ isOpen, onClose, order, statusTypes, 
         className="bg-white rounded-lg shadow-xl w-full max-w-[800px] max-h-[90vh] overflow-y-auto"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Cabeçalho */}
         <div className="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10" style={{ borderColor: '#D8E2DC' }}>
           <div>
             <h2 className="text-[28px]" style={{ color: '#F4ACB7' }}>
@@ -70,10 +100,7 @@ export default function OrderDetailModal({ isOpen, onClose, order, statusTypes, 
           </button>
         </div>
 
-        {/* Conteúdo */}
         <div className="p-6 space-y-6">
-          
-          {/* Status Atual e Alteração */}
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 rounded-lg" style={{ backgroundColor: currentStatus?.cor || '#F9F9F9', border: '1px solid #D8E2DC' }}>
               <label className="block text-[14px] mb-2" style={{ color: '#6D6875' }}>
@@ -104,7 +131,6 @@ export default function OrderDetailModal({ isOpen, onClose, order, statusTypes, 
             </div>
           </div>
 
-          {/* Informações do Cliente */}
           <div className="bg-white rounded-lg p-5 border" style={{ borderColor: '#D8E2DC' }}>
             <h3 className="text-[18px] mb-4" style={{ color: '#F4ACB7' }}>
               <strong>Informações do Cliente</strong>
@@ -133,7 +159,6 @@ export default function OrderDetailModal({ isOpen, onClose, order, statusTypes, 
             </div>
           </div>
 
-          {/* Informações dos Produtos */}
           <div className="bg-white rounded-lg p-5 border" style={{ borderColor: '#D8E2DC' }}>
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-[18px]" style={{ color: '#F4ACB7' }}>
@@ -151,10 +176,11 @@ export default function OrderDetailModal({ isOpen, onClose, order, statusTypes, 
                     <Package className="size-5 mt-1" style={{ color: '#F4ACB7' }} />
                     <div className="flex-1">
                       <span className="text-[15px]" style={{ color: '#6D6875' }}>
-                        <strong>{prod.quantidade}x Produto (ID: {prod.idProduto})</strong>
+                        {/* AQUI ESTAMOS EXIBINDO O NOME DO PRODUTO */}
+                        <strong>{prod.quantidade}x {productNames[prod.idProduto] || 'Carregando...'}</strong>
                       </span>
                       <div className="flex gap-4 mt-1 text-[13px]" style={{ color: '#9D8189' }}>
-                        <span>Peso: {prod.pesoTotal?.toFixed(2)}g</span>
+                        <span>Peso: {prod.pesoTotal?.toFixed(2)}Kg</span>
                         <span>Preço: R$ {prod.precoTotal?.toFixed(2)}</span>
                       </div>
                     </div>
@@ -165,7 +191,6 @@ export default function OrderDetailModal({ isOpen, onClose, order, statusTypes, 
               )}
             </div>
 
-            {/* Observações */}
             {order.observacoes && (
               <div className="mt-4 flex items-start gap-3">
                 <FileText className="size-5 mt-1" style={{ color: '#F4ACB7' }} />
@@ -181,7 +206,6 @@ export default function OrderDetailModal({ isOpen, onClose, order, statusTypes, 
             )}
           </div>
 
-          {/* Datas e Prazos */}
           <div className="grid grid-cols-2 gap-4">
             <div className="p-4 rounded-lg" style={{ backgroundColor: '#F9F9F9', border: '1px solid #D8E2DC' }}>
               <div className="flex items-center gap-2 mb-2">
@@ -218,7 +242,6 @@ export default function OrderDetailModal({ isOpen, onClose, order, statusTypes, 
 
         </div>
 
-        {/* Rodapé */}
         <div className="flex justify-end gap-3 p-6 border-t" style={{ borderColor: '#D8E2DC' }}>
           <Button
             onClick={handleViewOrderDetails}

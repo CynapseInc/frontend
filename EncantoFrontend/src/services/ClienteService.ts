@@ -1,9 +1,34 @@
 import api from '../provider/api';
 
+export interface PageResponse<T> {
+  content: T[];
+  totalElements: number;
+  totalPages: number;
+  number: number;
+  size: number;
+}
+
 export const clienteService = {
-  listarTodos: async (page = 0) => {
-    const { data } = await api.get(`/clientes?page=${page}`);
-    return data && data.content && Array.isArray(data.content) ? data.content : (Array.isArray(data) ? data : []);
+  listarTodos: async (page = 0, size = 10, search = ''): Promise<PageResponse<any>> => {
+    const { data } = await api.get('/clientes', {
+      params: {
+        page,
+        size,
+        search: search || undefined
+      }
+    });
+
+    if (!data) {
+      return {
+        content: [],
+        totalElements: 0,
+        totalPages: 0,
+        number: 0,
+        size: 0
+      };
+    }
+    
+    return data;
   },
   
   criar: async (payload: any) => {

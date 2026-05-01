@@ -6,9 +6,13 @@ export const statusPedidoService = {
     return data && data.content && Array.isArray(data.content) ? data.content : [];
   },
   
-  criar: async (nome: string, cor: string) => {
-    const { data } = await api.post('/status-pedidos', { status: nome, cor: cor }); 
-    return data;
+  async criar(status: string, cor: string, ordemKanban: number) { 
+    const response = await api.post('/status-pedidos', { 
+       status, 
+       cor, 
+       ordemKanban 
+    });
+    return response.data;
   },
   
   atualizar: async (id: string | number, nome: string, cor: string) => {
@@ -20,7 +24,8 @@ export const statusPedidoService = {
     await api.patch(`/status-pedidos/mudar-estado/${id}`);
   },
   
-  reordenarKanban: async (novosIdsNaOrdem: any[]) => {
-    await api.post('/status-pedidos/reordenar-kanban', novosIdsNaOrdem);
+  async reordenarKanban(novosIdsNaOrdem: { id: number, novaOrdemKanban: number }[]) {
+    const response = await api.post('/status-pedidos/reordenar-kanban', novosIdsNaOrdem);
+    return response.data;
   }
 };

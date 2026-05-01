@@ -13,7 +13,7 @@ import { pedidoService } from '../../services/PedidoService';
 import { clienteService } from '../../services/ClienteService';
 import { produtoService } from '../../services/ProdutoService';
 import { statusPedidoService } from '../../services/StatusPedidoService';
-import { produtoPedidoService } from '../../services/ProdutoPedidoService'; // Para adicionar/remover produtos do pedido
+import { produtoPedidoService } from '../../services/ProdutoPedidoService'; 
 
 import './index-det-pedido.css';
 
@@ -34,7 +34,7 @@ interface Product {
 }
 
 interface SelectedProduct {
-  idRelacionamento?: number; // ID do relacionamento ProdutoPedido na tabela do banco
+  idRelacionamento?: number; 
   product: Product;
   quantity: number;
   unitPrice: number;
@@ -48,7 +48,7 @@ interface StatusType {
 }
 
 export default function App() {
-  const { id } = useParams(); // Pega o ID do pedido da URL
+  const { id } = useParams(); 
   const navigate = useNavigate();
 
   // Estados com os dados da API
@@ -82,33 +82,36 @@ export default function App() {
       type: 'success'
     });
   
-    const showFeedback = (message: string, type: 'success' | 'error') => {
-      setFeedback({ isOpen: true, message, type });
-    };
+  const showFeedback = (message: string, type: 'success' | 'error') => {
+    setFeedback({ isOpen: true, message, type });
+  };
 
   // ==========================================
-  // BUSCAR DADOS DA API
+  // BUSCAR DADOS DA API COM VALIDAÇÃO SEGURA
   // ==========================================
   useEffect(() => {
     const fetchData = async () => {
       if (!id) return;
       setIsLoading(true);
       try {
-        const [pedidoData, clientesData, produtosData, statusData] = await Promise.all([
+        const [pedidoData, clientesResponse, produtosData, statusData] = await Promise.all([
           pedidoService.buscarPorId(id),
-          clienteService.listarTodos(),
-          produtoService.listarTodos(),
+          clienteService.listarTodos(0, 500),
+          produtoService.listarTodos(0, 500),
           statusPedidoService.listarTodos()
         ]);
 
-        // Carregar Clientes
-        setClients(clientesData);
+        if (!pedidoData) throw new Error("Pedido não encontrado na base de dados");
 
-        // Carregar Todos os Produtos (Para o modal de adicionar produto)
-        const formatProducts = produtosData.map((p: any) => ({
-          id: p.id.toString(),
-          title: p.titulo,
-          description: p.descricao,
+        const listaClientes = Array.isArray(clientesResponse) ? clientesResponse : (clientesResponse?.content || []);
+        setClients(listaClientes);
+
+        const listaDeProdutosDoCatalogo = Array.isArray(produtosData) ? produtosData : (produtosData?.content || []);
+
+        const formatProducts = listaDeProdutosDoCatalogo.map((p: any) => ({
+          id: p.id ? p.id.toString() : '',
+          title: p.titulo || 'Produto sem nome',
+          description: p.descricao || '',
           imageUrl: p.fotos && p.fotos.length > 0 ? p.fotos[0].foto : '',
           category: p.tema?.categoriaTema?.titulo || 'Diversos',
           theme: p.tema?.descricao || 'Diversos',
@@ -119,41 +122,74 @@ export default function App() {
         }));
         setAllProducts(formatProducts);
 
-        // Carregar Status
-        setStatusTypes(statusData.map((s: any) => ({ id: s.id.toString(), name: s.status })));
+        const listaStatusDaAPI = Array.isArray(statusData) ? statusData : (statusData?.content || []);
+        setStatusTypes(listaStatusDaAPI.map((s: any) => ({ 
+          id: s.id ? s.id.toString() : '', 
+          name: s.status || 'Status Desconhecido' 
+        })));
 
-        // Preencher formulário com os dados do Pedido Específico
-        setOrderId(pedidoData.id.toString());
-        setSelectedClientId(pedidoData.cliente?.id?.toString() || '');
-        // Tenta selecionar o primeiro endereço caso o pedido não traga um endereço específico atrelado (depende do seu backend)
-        if (pedidoData.cliente && pedidoData.cliente.enderecos && pedidoData.cliente.enderecos.length > 0) {
-           setSelectedAddressId(pedidoData.cliente.enderecos[0].id.toString());
+        // Preenchimento seguro de formulário (Garante que nunca seja NaN ou undefined para o layout)
+        setOrderId(pedidoData.id ? pedidoData.id.toString() : id.toString());
+
+        if (pedidoData.cliente?.id) {
+          setSelectedClientId(pedidoData.cliente.id.toString());
+        } else {
+          setSelectedClientId('');
         }
+        
+        if (pedidoData.cliente?.enderecos?.length > 0 && pedidoData.cliente.enderecos[0].id) {
+           setSelectedAddressId(pedidoData.cliente.enderecos[0].id.toString());
+        } else {
+           setSelectedAddressId('');
+        }
+        
         setObservations(pedidoData.observacoes || '');
-        setStatusId(pedidoData.statusAtual?.idStatusPedido?.toString() || '');
-        setCreatedAt(new Date(pedidoData.createdAt).toLocaleString('pt-BR'));
-        setUpdatedAt(new Date(pedidoData.updatedAt).toLocaleString('pt-BR'));
 
-        // Preencher Produtos do Pedido
-        if (pedidoData.produtos) {
+        // === CORREÇÃO DO STATUS ===
+        // O backend manda "idStatusPedido", se não achar ele tenta achar o "status.id", e por fim tenta achar direto "id"
+        let currentStatusId = '';
+        if (pedidoData.statusAtual) {
+            currentStatusId = pedidoData.statusAtual.idStatusPedido 
+                           || pedidoData.statusAtual.status?.id 
+                           || pedidoData.statusAtual.id 
+                           || '';
+        }
+        setStatusId(currentStatusId ? currentStatusId.toString() : '');
+        // ==========================
+        
+        setCreatedAt(pedidoData.createdAt ? new Date(pedidoData.createdAt).toLocaleString('pt-BR') : 'Data não definida');
+        setUpdatedAt(pedidoData.updatedAt ? new Date(pedidoData.updatedAt).toLocaleString('pt-BR') : 'Data não definida');
+
+        // Preenchimento Seguro dos Produtos
+        if (pedidoData.produtos && Array.isArray(pedidoData.produtos)) {
           const mapOrderProducts = pedidoData.produtos.map((prodRel: any) => {
-            const catalogoProd = formatProducts.find(p => p.id === prodRel.idProduto.toString());
+            const idProduto = prodRel.idProduto || prodRel.produto?.id;
+            const idProdutoStr = idProduto ? idProduto.toString() : '';
+            
+            const catalogoProd = formatProducts.find((p: any) => p.id === idProdutoStr);
+            
             return {
               idRelacionamento: prodRel.id,
-              product: catalogoProd || { id: prodRel.idProduto, title: 'Produto Excluído', unitPrice: prodRel.precoUnitario, unitWeight: prodRel.pesoUnitario },
-              quantity: prodRel.quantidade,
-              unitPrice: prodRel.precoUnitario,
-              totalPrice: prodRel.precoTotal,
-              unitWeight: prodRel.pesoUnitario,
-              totalWeight: prodRel.pesoTotal
+              product: catalogoProd || { 
+                id: idProdutoStr, 
+                title: prodRel.produto?.titulo || 'Produto Indisponível/Excluído', 
+                unitPrice: prodRel.precoUnitario || 0, 
+                unitWeight: prodRel.pesoUnitario || 0 
+              },
+              quantity: prodRel.quantidade || 1,
+              unitPrice: prodRel.precoUnitario || 0,
+              totalPrice: prodRel.precoTotal || 0,
+              unitWeight: prodRel.pesoUnitario || 0,
+              totalWeight: prodRel.pesoTotal || 0
             };
           });
           setSelectedProducts(mapOrderProducts);
+        } else {
+          setSelectedProducts([]);
         }
 
       } catch (error) {
         console.error("Erro ao carregar dados do pedido:", error);
-
         showFeedback('Erro ao carregar os detalhes do pedido.', 'error');
       } finally {
         setIsLoading(false);
@@ -173,12 +209,10 @@ export default function App() {
     if (quantity < 1) return;
     
     try {
-      // Se já existe no banco, atualiza lá
       if (idRelacionamento) {
         await produtoPedidoService.atualizarQuantidadeProduto(idRelacionamento, quantity);
       }
 
-      // Atualiza o visual
       setSelectedProducts(selectedProducts.map(sp => {
         if (sp.product.id === productId) {
           return {
@@ -220,7 +254,6 @@ export default function App() {
     }
 
     try {
-      // Adiciona no banco imediatamente
       const payload = {
         idProduto: parseInt(product.id),
         idPedido: parseInt(orderId),
@@ -272,12 +305,11 @@ export default function App() {
     }
     
     try {
-      // 1. Atualizar Pedido Geral (Observações, Cliente)
       const pedidoAtualizado = {
         observacoes: observations,
         origem: "Sistema/Balcão",
         clienteId: parseInt(selectedClientId),
-        usuarioId: 1, // Assumindo usuário logado
+        usuarioId: 1, 
         produtos: selectedProducts.map(sp => ({
           idProduto: parseInt(sp.product.id),
           quantidade: sp.quantity
@@ -286,14 +318,18 @@ export default function App() {
       
       await pedidoService.atualizar(orderId, pedidoAtualizado);
 
-      // 2. Atualizar Status se tiver mudado
       if (statusId) {
          await pedidoService.mudarStatus(parseInt(orderId), parseInt(statusId));
       }
 
       updateLastModified();
       showFeedback('Alterações salvas com sucesso!', 'success');
-      navigate('/kanban'); // Opcional: Redirecionar após salvar
+      
+      // Delay pequeno para o feedback ser visto antes de voltar pro Kanban
+      setTimeout(() => {
+          navigate('/kanban');
+      }, 1000); 
+
     } catch (error) {
       console.error("Erro ao salvar alterações", error);
       showFeedback('Erro ao salvar o pedido.', 'error');
@@ -301,17 +337,22 @@ export default function App() {
   };
 
   const handleSaveClient = async (clientData: any) => {
-    try {
-      if (clientData.id) {
-        await clienteService.atualizar(clientData.id, clientData);
-      } else {
-        await clienteService.criar(clientData);
-      }
-      const clientesAtualizados = await clienteService.listarTodos();
-      setClients(clientesAtualizados);
-      setIsClientFormOpen(false);
-      setEditingClient(null);
-    } catch(e) {
+  try {
+    if (clientData.id) {
+      await clienteService.atualizar(clientData.id, clientData);
+    } else {
+      await clienteService.criar(clientData);
+    }
+    
+    const clientesAtualizadosResponse = await clienteService.listarTodos(0, 500);
+    const listaAtualizada = Array.isArray(clientesAtualizadosResponse) 
+      ? clientesAtualizadosResponse 
+      : (clientesAtualizadosResponse?.content || []);
+      
+    setClients(listaAtualizada);
+    setIsClientFormOpen(false);
+    setEditingClient(null);
+  } catch(e) {
       console.error(e);
       showFeedback('Erro ao salvar cliente.', 'error');
     }
@@ -350,7 +391,8 @@ export default function App() {
             <div className="px-5 py-3 rounded-lg" style={{ backgroundColor: '#FFE5D9', border: '1px solid #D8E2DC' }}>
               <p className="text-[13px] mb-1" style={{ color: '#9D8189' }}>Status Atual</p>
               <p className="text-[18px]" style={{ color: '#6D6875' }}>
-                <strong>{statusTypes.find(s => s.id === statusId)?.name || 'Sem status'}</strong>
+                {/* Garantimos que a string será sempre exibida mesmo sem achar um status válido no map */}
+                <strong>{statusTypes.find(s => s.id === statusId)?.name || 'Sem status/Não configurado'}</strong>
               </p>
             </div>
           </div>
@@ -436,6 +478,7 @@ export default function App() {
                 className="w-full h-12 px-4 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]"
                 style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }}
               >
+                <option value="">Selecione um status...</option>
                 {statusTypes.map(status => (
                   <option key={status.id} value={status.id}>{status.name}</option>
                 ))}
