@@ -538,12 +538,12 @@ export default function App() {
                       <div className="w-full h-10 px-3 rounded-md border flex items-center" style={{ backgroundColor: '#D8E2DC', borderColor: '#D8E2DC', color: '#6D6875' }}><strong>R$ {sp.totalPrice.toFixed(2)}</strong></div>
                     </div>
                     <div>
-                      <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}><strong>Peso Unit. (kg)</strong></label>
-                      <div className="w-full h-10 px-3 rounded-md border flex items-center" style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC', color: '#9D8189' }}>{sp.unitWeight} kg</div>
+                      <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}><strong>Peso Unit. (g)</strong></label>
+                      <div className="w-full h-10 px-3 rounded-md border flex items-center" style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC', color: '#9D8189' }}>{sp.unitWeight} g</div>
                     </div>
                     <div>
-                      <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}><strong>Peso Total (kg)</strong></label>
-                      <div className="w-full h-10 px-3 rounded-md border flex items-center" style={{ backgroundColor: '#D8E2DC', borderColor: '#D8E2DC', color: '#6D6875' }}><strong>{sp.totalWeight.toFixed(2)} kg</strong></div>
+                      <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}><strong>Peso Total (g)</strong></label>
+                      <div className="w-full h-10 px-3 rounded-md border flex items-center" style={{ backgroundColor: '#D8E2DC', borderColor: '#D8E2DC', color: '#6D6875' }}><strong>{sp.totalWeight.toFixed(2)} g</strong></div>
                     </div>
                   </div>
                 </div>
@@ -562,8 +562,8 @@ export default function App() {
                 <p className="text-[18px]" style={{ color: '#6D6875' }}><strong>{calculateDeliveryDate()}</strong></p>
               </div>
               <div className="p-4 rounded-lg" style={{ backgroundColor: '#FFCAD4' }}>
-                <p className="text-[14px] mb-1" style={{ color: '#6D6875' }}>Peso Total</p>
-                <p className="text-[18px]" style={{ color: '#6D6875' }}><strong>{calculateTotalWeight().toFixed(2)} kg</strong></p>
+                <p className="text-[14px] mb-1" style={{ color: '#6D6875' }}>Peso Total(g)</p>
+                <p className="text-[18px]" style={{ color: '#6D6875' }}><strong>{calculateTotalWeight().toFixed(2)} g</strong></p>
               </div>
               <div className="p-4 rounded-lg" style={{ backgroundColor: '#F4ACB7' }}>
                 <p className="text-[14px] mb-1" style={{ color: 'white' }}>Valor Total</p>

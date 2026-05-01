@@ -176,11 +176,10 @@ const currentStatus = statusTypes.find(st => st.id === order.statusAtual?.idStat
                     <Package className="size-5 mt-1" style={{ color: '#F4ACB7' }} />
                     <div className="flex-1">
                       <span className="text-[15px]" style={{ color: '#6D6875' }}>
-                        {/* AQUI ESTAMOS EXIBINDO O NOME DO PRODUTO */}
                         <strong>{prod.quantidade}x {productNames[prod.idProduto] || 'Carregando...'}</strong>
                       </span>
                       <div className="flex gap-4 mt-1 text-[13px]" style={{ color: '#9D8189' }}>
-                        <span>Peso: {prod.pesoTotal?.toFixed(2)}Kg</span>
+                        <span>Peso: {prod.pesoTotal?.toFixed(2)}g</span>
                         <span>Preço: R$ {prod.precoTotal?.toFixed(2)}</span>
                       </div>
                     </div>

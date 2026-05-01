@@ -8,9 +8,9 @@ import './pesquisa-index.css'
 
 export default function App() {
   const [products, setProducts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<{name: string, count: number}[]>([]);
-  const [themes, setThemes] = useState<{name: string, count: number}[]>([]);
-  const [items, setItems] = useState<{name: string, count: number}[]>([]);
+  const [categories, setCategories] = useState<{ name: string, count: number }[]>([]);
+  const [themes, setThemes] = useState<{ name: string, count: number }[]>([]);
+  const [items, setItems] = useState<{ name: string, count: number }[]>([]);
 
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
@@ -22,8 +22,8 @@ export default function App() {
   const [quickFilter, setQuickFilter] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('newest');
-  const [showFilters, setShowFilters] = useState(false);
-  
+  const [showFilters, setShowFilters] = useState(true);
+
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
   const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
@@ -37,8 +37,8 @@ export default function App() {
         const produtosData = await produtoService.listarTodos(0, 500);
 
         // 2. Extraímos o array 'content' com segurança
-        const listaProdutos = Array.isArray(produtosData) 
-          ? produtosData 
+        const listaProdutos = Array.isArray(produtosData)
+          ? produtosData
           : (produtosData?.content || []);
 
         const catCount: Record<string, number> = {};
@@ -49,11 +49,11 @@ export default function App() {
         const formattedProducts = listaProdutos.map((p: any) => {
           const precoVenda = p.item?.precoVenda || 0;
           const precoPromocional = p.item?.precoPromocional || 0;
-          
+
           const hasPromo = precoPromocional > 0 && precoPromocional < precoVenda;
           const currentPrice = hasPromo ? precoPromocional : precoVenda;
           const oldPrice = hasPromo ? precoVenda : null;
-          
+
           const categoriaStr = p.tema?.categoriaTema?.titulo || p.tema?.categoria?.titulo || 'Sem Categoria';
           const temaStr = p.tema?.descricao || 'Sem Tema';
           const itemStr = p.item?.descricao || 'Sem Item';
@@ -73,7 +73,7 @@ export default function App() {
             item: itemStr,
             image: p.fotos && p.fotos.length > 0 ? p.fotos[0].foto : '',
             rating: 5,
-            isNew: false, 
+            isNew: false,
             isBestSeller: false,
             isPromo: hasPromo,
             inStock: p.ativo !== false
@@ -81,14 +81,14 @@ export default function App() {
         });
 
         setProducts(formattedProducts);
-        
+
         setCategories(Object.keys(catCount).map(k => ({ name: k, count: catCount[k] })));
         setThemes(Object.keys(themeCount).map(k => ({ name: k, count: themeCount[k] })));
         setItems(Object.keys(itemCount).map(k => ({ name: k, count: itemCount[k] })));
 
         if (formattedProducts.length > 0) {
-           const maxPrice = Math.max(...formattedProducts.map((p: any) => p.oldPrice || p.price));
-           setPriceRange([0, Math.ceil(maxPrice) + 50]);
+          const maxPrice = Math.max(...formattedProducts.map((p: any) => p.oldPrice || p.price));
+          setPriceRange([0, Math.ceil(maxPrice) + 50]);
         }
 
       } catch (error) {
@@ -116,8 +116,8 @@ export default function App() {
 
   const filteredProducts = products.filter(product => {
     if (searchTerm && !product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        !product.theme.toLowerCase().includes(searchTerm.toLowerCase()) &&
-        !product.item.toLowerCase().includes(searchTerm.toLowerCase())) {
+      !product.theme.toLowerCase().includes(searchTerm.toLowerCase()) &&
+      !product.item.toLowerCase().includes(searchTerm.toLowerCase())) {
       return false;
     }
     if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) {
@@ -153,7 +153,7 @@ export default function App() {
   const sortedProducts = [...filteredProducts].sort((a, b) => {
     if (sortBy === 'lowprice') return a.price - b.price;
     if (sortBy === 'highprice') return b.price - a.price;
-    return 0; 
+    return 0;
   });
 
   const totalProducts = sortedProducts.length;
@@ -172,7 +172,7 @@ export default function App() {
               <h2 className="text-[#6D6875] mb-2">Catálogo de Produtos</h2>
               <p className="text-[#9D8189] text-lg">Encontre o produto perfeito para seu momento especial</p>
             </div>
-            
+
             <button
               onClick={() => setShowFilters(!showFilters)}
               className="md:hidden bg-[#F4ACB7] text-white px-6 py-3 rounded-xl flex items-center gap-2"
@@ -185,9 +185,10 @@ export default function App() {
       </div>
 
       <div className="w-full px-8 py-8">
-          <div className="flex gap-8">
-           <aside className={`${showFilters ? 'block' : 'hidden'} md:block w-36 shrink-0`}>
-            <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-[#D8E2DC] sticky top-24">
+        <div className="flex gap-8">
+          {/* Usando colchetes para um controle milimétrico */}
+          <aside className={`${showFilters ? 'block' : 'hidden'} md:block w-[101px] min-w-[104px] shrink-0`}>
+            <div className="bg-white rounded-2xl p-3 shadow-lg border-2 border-[#D8E2DC] sticky top-24">
               <div className="flex items-center justify-between mb-6">
                 <h3 className="text-[#6D6875]">Filtros</h3>
                 <button onClick={clearFilters} className="text-[#F4ACB7] text-sm hover:underline">Limpar tudo</button>
@@ -195,17 +196,17 @@ export default function App() {
 
               <div className="mb-6">
                 <div className="relative">
-                  <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#9D8189]" />
+                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9D8189]" />
                   <input
                     type="text"
-                    placeholder="Buscar produto, tema ou item..."
+                    placeholder="Buscar..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-12 pr-10 py-3 border-2 border-[#D8E2DC] rounded-xl focus:border-[#F4ACB7] focus:outline-none"
+                    className="w-full pl-8 pr-6 py-2 text-sm border-2 border-[#D8E2DC] rounded-xl focus:border-[#F4ACB7] focus:outline-none"
                   />
                   {searchTerm && (
-                    <button onClick={() => setSearchTerm('')} className="absolute right-4 top-1/2 -translate-y-1/2">
-                      <X className="w-5 h-5 text-[#9D8189]" />
+                    <button onClick={() => setSearchTerm('')} className="absolute right-2 top-1/2 -translate-y-1/2">
+                      <X className="w-4 h-4 text-[#9D8189]" />
                     </button>
                   )}
                 </div>
@@ -225,12 +226,11 @@ export default function App() {
                               setSelectedCategories([...selectedCategories, cat.name]);
                             }
                           }}
-                          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-                            selectedCategories.includes(cat.name) ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'
-                          }`}
+                          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${selectedCategories.includes(cat.name) ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'
+                            }`}
                         >
                           {selectedCategories.includes(cat.name) && (
-                            <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                            <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                           )}
                         </div>
                         <span className="text-[#6D6875] flex-1 truncate" title={cat.name}>{cat.name}</span>
@@ -255,12 +255,11 @@ export default function App() {
                               setSelectedThemes([...selectedThemes, theme.name]);
                             }
                           }}
-                          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-                            selectedThemes.includes(theme.name) ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'
-                          }`}
+                          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${selectedThemes.includes(theme.name) ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'
+                            }`}
                         >
                           {selectedThemes.includes(theme.name) && (
-                            <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                            <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                           )}
                         </div>
                         <span className="text-[#6D6875] flex-1 truncate" title={theme.name}>{theme.name}</span>
@@ -285,12 +284,11 @@ export default function App() {
                               setSelectedItems([...selectedItems, item.name]);
                             }
                           }}
-                          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${
-                            selectedItems.includes(item.name) ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'
-                          }`}
+                          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${selectedItems.includes(item.name) ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'
+                            }`}
                         >
                           {selectedItems.includes(item.name) && (
-                            <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                            <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
                           )}
                         </div>
                         <span className="text-[#6D6875] flex-1 truncate" title={item.name}>{item.name}</span>
@@ -312,20 +310,20 @@ export default function App() {
                     onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
                     className="w-full accent-[#F4ACB7]"
                   />
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-1"> {/* Reduzido de gap-3 para gap-1 */}
                     <input
                       type="number"
                       value={priceRange[0]}
                       onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])}
-                      className="w-full px-3 py-2 border-2 border-[#D8E2DC] rounded-lg focus:border-[#F4ACB7] focus:outline-none text-[#6D6875]"
+                      className="w-full px-1 py-2 text-sm border-2 border-[#D8E2DC] rounded-lg focus:border-[#F4ACB7] focus:outline-none text-[#6D6875]"
                       placeholder="Min"
                     />
-                    <span className="text-[#9D8189]">até</span>
+                    <span className="text-[#9D8189] text-xs">até</span>
                     <input
                       type="number"
                       value={priceRange[1]}
                       onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                      className="w-full px-3 py-2 border-2 border-[#D8E2DC] rounded-lg focus:border-[#F4ACB7] focus:outline-none text-[#6D6875]"
+                      className="w-full px-1 py-2 text-sm border-2 border-[#D8E2DC] rounded-lg focus:border-[#F4ACB7] focus:outline-none text-[#6D6875]"
                       placeholder="Max"
                     />
                   </div>
@@ -382,26 +380,24 @@ export default function App() {
             {currentProducts.length > 0 ? (
               /* ESTA DIV NOVA CONTROLA APENAS O TAMANHO DOS CARDS E CENTRALIZA-OS */
               <div className={viewMode === 'grid' ? 'max-w-7xl mx-auto' : 'w-full'}>
-                
+
                 <div className={`grid gap-4 mb-8 ${viewMode === 'grid' ? 'grid-cols-4' : 'grid-cols-1'}`}>
                   {currentProducts.map((product) => (
-                    <div 
-                      key={product.id} 
-                      className={`bg-white overflow-hidden shadow-sm hover:shadow-md transition-all hover:-translate-y-1 group border border-[#D8E2DC] ${
-                        viewMode === 'list' ? 'rounded-2xl flex gap-6' : 'rounded-xl flex flex-col aspect-square'
-                      }`}
+                    <div
+                      key={product.id}
+                      className={`bg-white overflow-hidden shadow-sm hover:shadow-md transition-all hover:-translate-y-1 group border border-[#D8E2DC] ${viewMode === 'list' ? 'rounded-2xl flex gap-6' : 'rounded-xl flex flex-col aspect-square'
+                        }`}
                     >
                       {/* Área da Imagem */}
                       <div className={`relative overflow-hidden ${viewMode === 'list' ? 'w-64 shrink-0' : 'flex-1 w-full'}`}>
-                        <ImageWithFallback 
-                          src={product.image} 
-                          alt={product.name} 
-                          className={`w-full object-cover group-hover:scale-105 transition-transform duration-500 ${
-                            viewMode === 'list' ? 'h-full' : 'absolute inset-0 h-full'
-                          }`} 
+                        <ImageWithFallback
+                          src={product.image}
+                          alt={product.name}
+                          className={`w-full object-cover group-hover:scale-105 transition-transform duration-500 ${viewMode === 'list' ? 'h-full' : 'absolute inset-0 h-full'
+                            }`}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
-                        
+
                         {/* Badges */}
                         <div className={`absolute flex flex-col gap-1.5 z-10 ${viewMode === 'list' ? 'top-3 left-3' : 'bottom-2 left-2'}`}>
                           {product.isPromo && (
@@ -417,8 +413,8 @@ export default function App() {
                         </div>
 
                         <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity z-10">
-                          <button 
-                            onClick={() => setQuickViewProduct(product)} 
+                          <button
+                            onClick={() => setQuickViewProduct(product)}
                             className="bg-white/95 backdrop-blur-sm p-2 rounded-full hover:scale-110 transition-all shadow-sm"
                           >
                             <Eye className="w-4 h-4 text-[#F4ACB7]" />
@@ -452,13 +448,12 @@ export default function App() {
                               </span>
                             )}
                           </div>
-                          
-                          <button 
-                            onClick={() => handlePecaJaClick(product.id)} 
-                            disabled={!product.inStock} 
-                            className={`w-full bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white transition-all uppercase font-bold disabled:opacity-50 ${
-                              viewMode === 'list' ? 'py-3 rounded-xl text-sm' : 'py-1.5 rounded-lg text-[10px]'
-                            }`}
+
+                          <button
+                            onClick={() => handlePecaJaClick(product.id)}
+                            disabled={!product.inStock}
+                            className={`w-full bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white transition-all uppercase font-bold disabled:opacity-50 ${viewMode === 'list' ? 'py-3 rounded-xl text-sm' : 'py-1.5 rounded-lg text-[10px]'
+                              }`}
                           >
                             {product.inStock ? 'Peça já' : 'Esgotado'}
                           </button>
