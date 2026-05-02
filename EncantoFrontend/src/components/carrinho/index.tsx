@@ -278,7 +278,7 @@ export default function App() {
                   {totalWeight > 0 && (
                     <div className="flex justify-between text-[#9D8189] text-sm">
                       <span>Peso estimado</span>
-                      <span>{(totalWeight / 1000).toFixed(2)} kg</span>
+                      <span>{totalWeight} g</span>
                     </div>
                   )}
                 </div>

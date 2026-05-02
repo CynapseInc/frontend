@@ -136,7 +136,7 @@ export default function AddProductModal({ isOpen, onClose, products, selectedPro
                         <strong>R$ {product.unitPrice.toFixed(2)}</strong>
                       </span>
                       <span className="text-[12px]" style={{ color: '#9D8189' }}>
-                        {product.unitWeight}kg
+                        {product.unitWeight}g
                       </span>
                     </div>
                     <Button
