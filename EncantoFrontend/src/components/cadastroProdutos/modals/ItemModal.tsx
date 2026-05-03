@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../../ui/
 import { X } from 'lucide-react';
 import { Input } from '../../ui/input';
 import { Button } from '../../ui/button';
+import ItemCombobox from './ItemCombobox';
 
 import '../index-cadastro.css'
 
@@ -85,23 +86,20 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
     setBaseItemId('');
   };
 
-  const handleBaseItemChange = (selectedItemId: string) => {
+  const handleBaseItemChange = (selectedItemId: string, selectedItem?: Item | null) => {
     setBaseItemId(selectedItemId);
-    if (selectedItemId) {
-      const selectedItem = items.find(i => i.id === selectedItemId);
-      if (selectedItem) {
-        setDescription(selectedItem.description);
-        setProductionCost(selectedItem.productionCost.toString());
-        setProductionDeadline(selectedItem.productionDeadline);
-        setWidth(selectedItem.width);
-        setHeight(selectedItem.height);
-        setWeight(selectedItem.weight);
-        setLength(selectedItem.length);
-        setMaterial(selectedItem.material);
-        setPromotionalPrice(selectedItem.promotionalPrice.toString());
-        setUnitPrice(selectedItem.unitPrice.toString());
-        setMinimumQuantity(selectedItem.minimumQuantity.toString());
-      }
+    if (selectedItem) {
+      setDescription(selectedItem.description);
+      setProductionCost(selectedItem.productionCost.toString());
+      setProductionDeadline(selectedItem.productionDeadline);
+      setWidth(selectedItem.width);
+      setHeight(selectedItem.height);
+      setWeight(selectedItem.weight);
+      setLength(selectedItem.length);
+      setMaterial(selectedItem.material);
+      setPromotionalPrice(selectedItem.promotionalPrice.toString());
+      setUnitPrice(selectedItem.unitPrice.toString());
+      setMinimumQuantity(selectedItem.minimumQuantity.toString());
     }
   };
 
@@ -178,21 +176,11 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
                 <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}>
                   Basear em item existente (opcional)
                 </label>
-                <select
+                <ItemCombobox
                   value={baseItemId}
-                  onChange={(e) => handleBaseItemChange(e.target.value)}
-                  className="w-full h-11 px-3 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]"
-                  style={{
-                    backgroundColor: 'white',
-                    borderColor: '#D8E2DC',
-                    color: '#6D6875'
-                  }}
-                >
-                  <option value="">Selecione um item (opcional)</option>
-                  {items.map(i => (
-                    <option key={i.id} value={i.id}>{i.description}</option>
-                  ))}
-                </select>
+                  onChange={handleBaseItemChange}
+                  items={items}
+                />
                 <p className="text-[13px] mt-2" style={{ color: '#9D8189' }}>
                   Selecione um item para copiar suas informações e editá-las
                 </p>

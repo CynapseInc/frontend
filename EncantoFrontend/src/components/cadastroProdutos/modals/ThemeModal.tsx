@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../../ui/
 import { X } from 'lucide-react';
 import { Input } from '../../ui/input';
 import { Button } from '../../ui/button';
+import CategoryCombobox from './CategoryCombobox';
 
 interface ProductCategory {
   id: string;
@@ -116,22 +117,11 @@ export default function ThemeModal({ isOpen, onClose, onSave, theme, categories 
               <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}>
                 Categoria <span style={{ color: '#F4ACB7' }}>*</span>
               </label>
-              <select
+              <CategoryCombobox
                 value={categoryId}
-                onChange={(e) => setCategoryId(e.target.value)}
-                className="w-full h-11 px-3 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]"
-                style={{
-                  backgroundColor: 'white',
-                  borderColor: '#D8E2DC',
-                  color: '#6D6875'
-                }}
-                required
-              >
-                <option value="">Selecione uma categoria</option>
-                {categories.map(cat => (
-                  <option key={cat.id} value={cat.id}>{cat.description}</option>
-                ))}
-              </select>
+                onChange={(id) => setCategoryId(id)}
+                categories={categories}
+              />
             </div>
           </div>
 

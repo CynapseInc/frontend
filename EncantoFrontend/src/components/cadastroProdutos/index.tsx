@@ -405,6 +405,7 @@ export default function App() {
                 <option value="">Selecione um item</option>
                 {items.map(item => <option key={item.id} value={item.id}>{item.description}</option>)}
               </select>
+             
             </div>
 
             {/* Informações do Item (Card) */}
