@@ -185,28 +185,34 @@ export default function App() {
       </div>
 
       <div className="w-full px-8 py-8">
-        <div className="flex gap-8">
-          {/* Usando colchetes para um controle milimétrico */}
-          <aside className={`${showFilters ? 'block' : 'hidden'} md:block w-[101px] min-w-[104px] shrink-0`}>
+        <div className="flex gap-4">
+          <aside className={`${showFilters ? 'block' : 'hidden'} md:block w-[104px] min-w-[104px] shrink-0`}>
             <div className="bg-white rounded-2xl p-3 shadow-lg border-2 border-[#D8E2DC] sticky top-24">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-[#6D6875]">Filtros</h3>
-                <button onClick={clearFilters} className="text-[#F4ACB7] text-sm hover:underline">Limpar tudo</button>
+              
+              {/* CORREÇÃO 2: justify-between para colocar na mesma linha. 
+                  Encurtamos o texto para "Limpar" para que a matemática de espaço bata perfeitamente! */}
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-[#6D6875] font-bold text-sm">Filtros</h3>
+                <button onClick={clearFilters} className="text-[#F4ACB7] text-[10px] hover:underline">Limpar</button>
               </div>
 
-              <div className="mb-6">
+              <div className="mb-6 px-1">
                 <div className="relative">
-                  <Search className="absolute left-2 top-1/2 -translate-y-1/2 w-4 h-4 text-[#9D8189]" />
+                  {/* LUPA TRAVADA: A propriedade size={14} impede o ícone de ficar gigante */}
+                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9D8189]" />
+                  
                   <input
                     type="text"
-                    placeholder="Buscar..."
+                    placeholder="Busca por Tema, Produto e Categoria..."
                     value={searchTerm}
                     onChange={(e) => setSearchTerm(e.target.value)}
-                    className="w-full pl-8 pr-6 py-2 text-sm border-2 border-[#D8E2DC] rounded-xl focus:border-[#F4ACB7] focus:outline-none"
+                    style={{ paddingLeft: '32px', paddingRight: '22px' }}
+                    className="w-full py-1.5 text-xs border-2 border-[#D8E2DC] rounded-xl focus:border-[#F4ACB7] focus:outline-none"
                   />
+                  
                   {searchTerm && (
                     <button onClick={() => setSearchTerm('')} className="absolute right-2 top-1/2 -translate-y-1/2">
-                      <X className="w-4 h-4 text-[#9D8189]" />
+                      <X size={14} className="text-[#9D8189]" />
                     </button>
                   )}
                 </div>
