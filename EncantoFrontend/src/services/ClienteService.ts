@@ -9,25 +9,23 @@ export interface PageResponse<T> {
 }
 
 export const clienteService = {
-  listarTodos: async (page = 0, size = 10, search = ''): Promise<PageResponse<any>> => {
+  listarTodos: async (
+    {
+      search = '',
+      page = 0
+    }: {
+      search?: string;
+      page?: number;  
+    }
+  ) => {
     const { data } = await api.get('/clientes', {
       params: {
-        page,
-        size,
-        search: search || undefined
+        search: search || undefined,
+        page: page || undefined
       }
     });
 
-    if (!data) {
-      return {
-        content: [],
-        totalElements: 0,
-        totalPages: 0,
-        number: 0,
-        size: 0
-      };
-    }
-    
+    console.log(data, "printando ")
     return data;
   },
   

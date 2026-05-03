@@ -96,14 +96,14 @@ export default function App() {
       try {
         const [pedidoData, clientesResponse, produtosData, statusData] = await Promise.all([
           pedidoService.buscarPorId(id),
-          clienteService.listarTodos(0, 500),
+          clienteService.listarTodos({ page: 0 }),
           produtoService.listarTodos(0, 500),
           statusPedidoService.listarTodos()
         ]);
 
         if (!pedidoData) throw new Error("Pedido não encontrado na base de dados");
 
-        const listaClientes = Array.isArray(clientesResponse) ? clientesResponse : (clientesResponse?.content || []);
+        const listaClientes = clientesResponse?.content || [];
         setClients(listaClientes);
 
         const listaDeProdutosDoCatalogo = Array.isArray(produtosData) ? produtosData : (produtosData?.content || []);
@@ -344,11 +344,8 @@ export default function App() {
       await clienteService.criar(clientData);
     }
     
-    const clientesAtualizadosResponse = await clienteService.listarTodos(0, 500);
-    const listaAtualizada = Array.isArray(clientesAtualizadosResponse) 
-      ? clientesAtualizadosResponse 
-      : (clientesAtualizadosResponse?.content || []);
-      
+    const clientesAtualizadosResponse = await clienteService.listarTodos({ page: 0 });
+    const listaAtualizada = clientesAtualizadosResponse?.content || [];
     setClients(listaAtualizada);
     setIsClientFormOpen(false);
     setEditingClient(null);
@@ -594,7 +591,7 @@ export default function App() {
       </div>
 
       {/* Modals */}
-      <ClientListModal isOpen={isClientListOpen} onClose={() => setIsClientListOpen(false)} clients={clients as any} onEdit={(c: any) => { setEditingClient(c); setIsClientFormOpen(true); setIsClientListOpen(false); }} />
+      <ClientListModal isOpen={isClientListOpen} onClose={() => setIsClientListOpen(false)} onEdit={(c: any) => { setEditingClient(c); setIsClientFormOpen(true); setIsClientListOpen(false); }} />
       <ClientFormModal isOpen={isClientFormOpen} onClose={() => { setIsClientFormOpen(false); setEditingClient(null); }} onSave={handleSaveClient} client={editingClient as any} />
       <AddProductModal isOpen={isAddProductModalOpen} onClose={() => setIsAddProductModalOpen(false)} products={allProducts as any} selectedProducts={selectedProducts as any} onAddProduct={handleAddProduct} />
       <FeedbackModal

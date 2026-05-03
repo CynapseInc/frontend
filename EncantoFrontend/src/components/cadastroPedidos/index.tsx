@@ -13,6 +13,8 @@ import { statusPedidoService } from '../../services/StatusPedidoService';
 import { pedidoService } from '../../services/PedidoService';
 
 import './index-cad-pedido.css';
+import ClienteCombobox from './modals/ClienteCombobox';
+import EnderecoCombobox from './modals/EnderecoCombobox';
 
 interface EnderecoCliente {
   id?: number;
@@ -65,12 +67,16 @@ export default function App() {
     setFeedback({ isOpen: true, message, type });
   };
 
-  const [clients, setClients] = useState<Cliente[]>([]);
+  // const [clients, setClients] = useState<Cliente[]>([]);  
+  const [client, setClient] = useState<Cliente>({ nome: '', telefone: '', email: '', enderecos: [] });
   const [products, setProducts] = useState<Product[]>([]);
   const [statusTypes, setStatusTypes] = useState<StatusType[]>([]);
 
   const [selectedClientId, setSelectedClientId] = useState('');
   const [selectedAddressId, setSelectedAddressId] = useState('');
+
+  const [enderecosClient, setEnderecosClient] = useState<EnderecoCliente[]>([]);
+
   const [observations, setObservations] = useState('');
   const [statusId, setStatusId] = useState('');
   const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
@@ -95,16 +101,13 @@ export default function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [clientesResponse, produtosResponse, statusData] = await Promise.all([
-          clienteService.listarTodos(0, 500), // <-- Adicionado (0, 500)
-          produtoService.listarTodos(0, 500),
+        const [ produtosResponse, statusData] = await Promise.all([
+          
+          produtoService.listarTodos(0, 500), // 1. Pedimos um limite alto de produtos
           statusPedidoService.listarTodos()
         ]);
 
-        const listaClientes = Array.isArray(clientesResponse)
-          ? clientesResponse
-          : (clientesResponse?.content || []);
-        setClients(listaClientes);
+        // setClients(clientesData);
 
         // 2. Extraímos o array 'content' de forma segura
         const listaProdutos = Array.isArray(produtosResponse)
@@ -139,9 +142,9 @@ export default function App() {
     };
     fetchData();
   }, []);
-
-  const selectedClient = clients.find(c => c.id?.toString() === selectedClientId);
-  const selectedAddress = selectedClient?.enderecos?.find(a => a.id?.toString() === selectedAddressId);
+  
+  // const selectedClient = clients.find(c => c.id?.toString() === selectedClientId);
+  const selectedAddress = client?.enderecos?.find(a => a.id?.toString() === selectedAddressId);
 
   const filteredProducts = products.filter(product => {
     const search = searchProduct.toLowerCase();
@@ -246,14 +249,20 @@ export default function App() {
 
   const handleSaveClient = async (clientData: any) => {
     try {
+      if (clientData.id) {
+        await clienteService.atualizar(clientData.id, clientData);
+        showFeedback("Cliente atualizado com sucesso!", "success");
+      } else {
+        await clienteService.criar(clientData);
+        showFeedback("Cliente cadastrado com sucesso!", "success");
+      }
 
-      const clientesAtualizadosResponse = await clienteService.listarTodos(0, 500);
-      const listaAtualizada = Array.isArray(clientesAtualizadosResponse)
-        ? clientesAtualizadosResponse
-        : (clientesAtualizadosResponse?.content || []);
+      setIsClientFormOpen(false);
+      setEditingClient(null);
 
-      setClients(listaAtualizada);
-
+      const clientesAtualizados = await clienteService.listarTodos({ page: 0 });
+      const listaAtualizada = clientesAtualizados?.content || [];
+      
       if (!clientData.id && listaAtualizada.length > 0) {
         const novoId = listaAtualizada[listaAtualizada.length - 1].id;
         setSelectedClientId(novoId.toString());
@@ -288,7 +297,7 @@ export default function App() {
           <div className="grid grid-cols-[1fr_auto_auto] gap-3 mb-5">
             <div>
               <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}><strong>Cliente</strong> <span style={{ color: '#F4ACB7' }}>*</span></label>
-              <select
+              {/* <select
                 value={selectedClientId}
                 onChange={(e) => { setSelectedClientId(e.target.value); setSelectedAddressId(''); }}
                 className="w-full h-12 px-4 rounded-md text-[15px] border focus:outline-none focus:border-[#F4ACB7]"
@@ -298,7 +307,12 @@ export default function App() {
                 {clients.map(client => (
                   <option key={client.id} value={client.id}>{client.nome} - {client.telefone}</option>
                 ))}
-              </select>
+              </select> */}
+                <ClienteCombobox 
+                  value={selectedClientId || ''}
+                  onChange={(id, name, enderecos) => { setSelectedClientId(id); setEnderecosClient(enderecos);  }}
+                  isErr={!selectedClientId}
+                />
             </div>
             <div className="flex items-end">
               <Button onClick={() => setIsClientListOpen(true)} className="h-12 px-5 gap-2 text-[15px]" style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}>
@@ -312,22 +326,14 @@ export default function App() {
             </div>
           </div>
 
-          {selectedClient && selectedClient.enderecos && selectedClient.enderecos.length > 0 && (
+          {enderecosClient && enderecosClient.length > 0 && (
             <div className="mb-5">
               <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}><strong>Endereço de Entrega</strong></label>
-              <select
+              <EnderecoCombobox
+                enderecos={enderecosClient}
                 value={selectedAddressId}
-                onChange={(e) => setSelectedAddressId(e.target.value)}
-                className="w-full h-12 px-4 rounded-md text-[15px] border focus:outline-none focus:border-[#F4ACB7]"
-                style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }}
-              >
-                <option value="">Selecione um endereço</option>
-                {selectedClient.enderecos.map(addr => (
-                  <option key={addr.id} value={addr.id?.toString()}>
-                    {addr.logradouro}, {addr.numero} - {addr.bairro}, {addr.cidade}/{addr.estado}
-                  </option>
-                ))}
-              </select>
+                onChange={(id) => setSelectedAddressId(id)}
+              />
             </div>
           )}
 
@@ -553,7 +559,7 @@ export default function App() {
         )}
 
         {/* 4. Resumo e Confirmação */}
-        {selectedProducts.length > 0 && selectedClient && (
+        {selectedProducts.length > 0 && selectedClientId && (
           <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
             <h2 className="text-[22px] mb-5" style={{ color: '#F4ACB7' }}><strong>Resumo do Pedido</strong></h2>
             <div className="grid grid-cols-3 gap-4 mb-6">
@@ -584,11 +590,10 @@ export default function App() {
         )}
       </div>
 
-      <ClientListModal
-        isOpen={isClientListOpen}
-        onClose={() => setIsClientListOpen(false)}
-        clients={clients}
-        onEdit={handleEditClient}
+      <ClientListModal 
+        isOpen={isClientListOpen} 
+        onClose={() => setIsClientListOpen(false)} 
+        onEdit={handleEditClient} 
       />
       <ClientFormModal
         isOpen={isClientFormOpen}
