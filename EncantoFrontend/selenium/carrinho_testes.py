@@ -81,7 +81,7 @@ class FrontBasicoTest(unittest.TestCase):
 
     def preencher_cep(
         self,
-        xpath='//*[@id="root"]/div/div/main/div/div/div[2]/div[2]/div[1]/div[3]/input',
+        xpath='//*[@id="root"]/div/div/main/div/div/div[2]/div[2]/div[1]/div[2]/div[2]/input',
     ):
         campo_cep = self.wait.until(EC.presence_of_element_located((By.XPATH, xpath)))
         campo_cep.clear()
@@ -89,11 +89,16 @@ class FrontBasicoTest(unittest.TestCase):
 
     def calcular_frete(
         self,
-        xpath='//*[@id="root"]/div/div/main/div/div/div[2]/div[2]/div[1]/div[3]/button',
+        xpath='//*[@id="root"]/div/div/main/div/div/div[2]/div[2]/div[1]/div[2]/div[2]/button',
     ):
         botao_calcular = self.wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
         botao_calcular.click()
 
+    def forma_pagamento(
+        self, xpath='//*[@id="root"]/div/div/main/div/div/div[2]/div[2]/div[1]/div[4]/div/button[1]'
+    ):
+        botao_pagamento = self.wait.until(EC.element_to_be_clickable((By.XPATH, xpath)))
+        botao_pagamento.click() 
     def finalizar_compra(
         self, xpath='//*[@id="root"]/div/div/main/div/div/div[2]/div[2]/div[1]/button'
     ):
@@ -134,14 +139,19 @@ class FrontBasicoTest(unittest.TestCase):
     def test_06_calcular_frete(self):
         """Clica no botão para calcular o frete."""
         self.calcular_frete()
+        time.sleep(2)
+
+    def test_07_selecionar_forma_pagamento(self):
+        """Clica no botão para selecionar a forma de pagamento."""
+        self.forma_pagamento()
         time.sleep(1)
 
-    def test_07_finalizar_compra(self):
+    def test_08_finalizar_compra(self):
         """Clica no botão para finalizar a compra."""
         self.finalizar_compra()
         time.sleep(1)
 
-    def test_08_botao_entendi(self):
+    def test_09_botao_entendi(self):
         """Clica no botão 'Entendi' para fechar a mensagem de confirmação."""
         self.botao_entendi()
         time.sleep(1)
