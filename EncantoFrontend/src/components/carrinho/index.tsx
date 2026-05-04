@@ -190,6 +190,7 @@ export default function App() {
     const urlWhatsapp = `https://api.whatsapp.com/send?phone=${numeroLoja}&text=${encodeURIComponent(texto)}`;
 
     window.open(urlWhatsapp, '_blank');
+    navigate('/catalogo');
   };
 
   const opcoesPagamento = [

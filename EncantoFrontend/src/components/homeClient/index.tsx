@@ -126,7 +126,7 @@ export default function App() {
               </div>
 
               <div className="block w-full">
-                <button className="bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white px-10 py-5 rounded-2xl hover:shadow-2xl transition-all transform hover:scale-105 shadow-xl font-bold">
+                <button onClick={() => navigate('/pesquisa-produtos')} className="bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white px-10 py-5 rounded-2xl hover:shadow-2xl transition-all transform hover:scale-105 shadow-xl font-bold">
                   Conheça nossos produtos
                 </button>
               </div>
@@ -254,7 +254,7 @@ export default function App() {
                           )}
                         </div>
 
-                        <button className="w-full bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white py-1 rounded hover:shadow-sm transition-all text-[9px] font-bold uppercase tracking-wide">
+                        <button onClick={() => navigate('/pesquisa-produtos', { state: { openProductId: product.id } })} className="w-full bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white py-1 rounded hover:shadow-sm transition-all text-[9px] font-bold uppercase tracking-wide">
                           Peça já
                         </button>
                       </div>

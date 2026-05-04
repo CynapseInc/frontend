@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { ShoppingCart, Heart, Star, ChevronLeft, ChevronRight, Search, X, Filter, Grid, List, Eye, Sparkles, TrendingUp, Tag } from 'lucide-react';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import type { Produto } from '../../interfaces/Produto';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { produtoService } from '../../services/ProdutoService';
 import './pesquisa-index.css'
 
@@ -29,6 +29,7 @@ export default function App() {
   const [quickViewProduct, setQuickViewProduct] = useState<any>(null);
 
   const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const fetchCatalog = async () => {
@@ -98,6 +99,13 @@ export default function App() {
 
     fetchCatalog();
   }, []);
+
+  useEffect(() => {
+    if (location.state?.openProductId && products.length > 0) {
+      const found = products.find((p: any) => p.id === location.state.openProductId);
+      if (found) setQuickViewProduct(found);
+    }
+  }, [products, location.state]);
 
   const handlePecaJaClick = (productId: number) => {
     navigate(`/detalhe-produto/${productId}`);
@@ -169,7 +177,7 @@ export default function App() {
         <div className="w-full px-8">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-[#6D6875] mb-2">Catálogo de Produtos</h2>
+              <h2 className="text-3xl font-bold text-[#F4ACB7] mb-2">Catálogo de Produtos</h2>
               <p className="text-[#9D8189] text-lg">Encontre o produto perfeito para seu momento especial</p>
             </div>
 

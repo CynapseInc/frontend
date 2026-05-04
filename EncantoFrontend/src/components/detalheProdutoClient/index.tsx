@@ -199,7 +199,7 @@ export default function App() {
           <div className="space-y-6">
             <div>
               <div className="flex items-start gap-3 mb-4">
-                <h2 className="text-[#6D6875] flex-1">{product.name}</h2>
+                <h2 className="text-3xl font-bold text-[#F4ACB7] flex-1">{product.name}</h2>
                 {product.discount && (
                   <span className="bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white px-4 py-2 rounded-xl shadow-lg flex items-center gap-1 shrink-0">
                     <Tag className="w-4 h-4" /> {product.discount}% OFF
@@ -309,7 +309,7 @@ export default function App() {
 
         {/* Product Details Section */}
         <div className="bg-white rounded-3xl p-8 mb-8 shadow-xl border-2 border-[#D8E2DC]">
-          <h3 className="text-[#6D6875] mb-6">Informações Detalhadas do Produto</h3>
+          <h3 className="font-bold text-[#6D6875] mb-6">Informações Detalhadas do Produto</h3>
           
           <div className="space-y-6">
             <div>
@@ -377,7 +377,7 @@ export default function App() {
 
         {/* Customization Guidelines */}
         <div className="bg-gradient-to-br from-[#FFE5D9] to-[#FFCAD4]/20 rounded-3xl p-8 shadow-xl border-2 border-[#FFCAD4]/40">
-          <div className="flex items-start gap-4 mb-6">
+          <div className="flex items-center gap-4 mb-6">
             <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shrink-0 shadow-md">
               <Info className="w-6 h-6 text-[#F4ACB7]" />
             </div>
