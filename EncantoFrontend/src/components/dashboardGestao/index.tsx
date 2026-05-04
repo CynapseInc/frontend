@@ -165,6 +165,22 @@ export default function App() {
   // Último lead time mensal para o KPI "Tempo Médio de Entrega"
   const ultimoLeadTime = leadTimeData.length > 0 ? leadTimeData[leadTimeData.length - 1].leadTime : null;
 
+  const periodoFiltrado = useMemo(() => {
+    if (!filtroDataInicio || !filtroDataFim) return '';
+    const d1 = new Date(filtroDataInicio + 'T00:00:00');
+    const d2 = new Date(filtroDataFim + 'T00:00:00');
+    const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+    const fmtMesAno = (d: Date) =>
+      capitalize(new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(d));
+    const fmtMes = (d: Date) =>
+      capitalize(new Intl.DateTimeFormat('pt-BR', { month: 'long' }).format(d));
+    const sameMonth = d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth();
+    const sameYear = d1.getFullYear() === d2.getFullYear();
+    if (sameMonth) return fmtMesAno(d1);
+    if (sameYear) return `${fmtMes(d1)} a ${fmtMesAno(d2)}`;
+    return `${fmtMesAno(d1)} a ${fmtMesAno(d2)}`;
+  }, [filtroDataInicio, filtroDataFim]);
+
   return (
     <div className="min-h-screen bg-[#faf8f7]">
       {/* Header */}
@@ -174,7 +190,10 @@ export default function App() {
         {/* Page Title */}
         <div className="mb-6">
           <h1 className="text-[#e67e96]">Dashboard de Gestão de Pedidos</h1>
-          <p className="text-neutral-400 mt-1">Visão geral operacional - Junho 2025</p>
+          <p className="text-neutral-400 mt-1">
+            Visão geral operacional ·{' '}
+            <span className="text-[#e67e96] font-medium">{periodoFiltrado}</span>
+          </p>
         </div>
 
         {error && <p className="text-red-500 text-sm">{error}</p>}
