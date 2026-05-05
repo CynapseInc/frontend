@@ -186,7 +186,7 @@ export default function App() {
     texto += `*FORMA DE PAGAMENTO ESCOLHIDA:*\n`;
     texto += `${meioPagamento}\n`;
 
-    const numeroLoja = "5511987654321"; // Coloque o número do WhatsApp da loja aqui
+    const numeroLoja = "5511951641033";
     const urlWhatsapp = `https://api.whatsapp.com/send?phone=${numeroLoja}&text=${encodeURIComponent(texto)}`;
 
     window.open(urlWhatsapp, '_blank');
@@ -382,7 +382,7 @@ export default function App() {
 
                       {/* NOVO: Título claro para a escolha da transportadora */}
                       <h4 className="text-[#6D6875] font-bold mb-0 text-sm" style={{fontWeight: 'bold'}}>Escolha a Transportadora</h4>
-                      <h4 className="text-[#6D6875] mb-3 text-sm">Escolha a Transportadora</h4>
+                      <h4 className="text-[#6D6875] mb-3 text-sm" style={{fontSize: '12px', fontStyle: 'italic'}}>Os valores abaixo são uma estimativa</h4>
 
                       <div className="space-y-2">
                         {opcoesFrete.map((opcao) => {

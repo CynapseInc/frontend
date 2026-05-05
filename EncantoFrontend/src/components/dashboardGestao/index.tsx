@@ -49,15 +49,15 @@ const EncantoLogo = () => (
 );
 
 interface DashData {
-  tiposPedido:                { id: number; origem: string; observacoes: string; status: string; tipoPedido: string }[];
+  tiposPedido: { id: number; origem: string; observacoes: string; status: string; tipoPedido: string }[];
   retrabalhoQuantidadePorMes: { mes: string; quantidadePedidos: number }[];
-  leadtimePorEtapa:           { etapa: string; leadTime: number }[];
-  leadtimePorFuncionario:     { funcionario: string; leadTime: number; totalPedidos: number }[];
-  produtosMaisPedidos:        { id: number; produtoId: number; qtdProd: number }[];
-  leadtimeMensal:             { mes: string; leadTime: number }[];
-  pedidosPorMes:              { mes: string; totalCriados: number; totalEntregues: number }[];
-  cargaTrabalho:              { funcionario: string; emAndamento: number }[];
-  pedidosSemAtualizacao:      { id: number; cliente: string; status: string; diasParado: number; responsavel: string }[];
+  leadtimePorEtapa: { etapa: string; leadTime: number }[];
+  leadtimePorFuncionario: { funcionario: string; leadTime: number; totalPedidos: number }[];
+  produtosMaisPedidos: { id: number; produtoId: number; qtdProd: number }[];
+  leadtimeMensal: { mes: string; leadTime: number }[];
+  pedidosPorMes: { mes: string; totalCriados: number; totalEntregues: number }[];
+  cargaTrabalho: { funcionario: string; emAndamento: number }[];
+  pedidosSemAtualizacao: { id: number; cliente: string; status: string; diasParado: number; responsavel: string }[];
 }
 
 export default function App() {
@@ -77,8 +77,8 @@ export default function App() {
   const [temas, setTemas] = useState<{ id: number; descricao: string }[]>([]);
 
   useEffect(() => {
-    produtoService.listarTodos(0, 1000).then((data) => setProdutos(data?.content ?? (Array.isArray(data) ? data : []))).catch(() => {});
-    temaService.listarTodos().then((data) => setTemas(data)).catch(() => {});
+    produtoService.listarTodos(0, 1000).then((data) => setProdutos(data?.content ?? (Array.isArray(data) ? data : []))).catch(() => { });
+    temaService.listarTodos().then((data) => setTemas(data)).catch(() => { });
   }, []);
 
   const fetchDash = useCallback(() => {
@@ -181,18 +181,31 @@ export default function App() {
     return `${fmtMesAno(d1)} a ${fmtMesAno(d2)}`;
   }, [filtroDataInicio, filtroDataFim]);
 
+  const formatarMes = (mesStr: string) => {
+    if (!mesStr) return '';
+    const partes = mesStr.split('-');
+    if (partes.length < 2) return mesStr;
+
+    const meses = ['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez'];
+    const mesIndex = parseInt(partes[1], 10) - 1;
+
+    return meses[mesIndex];
+  };
+
   return (
     <div className="min-h-screen bg-[#faf8f7]">
       {/* Header */}
 
 
-      <main className="p-6 max-w-[1600px] mx-auto space-y-6">
+      <main className="w-full max-w-[1600px] mx-auto px-8 py-10 box-border space-y-6">
         {/* Page Title */}
-        <div className="mb-6">
-          <h1 className="text-[#e67e96]">Dashboard de Gestão de Pedidos</h1>
-          <p className="text-neutral-400 mt-1">
-            Visão geral operacional ·{' '}
-            <span className="text-[#e67e96] font-medium">{periodoFiltrado}</span>
+        <div style={{ marginBottom: '2vh' }}>
+          <h1 style={{ fontSize: '48px', color: '#F4ACB7', marginBottom: '0.5rem', fontWeight: '600' }}>
+            Dashboard de Gestão de Pedidos
+          </h1>
+          <p style={{ fontSize: '16px', color: '#9D8189', marginBottom: '2rem' }}>
+            Visão geral operacional da sua equipe. 
+            <span style={{color: '#e98191', fontWeight: '700'}}>{periodoFiltrado && ` ${periodoFiltrado}`}</span>
           </p>
         </div>
 
@@ -390,16 +403,16 @@ export default function App() {
 
         {/* Gráficos Operacionais */}
         <div className="space-y-4">
-          <h2 className="text-neutral-800">Gráficos Operacionais</h2>
+          <h2 className="text-neutral-800" style={{color: '#f097a5'}}>Gráficos Operacionais</h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Pedidos criados x entregues */}
             <Card className="p-6 bg-white border-neutral-100 shadow-sm">
-              <h3 className="text-neutral-800 mb-4">Pedidos Criados vs Entregues</h3>
+              <h3 className="text-neutral-800 mb-4" style={{color: '#f097a5'}}>Pedidos Criados vs Entregues</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={pedidosMesData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="mes" stroke="#a3a3a3" />
+                  <XAxis dataKey="mes" stroke="#a3a3a3" tickFormatter={formatarMes} />
                   <YAxis stroke="#a3a3a3" />
                   <Tooltip
                     contentStyle={{
@@ -417,11 +430,11 @@ export default function App() {
 
             {/* Lead Time */}
             <Card className="p-6 bg-white border-neutral-100 shadow-sm">
-              <h3 className="text-neutral-800 mb-4">Tempo Médio de Entrega (dias)</h3>
+              <h3 className="text-neutral-800 mb-4" style={{color: '#f097a5'}}>Tempo Médio de Entrega (dias)</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={leadTimeData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="mes" stroke="#a3a3a3" />
+                  <XAxis dataKey="mes" stroke="#a3a3a3" tickFormatter={formatarMes} />
                   <YAxis stroke="#a3a3a3" />
                   <Tooltip
                     contentStyle={{
@@ -447,7 +460,7 @@ export default function App() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Tempo por etapa */}
             <Card className="p-6 bg-white border-neutral-100 shadow-sm">
-              <h3 className="text-neutral-800 mb-4">Tempo Médio por Etapa (dias)</h3>
+              <h3 className="text-neutral-800 mb-4" style={{color: '#f097a5'}}>Tempo Médio por Etapa (dias)</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={etapasProcessoData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -467,7 +480,7 @@ export default function App() {
 
             {/* Retrabalho */}
             <Card className="p-6 bg-white border-neutral-100 shadow-sm">
-              <h3 className="text-neutral-800 mb-4">Pedidos Refeitos por Mês</h3>
+              <h3 className="text-neutral-800 mb-4" style={{color: '#f097a5'}}>Pedidos Refeitos por Mês</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={retrabalhoData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -489,12 +502,12 @@ export default function App() {
 
         {/* Gráficos de Produtividade */}
         <div className="space-y-4">
-          <h2 className="text-neutral-800">Produtividade da Equipe</h2>
+          <h2 className="text-neutral-800" style={{color: '#f097a5'}}>Produtividade da Equipe</h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Pedidos concluídos */}
             <Card className="p-6 bg-white border-neutral-100 shadow-sm">
-              <h3 className="text-neutral-800 mb-4">Pedidos Concluídos por Funcionário</h3>
+              <h3 className="text-neutral-800 mb-4" style={{color: '#f097a5'}}>Pedidos Concluídos por Funcionário</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={pedidosConcluidosData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
@@ -514,7 +527,7 @@ export default function App() {
 
             {/* Carga de trabalho */}
             <Card className="p-6 bg-white border-neutral-100 shadow-sm">
-              <h3 className="text-neutral-800 mb-4">Carga de Trabalho Atual</h3>
+              <h3 className="text-neutral-800 mb-4" style={{color: '#f097a5'}}>Carga de Trabalho Atual</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={cargaTrabalhoData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />

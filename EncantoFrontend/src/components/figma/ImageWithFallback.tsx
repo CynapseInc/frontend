@@ -12,8 +12,12 @@ export const ImageWithFallback: React.FC<ImageWithFallbackProps> = ({
   ...props 
 }) => {
   const [error, setError] = useState(false);
-  const backendUrl = 'http://localhost:8080';
-  const finalSrc = src && src.startsWith('/uploads') ? `${backendUrl}${src}` : src;
+  
+  const isDev = import.meta.env.MODE === 'development';
+  
+  const finalSrc = src && src.startsWith('/uploads') && isDev 
+    ? `http://localhost:8080${src}` 
+    : src;
 
   if (error || !finalSrc) {
     return (

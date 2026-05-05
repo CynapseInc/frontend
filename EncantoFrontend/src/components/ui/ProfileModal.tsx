@@ -13,12 +13,13 @@ interface ProfileModalProps {
   initialMode?: 'view' | 'edit' | 'settings';
 }
 
-const API_BASE_URL = 'http://localhost:8080';
+const isDev = import.meta.env.MODE === 'development';
 
 const getFotoUrl = (caminho?: string) => {
   if (!caminho) return undefined;
   if (caminho.startsWith('data:image') || caminho.startsWith('http')) return caminho;
-  return `${API_BASE_URL}${caminho}`;
+  
+  return isDev ? `http://localhost:8080${caminho}` : caminho;
 };
 
 export default function ProfileModal({ isOpen, onClose, user, onUserUpdate, initialMode = 'view' }: ProfileModalProps) {
