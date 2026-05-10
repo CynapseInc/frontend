@@ -7,7 +7,7 @@ import api from '../../provider/api';
 import './index.css';
 
 // CEP DA SUA LOJA - Substitua pelo correto
-const CEP_ORIGEM = "01139000"; 
+const CEP_ORIGEM = "03020000"; 
 
 export default function App() {
   const navigate = useNavigate();

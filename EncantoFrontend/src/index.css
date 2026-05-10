@@ -54,3 +54,10 @@ button:focus-visible {
   }
 }
 
+/* Garante que o menu hambúrguer desaparece 100% em ecrãs de computador */
+@media (min-width: 768px) {
+  .esconder-no-pc {
+    display: none !important;
+  }
+}
+

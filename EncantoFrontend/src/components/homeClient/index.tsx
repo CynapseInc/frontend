@@ -25,8 +25,8 @@ export default function App() {
         const data = await produtoService.listarTodos(0, 500);
 
         // 2. Extraímos o array 'content' de forma segura
-        const listaProdutos = Array.isArray(data) 
-          ? data 
+        const listaProdutos = Array.isArray(data)
+          ? data
           : (data?.content || []);
 
         // 3. Fazemos o .filter na nova lista extraída
@@ -109,7 +109,8 @@ export default function App() {
                 </p>
               </div>
 
-              <h1 className="text-[#6D6875] mb-6 leading-tight">
+              {/* Hero Section -> Título */}
+              <h1 className="text-4xl md:text-5xl lg:text-6xl text-[#6D6875] mb-6 leading-tight font-extrabold">
                 TRANSFORMAMOS <span className="text-[#F4ACB7]">LEMBRANÇAS</span> EM MOMENTOS <span className="text-[#F4ACB7]">INESQUECÍVEIS</span>
               </h1>
 
@@ -191,8 +192,8 @@ export default function App() {
                 key={category}
                 onClick={() => setSelectedCategory(category)}
                 className={`px-8 py-4 rounded-2xl transition-all text-lg ${selectedCategory === category
-                    ? 'bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white shadow-xl scale-105'
-                    : 'bg-[#F9F9F9] text-[#6D6875] hover:bg-[#FFE5D9] border-2 border-[#D8E2DC]'
+                  ? 'bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white shadow-xl scale-105'
+                  : 'bg-[#F9F9F9] text-[#6D6875] hover:bg-[#FFE5D9] border-2 border-[#D8E2DC]'
                   }`}
               >
                 {category}
