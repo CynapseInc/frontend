@@ -1335,6 +1335,226 @@ html {
   font-size: var(--font-size);
 }
 
+/* ====================================================
+   AJUSTES PARA CELULAR (MÁX 767px)
+   ==================================================== */
+/* ====================================================
+   MÁGICA DO MODAL DE FILTROS (MÁX 767px - CELULAR)
+   O PC e o iPad vão ignorar isso completamente!
+   ==================================================== */
+@media (max-width: 767px) {
+  
+  /* Se fechado: Oculta a barra lateral */
+  .filter-sidebar.mobile-closed {
+    display: none !important;
+  }
+  
+  /* Se aberto: Transforma a barra lateral num Modal em Tela Cheia e sobrepõe tudo */
+  .filter-sidebar.mobile-open {
+    position: fixed !important;
+    inset: 0 !important; /* Estica do topo ao fundo */
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
+    background-color: white !important;
+    z-index: 99999 !important; /* Z-index Nuclear */
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  /* Tira as bordas da caixa original no celular para ficar plano como um App */
+  .filter-sidebar .filter-content > div {
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+  }
+
+  /* ----------------------------------------------------
+     RESPONSIVIDADES DA GRADE DE PRODUTOS
+     ---------------------------------------------------- */
+  
+  /* Transforma para 2 colunas no celular */
+  .pesquisa-client-wrapper .grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+  }
+
+  /* Corrige o modo Lista para não ficar espremido */
+  .pesquisa-client-wrapper .grid-cols-1 > div.flex.gap-6 {
+    flex-direction: column !important;
+    gap: 0 !important;
+  }
+  .pesquisa-client-wrapper .grid-cols-1 .w-64.shrink-0 {
+    width: 100% !important;
+    height: 250px !important;
+  }
+  
+  /* Otimiza os espaçamentos laterais da tela */
+  .pesquisa-client-wrapper .px-8 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Reduz os paddings do modal de Visualização Rápida no celular */
+  .pesquisa-client-wrapper .fixed .p-8 {
+    padding: 1.5rem !important;
+  }
+
+  /* ====================================================
+     CORREÇÃO DE VAZAMENTO LATERAL (OVERFLOW) NO CELULAR
+     ==================================================== */
+  
+  /* 1. Garante que nada passe da largura máxima da tela */
+  body, html, .pesquisa-client-wrapper {
+    overflow-x: hidden !important;
+    max-width: 100vw !important;
+  }
+
+  /* 2. Hero Section (Título e Botão) */
+  /* Empilha o título em cima e o botão de filtro embaixo no celular */
+  .pesquisa-client-wrapper .py-12 .flex.items-center.justify-between {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 1rem !important;
+  }
+  .pesquisa-client-wrapper .py-12 .flex.items-center.justify-between > button {
+    width: 100% !important; /* Botão de filtro grande e fácil de clicar */
+    justify-content: center !important;
+  }
+
+  /* 3. Paginação (Anterior / Próximo) */
+  /* Permite que os botões da paginação quebrem para a linha de baixo se não couberem */
+  .pesquisa-client-wrapper .flex-1 > div:last-child > .flex.items-center.justify-between {
+    flex-wrap: wrap !important;
+    justify-content: center !important;
+    gap: 0.75rem !important;
+  }
+  
+  /* Reduz um pouco os botões da paginação para caberem melhor */
+  .pesquisa-client-wrapper .flex-1 > div:last-child > .flex.items-center.justify-between > button {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    font-size: 0.85rem !important;
+  }
+}
+
+/* ====================================================
+   AJUSTES PARA TABLETS E IPADS (768px até 1024px)
+   ==================================================== */
+@media (min-width: 768px) and (max-width: 1024px) {
+  
+  /* 1. Grade de Produtos: Transforma para 3 colunas para os produtos respirarem */
+  .pesquisa-client-wrapper .grid-cols-4 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+  
+  /* 2. Respiro lateral da página */
+  .pesquisa-client-wrapper .px-8 {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
+
+  /* 3. A BARRA LATERAL (Mais fina, sem quebrar textos) */
+  .filter-sidebar-container.is-open {
+    width: 280px !important; 
+    min-width: 280px !important;
+  }
+
+  /* 4. Força os textos a ficarem em 1 linha e reduz a fonte graciosamente */
+  .filter-sidebar-container span,
+  .filter-sidebar-container label {
+    font-size: 12px !important; /* Fonte um pouco menor */
+    white-space: nowrap !important; /* PROÍBE a quebra de linha */
+    overflow: hidden !important; /* Se o texto for gigante, esconde o excesso... */
+    text-overflow: ellipsis !important; /* ...e coloca "..." no final */
+  }
+
+  /* 5. Ajuste no input de busca para o texto caber direitinho */
+  .filter-sidebar-container input[type="text"] {
+    font-size: 11px !important;
+  }
+  
+  /* 6. Reduz ligeiramente os quadradinhos de seleção para economizar espaço */
+  .filter-sidebar-container .w-5.h-5 {
+    width: 16px !important;
+    height: 16px !important;
+    min-width: 16px !important;
+  }
+  .filter-sidebar-container .w-4.h-4 {
+    width: 14px !important;
+    height: 14px !important;
+  }
+}
+
+/* ====================================================
+   LOGICA DE EXIBIÇÃO DOS FILTROS (PC E MOBILE)
+   ==================================================== */
+
+/* Regra Universal: Se estiver fechado, some em qualquer tela */
+.filter-sidebar-container.is-closed {
+  display: none !important;
+}
+
+/* AJUSTES PARA CELULAR (Abaixo de 768px) */
+@media (max-width: 767px) {
+  .filter-sidebar-container.is-open {
+    display: flex !important;
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    background-color: white !important;
+    z-index: 99999 !important; /* Z-index Nuclear para camadas */
+    flex-direction: column !important;
+  }
+}
+
+/* AJUSTES PARA PC E TABLET (Acima de 768px) */
+@media (min-width: 768px) {
+  .filter-sidebar-container.is-open {
+    display: block !important;
+  }
+
+  /* FORÇA A OCULTAÇÃO DO CABEÇALHO E RODAPÉ DE CELULAR NO PC */
+  .cabecalho-mobile-filtro,
+  .rodape-mobile-filtro {
+    display: none !important;
+  }
+
+  /* Garante que a grade de produtos se ajuste quando a barra sumir/aparecer */
+  .pesquisa-client-wrapper .flex.gap-4 {
+    align-items: flex-start;
+  }
+}
+
+/* ----------------------------------------------------
+   RESPONSIVIDADE DA GRADE (MANTENDO O SEU PADRÃO)
+   ---------------------------------------------------- */
+@media (max-width: 767px) {
+  .pesquisa-client-wrapper .grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 0.75rem !important;
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1024px) {
+  .pesquisa-client-wrapper .grid-cols-4 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+
+/* ====================================================
+   FORMATO DOS CARDS DE PRODUTO (RETÂNGULO VERTICAL)
+   Apenas para Celulares e Tablets (Até 1024px)
+   ==================================================== */
+@media (max-width: 1024px) {
+  /* Transforma o card quadrado (1/1) em um retângulo vertical (3/4) */
+  .pesquisa-client-wrapper .grid-cols-4 > div.aspect-square {
+    aspect-ratio: 3 / 4 !important; 
+    height: auto !important;
+  }
+}
+
 @property --tw-translate-x {
   syntax: "*";
   inherits: false;

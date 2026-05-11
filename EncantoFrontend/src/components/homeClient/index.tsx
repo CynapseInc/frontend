@@ -146,7 +146,7 @@ export default function App() {
               </div>
 
               {/* Floating badges */}
-              <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-2xl shadow-2xl border-2 border-[#FFCAD4]">
+              <div className="absolute -bottom-6 -left-2 bg-white p-6 rounded-2xl shadow-2xl border-2 border-[#FFCAD4]">
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-[#FFE5D9] rounded-xl flex items-center justify-center">
                     <Heart className="w-6 h-6 text-[#F4ACB7] fill-[#F4ACB7]" />
@@ -158,7 +158,7 @@ export default function App() {
                 </div>
               </div>
 
-              <div className="absolute -top-6 -right-6 bg-white p-6 rounded-2xl shadow-2xl border-2 border-[#FFCAD4]">
+              <div className="absolute -top-6 -right-2 bg-white p-6 rounded-2xl shadow-2xl border-2 border-[#FFCAD4]">
                 <div className="flex items-center gap-2">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 fill-[#F4ACB7] text-[#F4ACB7]" />
@@ -276,7 +276,8 @@ export default function App() {
       </section>
 
       {/* Testimonials */}
-      <section className="py-24 bg-gradient-to-br from-[#FFE5D9] via-[#F9F9F9] to-[#D8E2DC]">
+      {/* Testimonials */}
+<section id="depoimentos" className="py-24 bg-gradient-to-br from-[#FFE5D9] via-[#F9F9F9] to-[#D8E2DC]">
         <div className="w-full px-8">
           <div className="text-center mb-16">
             <div className="inline-block bg-white px-6 py-3 rounded-full mb-4 border-2 border-[#FFCAD4]">

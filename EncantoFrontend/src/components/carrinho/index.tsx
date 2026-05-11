@@ -200,8 +200,8 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen bg-[#F9F9F9] py-12 px-8">
-      <div className="max-w-[1400px] mx-auto">
+    <div className="carrinho-wrapper min-h-screen bg-[#F9F9F9] py-6 px-4 md:py-12 md:px-8 overflow-x-hidden w-full max-w-[100vw]">
+      <div className="max-w-[1400px] mx-auto w-full">
         {/* Cabeçalho */}
         <div className="flex items-center gap-4 mb-10">
           <div className="w-16 h-16 bg-[#FFE5D9] rounded-2xl flex items-center justify-center shadow-sm border border-[#FFCAD4]">

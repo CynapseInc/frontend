@@ -948,6 +948,164 @@
     }
   }
 
+  /* ====================================================
+   AJUSTES EXCLUSIVOS PARA CELULAR (MÁX 768px)
+   A versão de PC continuará 100% intacta e original.
+   ==================================================== */
+@media (max-width: 767px) {
+  
+  /* 1. HERO SECTION (Evitar que os textos e imagens vazem) */
+  #home h1 {
+    font-size: 2.2rem !important; /* Diminui o texto gigante */
+    line-height: 1.1 !important;
+    word-wrap: break-word;
+  }
+  #home p {
+    font-size: 1.1rem !important;
+  }
+  /* Ajusta a imagem e os crachás flutuantes para caberem na tela */
+  #home img {
+    height: 350px !important; 
+  }
+  #home .absolute.-bottom-6.-left-6 {
+    bottom: -10px !important;
+    left: 10px !important;
+    transform: scale(0.8);
+  }
+  #home .absolute.-top-6.-right-6 {
+    top: -10px !important;
+    right: 10px !important;
+    transform: scale(0.8);
+  }
+
+  /* 2. PRODUTOS (Cria o Carrossel que você pediu) */
+  #produtos .grid-cols-4 {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    overflow-x: auto !important; /* Habilita rolagem horizontal */
+    scroll-snap-type: x mandatory;
+    padding-bottom: 20px !important; /* Espaço para não cortar a sombra */
+    gap: 15px !important;
+  }
+  /* Cada produto ocupa 80% da tela do celular, mostrando apenas 1 por vez com um pedacinho do próximo */
+  #produtos .grid-cols-4 > div {
+    flex: 0 0 80% !important;
+    scroll-snap-align: center;
+  }
+  /* Deixa os botões de categorias (Todos, Aniversário, etc) menores */
+  #produtos button.px-8 {
+    padding: 8px 16px !important;
+    font-size: 0.9rem !important;
+  }
+
+  /* 3. DEPOIMENTOS (Remove as setas que esticam a tela) */
+  /* No celular as setas laterais empurram a tela, os usuários usarão apenas os 'dots' (bolinhas) */
+  button.-translate-x-16, 
+  button.translate-x-16 {
+    display: none !important;
+  }
+
+  /* 4. RODAPÉ (Empilha tudo em 1 coluna e centraliza) */
+  footer .grid-cols-4 {
+    grid-template-columns: 1fr !important;
+    text-align: center;
+    gap: 2rem !important;
+  }
+  /* Centraliza os ícones do Instagram, Facebook, etc */
+  footer .flex.gap-3 {
+    justify-content: center !important;
+  }
+  footer .flex.items-start {
+    align-items: center !important;
+    flex-direction: column !important;
+    gap: 5px !important;
+  }
+}
+/* ====================================================
+   AJUSTES EXCLUSIVOS PARA TABLETS E IPADS (769px até 1024px)
+   ==================================================== */
+@media (min-width: 768px) and (max-width: 1024px) {
+  
+  /* 1. HERO SECTION (Ajusta o tamanho dos textos e da imagem) */
+  #home h1 {
+    font-size: 3rem !important;
+    line-height: 1.2 !important;
+  }
+  #home p {
+    font-size: 1.1rem !important;
+  }
+  #home img {
+    height: 400px !important;
+  }
+
+  /* 2. PRODUTOS (Muda de 4 colunas para 3 colunas, dando mais respiro) */
+  #produtos .grid-cols-4 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 1rem !important;
+  }
+  
+  /* Ajusta o tamanho da fonte dos botões de categoria no tablet */
+  #produtos button.px-8 {
+    padding: 12px 20px !important;
+    font-size: 1rem !important;
+  }
+
+  /* 3. DEPOIMENTOS (Ajusta o espaçamento das setas laterais para não cortar na tela) */
+  button.-translate-x-16 {
+    transform: translateX(-1rem) translateY(-50%) !important;
+  }
+  button.translate-x-16 {
+    transform: translateX(1rem) translateY(-50%) !important;
+  }
+
+  /* 4. RODAPÉ (Muda de 4 colunas para 2 colunas) */
+  footer .grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 3rem !important;
+  }
+}
+/* ====================================================
+   CORREÇÃO DEFINITIVA DOS DEPOIMENTOS (CELULAR E TABLET ATÉ 1024px)
+   ==================================================== */
+@media (max-width: 1024px) {
+  /* Transforma a grade em 1 única coluna centralizada */
+  #depoimentos .grid {
+    grid-template-columns: 1fr !important;
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  /* O pulo do gato: Esconde os depoimentos inativos! (Aqueles com scale-100) */
+  #depoimentos .scale-100 {
+    display: none !important;
+  }
+
+  /* Mostra APENAS o depoimento ativo e remove o zoom extra para não vazar da tela */
+  #depoimentos .scale-105 {
+    display: block !important;
+    transform: scale(1) !important;
+  }
+  
+  /* Reposiciona as setas no tablet para não cortarem nas bordas da tela */
+  #depoimentos button.-translate-x-16 {
+    transform: translateX(-10px) translateY(-50%) !important;
+    z-index: 10;
+  }
+  #depoimentos button.translate-x-16 {
+    transform: translateX(10px) translateY(-50%) !important;
+    z-index: 10;
+  }
+}
+
+@media (max-width: 768px) {
+  /* No celular, o espaço é muito pequeno, então escondemos as setas laterais.
+     A navegação será feita exclusivamente pelas bolinhas (dots) abaixo. */
+  #depoimentos button.-translate-x-16, 
+  #depoimentos button.translate-x-16 {
+    display: none !important;
+  }
+}
+
   .bg-gradient-to-br {
     --tw-gradient-position: to bottom right in oklab;
     background-image: linear-gradient(var(--tw-gradient-stops));

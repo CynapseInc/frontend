@@ -181,10 +181,8 @@ export default function App() {
               <p className="text-[#9D8189] text-lg">Encontre o produto perfeito para seu momento especial</p>
             </div>
 
-            <button
-              onClick={() => setShowFilters(!showFilters)}
-              className="md:hidden bg-[#F4ACB7] text-white px-6 py-3 rounded-xl flex items-center gap-2"
-            >
+            <button onClick={() => setShowFilters(!showFilters)}
+              className="bg-[#F4ACB7] text-white px-6 py-3 rounded-xl flex items-center gap-2 shadow-md hover:bg-[#FFCAD4] transition-all">
               <Filter className="w-5 h-5" />
               Filtros
             </button>
@@ -194,166 +192,170 @@ export default function App() {
 
       <div className="w-full px-8 py-8">
         <div className="flex gap-4">
-          <aside className={`${showFilters ? 'block' : 'hidden'} md:block w-[104px] min-w-[104px] shrink-0`}>
-            <div className="bg-white rounded-2xl p-3 shadow-lg border-2 border-[#D8E2DC] sticky top-24">
-              
-              {/* CORREÇÃO 2: justify-between para colocar na mesma linha. 
-                  Encurtamos o texto para "Limpar" para que a matemática de espaço bata perfeitamente! */}
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-[#6D6875] font-bold text-sm">Filtros</h3>
-                <button onClick={clearFilters} className="text-[#F4ACB7] text-[10px] hover:underline">Limpar</button>
+          {/* SIDEBAR DE FILTROS - 100% ISOLADA PARA NÃO QUEBRAR O PC */}
+          <aside className={`filter-sidebar-container ${showFilters ? 'is-open' : 'is-closed'} md:static md:w-[104px] md:min-w-[104px] md:h-auto md:overflow-visible shrink-0`}>
+            {/* CABEÇALHO DO MODAL */}
+            <div className="cabecalho-mobile-filtro md:hidden flex items-center justify-between p-6 border-b border-[#D8E2DC] shrink-0 bg-white">
+              <div className="flex items-center gap-3">
+                <Filter className="w-6 h-6 text-[#F4ACB7]" />
+                <h2 className="text-xl font-bold text-[#6D6875] m-0">Filtros</h2>
               </div>
+              <button onClick={() => setShowFilters(false)} className="p-2 bg-[#F9F9F9] hover:bg-[#FFE5D9] rounded-full transition-all">
+                <X className="w-6 h-6 text-[#9D8189]" />
+              </button>
+            </div>
 
-              <div className="mb-6 px-1">
-                <div className="relative">
-                  {/* LUPA TRAVADA: A propriedade size={14} impede o ícone de ficar gigante */}
-                  <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9D8189]" />
-                  
-                  <input
-                    type="text"
-                    placeholder="Busca por Tema, Produto e Categoria..."
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    style={{ paddingLeft: '32px', paddingRight: '22px' }}
-                    className="w-full py-1.5 text-xs border-2 border-[#D8E2DC] rounded-xl focus:border-[#F4ACB7] focus:outline-none"
-                  />
-                  
-                  {searchTerm && (
-                    <button onClick={() => setSearchTerm('')} className="absolute right-2 top-1/2 -translate-y-1/2">
-                      <X size={14} className="text-[#9D8189]" />
-                    </button>
-                  )}
+            {/* ÁREA COM SCROLL NO CELULAR, CAIXA NORMAL NO PC */}
+            <div className="flex-1 overflow-y-auto p-6 md:p-0 md:overflow-visible">
+
+              {/* === ESTA É A SUA CAIXA BRANCA ORIGINAL DO PC === */}
+              <div className="bg-white rounded-2xl p-3 shadow-lg border-2 border-[#D8E2DC] sticky top-24">
+
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-[#6D6875] font-bold text-sm">Filtros</h3>
+                  <button onClick={clearFilters} className="text-[#F4ACB7] text-[10px] hover:underline">Limpar</button>
                 </div>
-              </div>
 
-              {categories.length > 0 && (
-                <div className="mb-6">
-                  <h4 className="text-[#6D6875] mb-3">Categoria</h4>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {categories.map((cat) => (
-                      <label key={cat.name} className="flex items-center gap-3 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg">
-                        <div
-                          onClick={() => {
-                            if (selectedCategories.includes(cat.name)) {
-                              setSelectedCategories(selectedCategories.filter(c => c !== cat.name));
-                            } else {
-                              setSelectedCategories([...selectedCategories, cat.name]);
-                            }
-                          }}
-                          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${selectedCategories.includes(cat.name) ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'
-                            }`}
-                        >
-                          {selectedCategories.includes(cat.name) && (
-                            <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                          )}
-                        </div>
-                        <span className="text-[#6D6875] flex-1 truncate" title={cat.name}>{cat.name}</span>
-                        <span className="text-[#9D8189] text-sm">({cat.count})</span>
-                      </label>
-                    ))}
+                <div className="mb-6 px-1">
+                  <div className="relative">
+                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9D8189]" />
+                    <input
+                      type="text"
+                      placeholder="Busca por Tema, Produto..."
+                      value={searchTerm}
+                      onChange={(e) => setSearchTerm(e.target.value)}
+                      style={{ paddingLeft: '32px', paddingRight: '22px' }}
+                      className="w-full py-1.5 text-xs border-2 border-[#D8E2DC] rounded-xl focus:border-[#F4ACB7] focus:outline-none"
+                    />
+                    {searchTerm && (
+                      <button onClick={() => setSearchTerm('')} className="absolute right-2 top-1/2 -translate-y-1/2">
+                        <X size={14} className="text-[#9D8189]" />
+                      </button>
+                    )}
                   </div>
                 </div>
-              )}
 
-              {themes.length > 0 && (
+                {/* Categorias */}
+                {categories.length > 0 && (
+                  <div className="mb-6">
+                    <h4 className="text-[#6D6875] mb-3">Categoria</h4>
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {categories.map((cat) => (
+                        <label key={cat.name} className="flex items-center gap-3 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg">
+                          <div
+                            onClick={() => {
+                              if (selectedCategories.includes(cat.name)) {
+                                setSelectedCategories(selectedCategories.filter(c => c !== cat.name));
+                              } else {
+                                setSelectedCategories([...selectedCategories, cat.name]);
+                              }
+                            }}
+                            className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${selectedCategories.includes(cat.name) ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'}`}
+                          >
+                            {selectedCategories.includes(cat.name) && (
+                              <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                            )}
+                          </div>
+                          <span className="text-[#6D6875] flex-1 truncate" title={cat.name}>{cat.name}</span>
+                          <span className="text-[#9D8189] text-sm">({cat.count})</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Temas */}
+                {themes.length > 0 && (
+                  <div className="mb-6">
+                    <h4 className="text-[#6D6875] mb-3">Tema</h4>
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {themes.map((theme) => (
+                        <label key={theme.name} className="flex items-center gap-3 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg">
+                          <div
+                            onClick={() => {
+                              if (selectedThemes.includes(theme.name)) {
+                                setSelectedThemes(selectedThemes.filter(t => t !== theme.name));
+                              } else {
+                                setSelectedThemes([...selectedThemes, theme.name]);
+                              }
+                            }}
+                            className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${selectedThemes.includes(theme.name) ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'}`}
+                          >
+                            {selectedThemes.includes(theme.name) && (
+                              <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                            )}
+                          </div>
+                          <span className="text-[#6D6875] flex-1 truncate" title={theme.name}>{theme.name}</span>
+                          <span className="text-[#9D8189] text-sm">({theme.count})</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Itens */}
+                {items.length > 0 && (
+                  <div className="mb-6">
+                    <h4 className="text-[#6D6875] mb-3">Item</h4>
+                    <div className="space-y-2 max-h-48 overflow-y-auto">
+                      {items.map((item) => (
+                        <label key={item.name} className="flex items-center gap-3 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg">
+                          <div
+                            onClick={() => {
+                              if (selectedItems.includes(item.name)) {
+                                setSelectedItems(selectedItems.filter(i => i !== item.name));
+                              } else {
+                                setSelectedItems([...selectedItems, item.name]);
+                              }
+                            }}
+                            className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${selectedItems.includes(item.name) ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'}`}
+                          >
+                            {selectedItems.includes(item.name) && (
+                              <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                            )}
+                          </div>
+                          <span className="text-[#6D6875] flex-1 truncate" title={item.name}>{item.name}</span>
+                          <span className="text-[#9D8189] text-sm">({item.count})</span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Preço e Checkboxes */}
                 <div className="mb-6">
-                  <h4 className="text-[#6D6875] mb-3">Tema</h4>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {themes.map((theme) => (
-                      <label key={theme.name} className="flex items-center gap-3 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg">
-                        <div
-                          onClick={() => {
-                            if (selectedThemes.includes(theme.name)) {
-                              setSelectedThemes(selectedThemes.filter(t => t !== theme.name));
-                            } else {
-                              setSelectedThemes([...selectedThemes, theme.name]);
-                            }
-                          }}
-                          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${selectedThemes.includes(theme.name) ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'
-                            }`}
-                        >
-                          {selectedThemes.includes(theme.name) && (
-                            <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                          )}
-                        </div>
-                        <span className="text-[#6D6875] flex-1 truncate" title={theme.name}>{theme.name}</span>
-                        <span className="text-[#9D8189] text-sm">({theme.count})</span>
-                      </label>
-                    ))}
+                  <h4 className="text-[#6D6875] mb-3">Preço</h4>
+                  <div className="space-y-3">
+                    <input type="range" min="0" max="1000" value={priceRange[1]} onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])} className="w-full accent-[#F4ACB7]" />
+                    <div className="flex items-center gap-1">
+                      <input type="number" value={priceRange[0]} onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])} className="w-full px-1 py-2 text-sm border-2 border-[#D8E2DC] rounded-lg focus:border-[#F4ACB7] focus:outline-none text-[#6D6875]" placeholder="Min" />
+                      <span className="text-[#9D8189] text-xs">até</span>
+                      <input type="number" value={priceRange[1]} onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])} className="w-full px-1 py-2 text-sm border-2 border-[#D8E2DC] rounded-lg focus:border-[#F4ACB7] focus:outline-none text-[#6D6875]" placeholder="Max" />
+                    </div>
                   </div>
                 </div>
-              )}
 
-              {items.length > 0 && (
-                <div className="mb-6">
-                  <h4 className="text-[#6D6875] mb-3">Item</h4>
-                  <div className="space-y-2 max-h-48 overflow-y-auto">
-                    {items.map((item) => (
-                      <label key={item.name} className="flex items-center gap-3 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg">
-                        <div
-                          onClick={() => {
-                            if (selectedItems.includes(item.name)) {
-                              setSelectedItems(selectedItems.filter(i => i !== item.name));
-                            } else {
-                              setSelectedItems([...selectedItems, item.name]);
-                            }
-                          }}
-                          className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${selectedItems.includes(item.name) ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'
-                            }`}
-                        >
-                          {selectedItems.includes(item.name) && (
-                            <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                          )}
-                        </div>
-                        <span className="text-[#6D6875] flex-1 truncate" title={item.name}>{item.name}</span>
-                        <span className="text-[#9D8189] text-sm">({item.count})</span>
-                      </label>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              <div className="mb-6">
-                <h4 className="text-[#6D6875] mb-3">Preço</h4>
                 <div className="space-y-3">
-                  <input
-                    type="range"
-                    min="0"
-                    max="1000"
-                    value={priceRange[1]}
-                    onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                    className="w-full accent-[#F4ACB7]"
-                  />
-                  <div className="flex items-center gap-1"> {/* Reduzido de gap-3 para gap-1 */}
-                    <input
-                      type="number"
-                      value={priceRange[0]}
-                      onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])}
-                      className="w-full px-1 py-2 text-sm border-2 border-[#D8E2DC] rounded-lg focus:border-[#F4ACB7] focus:outline-none text-[#6D6875]"
-                      placeholder="Min"
-                    />
-                    <span className="text-[#9D8189] text-xs">até</span>
-                    <input
-                      type="number"
-                      value={priceRange[1]}
-                      onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])}
-                      className="w-full px-1 py-2 text-sm border-2 border-[#D8E2DC] rounded-lg focus:border-[#F4ACB7] focus:outline-none text-[#6D6875]"
-                      placeholder="Max"
-                    />
-                  </div>
+                  <label className="flex items-center gap-2 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg">
+                    <input type="checkbox" checked={onlyPromo} onChange={(e) => setOnlyPromo(e.target.checked)} className="w-4 h-4 accent-[#F4ACB7]" />
+                    <span className="text-[#6D6875]">Apenas promoções</span>
+                  </label>
+                  <label className="flex items-center gap-2 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg">
+                    <input type="checkbox" checked={inStock} onChange={(e) => setInStock(e.target.checked)} className="w-4 h-4 accent-[#F4ACB7]" />
+                    <span className="text-[#6D6875]">Em estoque</span>
+                  </label>
                 </div>
               </div>
+            </div>
 
-              <div className="space-y-3">
-                <label className="flex items-center gap-2 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg">
-                  <input type="checkbox" checked={onlyPromo} onChange={(e) => setOnlyPromo(e.target.checked)} className="w-4 h-4 accent-[#F4ACB7]" />
-                  <span className="text-[#6D6875]">Apenas promoções</span>
-                </label>
-                <label className="flex items-center gap-2 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg">
-                  <input type="checkbox" checked={inStock} onChange={(e) => setInStock(e.target.checked)} className="w-4 h-4 accent-[#F4ACB7]" />
-                  <span className="text-[#6D6875]">Em estoque</span>
-                </label>
-              </div>
+            {/* RODAPÉ DO MODAL (APARECE APENAS NO CELULAR) */}
+            <div className="rodape-mobile-filtro md:hidden p-6 border-t border-[#D8E2DC] bg-white shrink-0">
+              <button 
+                onClick={() => setShowFilters(false)}
+                className="w-full bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white py-4 rounded-xl font-bold shadow-md uppercase tracking-wider text-lg"
+              >
+                Ver Produtos
+              </button>
             </div>
           </aside>
 

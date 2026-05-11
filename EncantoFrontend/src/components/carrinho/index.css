@@ -1417,3 +1417,200 @@ html {
   syntax: "*";
   inherits: false
 }
+
+/* ====================================================
+   RESPONSIVIDADE DO CARRINHO (CELULAR E TABLET)
+   O PC continua 100% blindado e intocável!
+   ==================================================== */
+
+/* AJUSTES PARA CELULAR (Até 767px) */
+@media (max-width: 767px) {
+  /* 1. Tratamento agressivo contra desalinhamento e vazamento lateral */
+  html, body {
+    max-width: 100% !important; /* Trocado de 100vw para 100% */
+    width: 100% !important;
+    overflow-x: hidden !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .carrinho-wrapper {
+    padding: 1.5rem 0rem !important; 
+    width: 100% !important;
+    max-width: 100% !important; /* Trocado de 100vw para 100% */
+    box-sizing: border-box !important;
+    overflow-x: scroll !important; 
+  }
+
+  /* Aplica a regra a TODOS os elementos dentro do carrinho para nunca vazarem */
+  .carrinho-wrapper * {
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  /* Contêiner interno do carrinho */
+  .carrinho-wrapper > div {
+    width: 100% !important;
+    margin: 0 auto !important;
+  }
+  
+  /* A "vacina" final para que os itens em Flexbox não empurrem a página */
+  .carrinho-wrapper .flex,
+  .carrinho-wrapper .flex-1,
+  .carrinho-wrapper .w-full {
+    min-width: 0 !important;
+  }
+
+  /* 2. Cabeçalho (Ícone da Sacola e Título) */
+  .carrinho-wrapper .flex.items-center.gap-4.mb-10 {
+    margin-bottom: 1.5rem !important;
+    gap: 0.75rem !important;
+  }
+  .carrinho-wrapper .w-16.h-16 {
+    width: 3rem !important; /* 48px */
+    height: 3rem !important;
+    border-radius: 0.75rem !important;
+  }
+  .carrinho-wrapper .w-16.h-16 svg {
+    width: 1.5rem !important;
+    height: 1.5rem !important;
+  }
+  .carrinho-wrapper h1.text-\[36px\] {
+    font-size: 24px !important;
+  }
+  .carrinho-wrapper h1 + p {
+    font-size: 13px !important;
+  }
+
+  /* 3. Caixas Brancas (Reduz padding interno gigante que espremeria o celular) */
+  .carrinho-wrapper .p-8 {
+    padding: 1.25rem !important; /* p-5 */
+  }
+  .carrinho-wrapper .p-16 {
+    padding: 2rem 1.25rem !important; /* Para a tela de carrinho vazio */
+  }
+
+  /* 4. Cartões dos Produtos (Lado a lado blindado contra quebras e amassados) */
+  .carrinho-wrapper .flex.gap-6.p-4 {
+    gap: 0.5rem !important; /* Reduzimos um pouquinho o gap para dar mais respiro */
+    padding: 0.75rem !important;
+  }
+  
+  /* Imagem */
+  .carrinho-wrapper .w-32.h-32 {
+    width: 4.5rem !important; 
+    height: 4.5rem !important;
+    border-radius: 0.5rem !important;
+    flex-shrink: 0 !important; /* Proíbe a foto de ser espremida */
+  }
+
+  /* Permite que o miolo do cartão (textos) encolha sem empurrar a tela para a direita */
+  .carrinho-wrapper .flex-1 {
+    min-width: 0 !important;
+  }
+
+  /* Título */
+  .carrinho-wrapper h3.text-\[18px\] {
+    font-size: 13px !important;
+    line-height: 1.2 !important;
+    margin-bottom: 0.25rem !important;
+  }
+
+  .carrinho-wrapper .inline-block.bg-\[\#FFE5D9\] {
+    white-space: normal !important;
+    word-wrap: break-word !important;
+  }
+
+  /* Container Inferior (Quantidade + Preço) */
+  .carrinho-wrapper .mt-4.flex.items-center.justify-between {
+    margin-top: 0.5rem !important;
+    flex-direction: row !important; 
+    align-items: flex-end !important; /* Alinha tudo pela base para ficar elegante */
+    gap: 0.5rem !important;
+  }
+
+  /* ----------------------------------------------------
+     O SEGREDO CONTRA QUEBRAS DE LINHA E AMASSADOS
+     ---------------------------------------------------- */
+     
+  /* Caixa dos botões de Quantidade */
+  .carrinho-wrapper .mt-4.flex.items-center.justify-between > div:first-child {
+    flex-shrink: 0 !important; /* Proíbe o navegador de amassar os botões */
+  }
+
+  /* Caixa do Preço */
+  .carrinho-wrapper .text-right {
+    text-align: right !important;
+    width: auto !important;
+    flex-shrink: 0 !important; /* Proíbe o navegador de espremer o preço */
+  }
+
+  /* Textos de preço e peso */
+  .carrinho-wrapper .text-right p {
+    text-align: right !important;
+    margin-left: auto !important;
+    white-space: nowrap !important; /* PROÍBE ABSOLUTAMENTE a quebra de linha */
+  }
+
+  /* Botões de + e - */
+  .carrinho-wrapper .w-8 {
+    width: 1.5rem !important; 
+  }
+  .carrinho-wrapper .h-8 {
+    height: 1.5rem !important;
+  }
+  
+  /* Valor Final do Item */
+  .carrinho-wrapper .text-\[20px\] {
+    font-size: 15px !important;
+    margin-top: 2px !important;
+    white-space: nowrap !important; /* Garante que o R$ não separe dos números */
+  }
+
+  /* 5. Resumo do Pedido */
+  .carrinho-wrapper h2.text-\[20px\] {
+    font-size: 16px !important;
+    margin-bottom: 1rem !important;
+    padding-bottom: 0.5rem !important;
+  }
+  .carrinho-wrapper .text-\[32px\] {
+    font-size: 24px !important; /* Total Final */
+  }
+
+  /* 6. Grid das Formas de Pagamento */
+  .carrinho-wrapper .grid-cols-3 {
+    gap: 0.5rem !important;
+  }
+  .carrinho-wrapper .grid-cols-3 button {
+    padding: 0.5rem !important;
+  }
+  .carrinho-wrapper .grid-cols-3 span {
+    font-size: 10px !important; /* Evita que o texto quebre para fora do botão */
+  }
+
+  /* 7. Botão Finalizar */
+  .carrinho-wrapper button.text-lg {
+    font-size: 14px !important;
+    padding: 1rem !important;
+  }
+}
+
+/* AJUSTES PARA TABLETS E IPADS (768px até 1024px) */
+@media (min-width: 768px) and (max-width: 1150px) {
+  .carrinho-wrapper .grid.lg\:grid-cols-3 {
+    grid-template-columns: 1fr !important;
+    gap: 2rem !important;
+  }
+
+  /* Faz a lista de produtos ocupar a largura total */
+  .carrinho-wrapper .lg\:col-span-2 {
+    grid-column: span 1 / span 1 !important;
+  }
+
+  .carrinho-wrapper .p-8 {
+    padding: 1.5rem !important;
+  }
+  
+  /* Nota: O Tailwind no seu TSX já vai empilhar as colunas do Resumo para baixo dos Produtos 
+     automaticamente no Tablet, o que já garante uma ótima visualização sem precisar forçar no CSS! */
+}
