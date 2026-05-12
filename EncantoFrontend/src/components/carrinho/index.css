@@ -1614,3 +1614,63 @@ html {
   /* Nota: O Tailwind no seu TSX já vai empilhar as colunas do Resumo para baixo dos Produtos 
      automaticamente no Tablet, o que já garante uma ótima visualização sem precisar forçar no CSS! */
 }
+
+/* ====================================================
+   AJUSTES PARA TABLETS E IPADS (768px até 1024px)
+   ==================================================== */
+
+/* 1. Formato Vertical (Retrato) para todos os dispositivos abaixo do PC */
+@media (max-width: 1024px) {
+  .pesquisa-client-wrapper .grid-cols-4 > div.aspect-square {
+    aspect-ratio: 3 / 4 !important; /* Transforma o quadrado em retângulo */
+    height: auto !important;
+  }
+}
+
+/* 2. Regras Gerais para TODOS os Tablets */
+@media (min-width: 768px) and (max-width: 1024px) {
+  
+  /* REDUZ O GAP PARA O MÍNIMO (Elimina o espaçamento enorme) */
+  .pesquisa-client-wrapper .w-full.px-8.py-8 > .flex.gap-4 {
+    gap: 1rem !important; /* 16px de distância é o ideal para tablets */
+  }
+
+  /* Reduz as margens laterais do ecrã para dar espaço útil aos produtos */
+  .pesquisa-client-wrapper .px-8 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  /* Torna a barra lateral mais compacta para não empurrar a grelha */
+  .pesquisa-client-wrapper aside.w-\[104px\] {
+    width: 160px !important;
+    min-width: 160px !important;
+  }
+  
+  /* Mantém o texto protegido contra quebras */
+  .pesquisa-client-wrapper aside.w-\[104px\] span,
+  .pesquisa-client-wrapper aside.w-\[104px\] label {
+    font-size: 12px !important;
+    white-space: nowrap !important;
+    overflow: hidden !important;
+    text-overflow: ellipsis !important;
+  }
+}
+
+/* 3. IPAD NORMAL (768px até 950px) - O Pulo do Gato */
+@media (min-width: 768px) and (max-width: 950px) {
+  /* Em iPads normais, forçamos APENAS 2 COLUNAS para parar de espremer */
+  .pesquisa-client-wrapper .grid-cols-4 {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 1.5rem !important;
+  }
+}
+
+/* 4. IPAD PRO / TABLETS GRANDES (951px até 1024px) */
+@media (min-width: 951px) and (max-width: 1024px) {
+  /* No iPad Pro, como há espaço sobrando, mantemos 3 colunas elegantes */
+  .pesquisa-client-wrapper .grid-cols-4 {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 1.5rem !important;
+  }
+}
