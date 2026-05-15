@@ -435,6 +435,10 @@ export function HomeCalendar() {
                   <div className="size-4 rounded" style={{ backgroundColor: 'white', border: '2px solid #F4ACB7' }} />
                   <span className="text-[13px]" style={{ color: '#9D8189' }}>Hoje</span>
                 </div>
+                <div className="flex items-center gap-2">
+                  <div className="size-4 rounded" style={{ backgroundColor: 'white', border: '1px solid #D8E2DC' }} />
+                  <span className="text-[13px]" style={{ color: '#9D8189' }}>Sem pedidos</span>
+                </div>
               </div>
             </div>
           </div>
