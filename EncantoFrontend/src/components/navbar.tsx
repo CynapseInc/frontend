@@ -30,7 +30,9 @@ export default function Navbar() {
   });
 
   useEffect(() => {
-    const storedUser = sessionStorage.getItem('encanto_user');
+    // CORREÇÃO: Agora procura o utilizador em ambos os storages
+    const storedUser = localStorage.getItem('encanto_user') || sessionStorage.getItem('encanto_user');
+    
     if (storedUser) {
       setUserData(JSON.parse(storedUser));
     } else {
@@ -47,13 +49,21 @@ export default function Navbar() {
   }, [location.pathname, navigate]);
 
   const confirmLogout = () => {
+    // CORREÇÃO: Limpa ambos os storages para permitir um logout limpo
     sessionStorage.clear();
+    localStorage.removeItem('encanto_token');
+    localStorage.removeItem('encanto_user');
     navigate('/login'); 
   };
 
   const handleUserUpdate = (updatedUser: any) => {
     setUserData(updatedUser);
-    sessionStorage.setItem('encanto_user', JSON.stringify(updatedUser));
+    // CORREÇÃO: Atualiza os dados no storage correto onde a sessão foi iniciada
+    if (localStorage.getItem('encanto_user')) {
+      localStorage.setItem('encanto_user', JSON.stringify(updatedUser));
+    } else {
+      sessionStorage.setItem('encanto_user', JSON.stringify(updatedUser));
+    }
   };
 
   const getInitials = (name: string) => {

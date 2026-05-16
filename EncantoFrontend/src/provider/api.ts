@@ -7,7 +7,9 @@ const api = axios.create({
 });
 
 api.interceptors.request.use((config) => {
-  const token = sessionStorage.getItem('encanto_token') || sessionStorage.getItem('token');
+  // Agora procura no localStorage primeiro, com fallback para o sessionStorage
+  const token = localStorage.getItem('encanto_token') || sessionStorage.getItem('encanto_token') || sessionStorage.getItem('token');
+  
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
   }
