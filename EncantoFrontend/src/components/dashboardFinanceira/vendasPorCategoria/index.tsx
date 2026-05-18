@@ -35,7 +35,7 @@ export function GraficoVendasCategoria({ dados = [] }: GraficoVendasCategoriaPro
       <Card classeCss={styles.containerGrafico}>
         <h3 className={styles.tituloGrafico}>Categorias Mais Vendidas</h3>
         <div className={styles.areaGrafico} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-          <p style={{ color: '#999', fontSize: '14px' }}>Nenhum dado disponível para o período selecionado</p>
+          <p style={{ color: '#999', fontSize: '14px' }}>Sem dados</p>
         </div>
       </Card>
     );

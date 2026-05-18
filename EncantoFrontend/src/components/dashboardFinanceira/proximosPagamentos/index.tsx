@@ -60,7 +60,7 @@ export function ProximosPagamentos({ pagamentos = [] }: ProximosPagamentosProps)
             <h3 className={styles.titulo}>Próximos Pagamentos</h3>
           </div>
           <div className={styles.listaScroll} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', flex: 1 }}>
-            <p style={{ color: '#999', fontSize: '14px', textAlign: 'center' }}>Nenhum pagamento para o período selecionado</p>
+            <p style={{ color: '#999', fontSize: '14px', textAlign: 'center' }}>Sem dados</p>
           </div>
         </div>
         <div className={styles.totalContainer}>

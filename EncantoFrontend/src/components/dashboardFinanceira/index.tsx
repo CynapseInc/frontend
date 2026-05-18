@@ -171,25 +171,44 @@ export function DashFinanceira() {
     try {
       const dataInicioFormatada = converterDataInicioParaAPI(dataInicio);
       const dataFimFormatada = converterDataFimParaAPI(dataFim);
-      
+
       const dataInicioAntFormatada = converterDataInicioParaAPI(obterMesAnterior(dataInicio));
       const dataFimAntFormatada = converterDataFimParaAPI(obterMesAnterior(dataFim));
-      
+
       const [data, dataAnterior] = await Promise.all([
         dashFinanceiraService.listarDashFinanceiros(dataInicioFormatada, dataFimFormatada),
         dashFinanceiraService.listarDashFinanceiros(dataInicioAntFormatada, dataFimAntFormatada)
       ]);
 
-      const varReceita = calcularVariacao(data.kpi.totalReceita, dataAnterior.kpi.totalReceita);
-      const varDespesa = calcularVariacao(Math.abs(data.kpi.totalDespesa), Math.abs(dataAnterior.kpi.totalDespesa));
-      const varLucro = calcularVariacao(data.kpi.totalLucro, dataAnterior.kpi.totalLucro);
+      // Reaproveitar dados do gráfico de evolução mensal para calcular as variações
+      const evolucaoAtual = transformarEvolucaoMensal(data.evolucaoMensal);
+      let receitaAtual = 0, receitaAnterior = 0, despesaAtual = 0, despesaAnterior = 0, lucroAtual = 0, lucroAnterior = 0;
+      if (evolucaoAtual.length >= 2) {
+        const penultimo = evolucaoAtual[evolucaoAtual.length - 2];
+        const ultimo = evolucaoAtual[evolucaoAtual.length - 1];
+        receitaAnterior = penultimo.receita;
+        receitaAtual = ultimo.receita;
+        despesaAnterior = penultimo.despesa;
+        despesaAtual = ultimo.despesa;
+        lucroAnterior = penultimo.receita - penultimo.despesa;
+        lucroAtual = ultimo.receita - ultimo.despesa;
+      } else if (evolucaoAtual.length === 1) {
+        receitaAtual = evolucaoAtual[0].receita;
+        despesaAtual = evolucaoAtual[0].despesa;
+        lucroAtual = receitaAtual - despesaAtual;
+      }
+
+      const varReceita = calcularVariacao(receitaAtual, receitaAnterior);
+      const varDespesa = calcularVariacao(despesaAtual, despesaAnterior);
+      const varLucro = calcularVariacao(lucroAtual, lucroAnterior);
+      // varAPagar permanece igual pois não está no gráfico
       const varAPagar = calcularVariacao(Math.abs(data.kpi.totalAPagar), Math.abs(dataAnterior.kpi.totalAPagar));
 
       const totalPagar = formatarValor(Math.abs(data.kpi.totalAPagar));
       const totalDespesa = formatarValor(Math.abs(data.kpi.totalDespesa));
       const totalLucro = formatarValor(data.kpi.totalLucro);
       const totalReceita = formatarValor(data.kpi.totalReceita);
-      
+
       setKpis({
         totalReceita,
         totalDespesa,
@@ -201,7 +220,7 @@ export function DashFinanceira() {
         varAPagar
       });
 
-      setEvolucaoMensal(transformarEvolucaoMensal(data.evolucaoMensal));
+      setEvolucaoMensal(evolucaoAtual);
       setDespesasPorCategoria(transformarDespesasCategoria(data.despesasPorCategoria));
       setCategoriasMaisVendidas(transformarCategoriasMaisVendidas(data.categoriasMaisVendidas));
       setProximosPagamentos(transformarProximosPagamentos(data.proximosPagamentos));
