@@ -1,8 +1,10 @@
-import { X, Edit2, Loader2, Search } from 'lucide-react';
+import { X, Edit2, Trash2, Loader2, Search } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { useEffect, useState } from 'react';
 import { clienteService } from '../../services/ClienteService';
+import ConfirmModal from '../ui/ConfirmModal';
+import FeedbackModal from '../ui/FeedbackModal';
 
 interface EnderecoCliente {
   id?: number; cep: string; logradouro: string; numero: string;
@@ -26,6 +28,13 @@ export default function ClientListModal({ isOpen, onClose, onEdit }: ClientListM
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalElements, setTotalElements] = useState(0);
+
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [clientToDelete, setClientToDelete] = useState<number | null>(null);
+
+  const [isFeedbackOpen, setIsFeedbackOpen] = useState(false);
+  const [feedbackMessage, setFeedbackMessage] = useState('');
+  const [feedbackType, setFeedbackType] = useState<'success' | 'error'>('success');
 
   const gerarPaginas = (currentPage: number, totalPages: number) => {
     const maxPages = 7;
@@ -83,9 +92,42 @@ export default function ClientListModal({ isOpen, onClose, onEdit }: ClientListM
     }
   };
 
+  // Abre o modal e guarda qual cliente será excluído
+  const handleDeleteClick = (id?: number) => {
+    if (!id) return;
+    setClientToDelete(id);
+    setIsDeleteModalOpen(true);
+  };
+
+  // Função que realmente exclui quando o usuário clica em "Sim" no modal
+  const confirmDelete = async () => {
+    if (!clientToDelete) return;
+    try {
+      await clienteService.excluir(clientToDelete);
+      
+      // Abre o feedback de sucesso
+      setFeedbackType('success');
+      setFeedbackMessage('Cliente inativado com sucesso!');
+      setIsFeedbackOpen(true);
+      
+      fetchClients(); // Recarrega a lista
+    } catch (error) {
+      console.error('Erro ao excluir cliente:', error);
+      
+      // Abre o feedback de erro
+      setFeedbackType('error');
+      setFeedbackMessage('Erro ao inativar o cliente. Tente novamente.');
+      setIsFeedbackOpen(true);
+    } finally {
+      setIsDeleteModalOpen(false);
+      setClientToDelete(null);
+    }
+  };
+
   if (!isOpen) return null;
 
   return (
+    <>
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }} onClick={onClose}>
       <div className="bg-white rounded-lg shadow-xl w-full max-w-[900px] max-h-[90vh] flex flex-col" onClick={(e) => e.stopPropagation()}>
         {/* Header */}
@@ -109,7 +151,7 @@ export default function ClientListModal({ isOpen, onClose, onEdit }: ClientListM
                 setCurrentPage(1);
               }}
               className="pl-10 h-12 text-[16px]"
-              style={{ 
+              style={{
                 borderColor: '#D8E2DC',
                 backgroundColor: '#F9F9F9',
                 color: '#6D6875',
@@ -145,9 +187,14 @@ export default function ClientListModal({ isOpen, onClose, onEdit }: ClientListM
                       <td className="p-4 text-[15px]" style={{ color: '#9D8189' }}>{client.telefone}</td>
                       <td className="p-4 text-[14px]" style={{ color: '#9D8189' }}>{client.enderecos?.length || 0} endereço(s)</td>
                       <td className="p-4 text-center">
-                        <Button onClick={() => onEdit(client)} className="h-9 px-4 gap-2 text-[14px]" style={{ backgroundColor: '#F4ACB7', color: 'white' }}>
-                          <Edit2 className="size-4" /> Editar
-                        </Button>
+                        <div className="flex items-center justify-center gap-2">
+                          <Button onClick={() => onEdit(client)} className="h-9 px-4 gap-2 text-[14px]" style={{ backgroundColor: '#F4ACB7', color: 'white' }}>
+                            <Edit2 className="size-4" />
+                          </Button>
+                          <Button onClick={() => handleDeleteClick(client.id)} className="h-9 px-4 gap-2 text-[14px]" style={{ backgroundColor: 'white', color: '#F4ACB7', border: '1px solid #F4ACB7' }}>
+                            <Trash2 className="size-4" />
+                          </Button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -203,6 +250,25 @@ export default function ClientListModal({ isOpen, onClose, onEdit }: ClientListM
           <Button onClick={onClose} className="px-6 py-2 h-11 text-[15px]" style={{ backgroundColor: '#F4ACB7', color: 'white' }}>Fechar</Button>
         </div>
       </div>
-    </div>
+      </div>
+      <ConfirmModal
+      isOpen={isDeleteModalOpen}
+      onClose={() => {
+        setIsDeleteModalOpen(false);
+        setClientToDelete(null);
+      }}
+      onConfirm={confirmDelete}
+      title="Inativar Cliente"
+      message="Tem certeza que deseja excluir este cliente? Ele não aparecerá mais para novos pedidos, mas seu histórico será mantido."
+      confirmText="Sim, excluir"
+      cancelText="Cancelar"
+    />
+    <FeedbackModal
+      isOpen={isFeedbackOpen}
+      onClose={() => setIsFeedbackOpen(false)}
+      message={feedbackMessage}
+      type={feedbackType}
+    />
+  </>
   );
 }
