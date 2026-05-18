@@ -58,6 +58,8 @@ export default function App() {
   const [isLoading, setIsLoading] = useState(true);
 
   // Estados do Formulário/Pedido
+  // Estados do Formulário/Pedido
+  const [orderClient, setOrderClient] = useState<Cliente | null>(null); // NOVO ESTADO
   const [orderId, setOrderId] = useState('');
   const [selectedClientId, setSelectedClientId] = useState('');
   const [selectedAddressId, setSelectedAddressId] = useState('');
@@ -66,6 +68,7 @@ export default function App() {
   const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
   const [createdAt, setCreatedAt] = useState('');
   const [updatedAt, setUpdatedAt] = useState('');
+  
 
   // Estados dos Modais
   const [isClientListOpen, setIsClientListOpen] = useState(false);
@@ -129,12 +132,23 @@ export default function App() {
         })));
 
         // Preenchimento seguro de formulário (Garante que nunca seja NaN ou undefined para o layout)
+        // ...código anterior do useEffect...
         setOrderId(pedidoData.id ? pedidoData.id.toString() : id.toString());
 
-        if (pedidoData.cliente?.id) {
+        // NOVA LÓGICA DE CLIENTE: Pega o cliente direto do pedido
+        if (pedidoData.cliente) {
+          setOrderClient(pedidoData.cliente);
           setSelectedClientId(pedidoData.cliente.id.toString());
+          
+          if (pedidoData.cliente.enderecos?.length > 0 && pedidoData.cliente.enderecos[0].id) {
+             setSelectedAddressId(pedidoData.cliente.enderecos[0].id.toString());
+          } else {
+             setSelectedAddressId('');
+          }
         } else {
+          setOrderClient(null);
           setSelectedClientId('');
+          setSelectedAddressId('');
         }
         
         if (pedidoData.cliente?.enderecos?.length > 0 && pedidoData.cliente.enderecos[0].id) {
@@ -337,21 +351,26 @@ export default function App() {
   };
 
   const handleSaveClient = async (clientData: any) => {
-  try {
-    if (clientData.id) {
-      await clienteService.atualizar(clientData.id, clientData);
-    } else {
-      await clienteService.criar(clientData);
-    }
-    
-    const clientesAtualizadosResponse = await clienteService.listarTodos({ page: 0 });
-    const listaAtualizada = clientesAtualizadosResponse?.content || [];
-    setClients(listaAtualizada);
-    setIsClientFormOpen(false);
-    setEditingClient(null);
-  } catch(e) {
-      console.error(e);
-      showFeedback('Erro ao salvar cliente.', 'error');
+    try {
+      if (clientData.id) {
+        await clienteService.atualizar(clientData.id, clientData);
+      } else {
+        await clienteService.criar(clientData);
+      }
+      
+      // Se o cliente editado for o cliente deste pedido, atualiza o visual dele na tela
+      if (orderClient && clientData.id === orderClient.id) {
+        setOrderClient(clientData);
+      }
+      
+      const clientesAtualizadosResponse = await clienteService.listarTodos({ page: 0 });
+      const listaAtualizada = clientesAtualizadosResponse?.content || [];
+      setClients(listaAtualizada);
+      setIsClientFormOpen(false);
+      setEditingClient(null);
+    } catch(e) {
+        console.error(e);
+        showFeedback('Erro ao salvar cliente.', 'error');
     }
   };
 
@@ -396,25 +415,20 @@ export default function App() {
         </div>
 
         {/* 1. Informações do Cliente */}
+        {/* 1. Informações do Cliente */}
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
           <h2 className="text-[22px] mb-5" style={{ color: '#F4ACB7' }}><strong>Informações do Cliente</strong></h2>
 
           <div className="grid grid-cols-[1fr_auto_auto] gap-3 mb-5">
             <div>
-              <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}><strong>Cliente</strong> <span style={{ color: '#F4ACB7' }}>*</span></label>
-              <select
-                value={selectedClientId}
-                onChange={(e) => { setSelectedClientId(e.target.value); setSelectedAddressId(''); updateLastModified(); }}
-                className="w-full h-12 px-4 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]"
-                style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }}
+              <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}><strong>Cliente</strong></label>
+              <div 
+                className="w-full h-12 px-4 rounded-md text-[15px] border flex items-center cursor-not-allowed"
+                style={{ backgroundColor: '#F0F0F0', borderColor: '#D8E2DC', color: '#6D6875' }}
+                title="O cliente não pode ser alterado em um pedido já registrado."
               >
-                <option value="">Selecione um cliente</option>
-                {clients.map(client => (
-                  <option key={client.id} value={client.id?.toString()}>
-                    {client.nome} - {client.telefone}
-                  </option>
-                ))}
-              </select>
+                {orderClient ? `${orderClient.nome} - ${orderClient.telefone}` : 'Cliente não encontrado'}
+              </div>
             </div>
 
             <div className="flex items-end">
@@ -425,8 +439,8 @@ export default function App() {
 
             <div className="flex items-end">
               <Button
-                onClick={() => { if(selectedClient) { setEditingClient(selectedClient); setIsClientFormOpen(true); } }}
-                disabled={!selectedClient}
+                onClick={() => { if(orderClient) { setEditingClient(orderClient); setIsClientFormOpen(true); } }}
+                disabled={!orderClient}
                 className="h-12 px-5 gap-2 text-[15px] disabled:opacity-40"
                 style={{ backgroundColor: '#F4ACB7', color: 'white' }}
               >
@@ -436,7 +450,7 @@ export default function App() {
           </div>
 
           {/* Endereço */}
-          {selectedClient && selectedClient.enderecos && selectedClient.enderecos.length > 0 && (
+          {orderClient && orderClient.enderecos && orderClient.enderecos.length > 0 && (
             <div className="mb-5">
               <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}><strong>Endereço de Entrega</strong></label>
               <select
@@ -446,7 +460,7 @@ export default function App() {
                 style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }}
               >
                 <option value="">Selecione um endereço</option>
-                {selectedClient.enderecos.map(addr => (
+                {orderClient.enderecos.map(addr => (
                   <option key={addr.id} value={addr.id?.toString()}>
                     {addr.logradouro}, {addr.numero} - {addr.bairro}, {addr.cidade}/{addr.estado}
                   </option>
@@ -454,7 +468,7 @@ export default function App() {
               </select>
             </div>
           )}
-
+          
           <div className="grid grid-cols-2 gap-5 mb-5">
             <div>
               <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}><strong>Observações do Pedido</strong></label>

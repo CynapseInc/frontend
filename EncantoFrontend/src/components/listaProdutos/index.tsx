@@ -7,6 +7,9 @@ import FeedbackModal from '../ui/FeedbackModal';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import { useNavigate } from 'react-router-dom';
 import { produtoService } from '../../services/ProdutoService';
+import { categoriaTemaService } from '../../services/CategoriaTemaService';
+import { temaService } from '../../services/TemaService';
+import { itemService } from '../../services/ItemService';
 import type { Produto } from '../../interfaces/Produto'; 
 import './index-lista-produtos.css';
 
@@ -41,47 +44,73 @@ export default function App() {
 
   const itemsPerPage = 10;
 
+  // Adicione este novo useEffect
   useEffect(() => {
-  const fetchProducts = async () => {
-    try {
-      const data = await produtoService.listarTodos(currentPage - 1, 10, searchTerm);
-      
-      if (data && data.content) {
-        setProducts(data.content);
-        setTotalPages(data.totalPages); 
-        setTotalElements(data.totalElements || data.content.length); // <-- Adicione isto
-      } else {
-        setProducts(Array.isArray(data) ? data : []);
-        setTotalPages(1); 
-        setTotalElements(Array.isArray(data) ? data.length : 0); // <-- Adicione isto
+    const fetchFiltros = async () => {
+      try {
+        // Carrega tudo ao mesmo tempo para ser mais rápido
+        const [categoriasData, temasData, itensData] = await Promise.all([
+          categoriaTemaService.listarTodos(),
+          temaService.listarTodos(),
+          itemService.listarTodos() // Nota: O seu itemService tem paginação por defeito (page=0). Assume-se que trará os itens necessários.
+        ]);
+
+        // Mapeia os arrays de objetos para arrays de strings (usando os mesmos nomes de propriedades que usou na listagem)
+        const categoriasNomes = categoriasData.map((c: any) => c.titulo).filter(Boolean);
+        const temasNomes = temasData.map((t: any) => t.descricao).filter(Boolean);
+        const itensNomes = itensData.map((i: any) => i.descricao).filter(Boolean); 
+
+        // Atualiza os estados, garantindo que o 'Todos' fica sempre no início e removendo possíveis duplicados com o Set
+        setCategories(['Todos', ...Array.from(new Set(categoriasNomes)) as string[]]);
+        setThemes(['Todos', ...Array.from(new Set(temasNomes)) as string[]]);
+        setItems(['Todos', ...Array.from(new Set(itensNomes)) as string[]]);
+
+      } catch (error) {
+        console.error("Erro ao carregar as opções de filtro:", error);
       }
-    } catch (error) {
-      console.error("Erro ao buscar produtos:", error);
-    }
-  };
+    };
 
-  fetchProducts();
-}, [currentPage, searchTerm]);
+    fetchFiltros();
+  }, []); // O array vazio [] garante que isto só corre uma vez quando a página é montada
 
-  const filteredProducts = products.filter(product => {
-    const nome = product.titulo || '';
-    const categoria = product.tema?.categoriaTema?.titulo || 'Sem Categoria';
-    const tema = product.tema?.descricao || 'Sem tema';
-    const item = product.item?.descricao || 'Sem item';
+  useEffect(() => {
+    const fetchProducts = async () => {
+      try {
+        // Envia os filtros para a API (se for 'Todos', passa undefined para a API não filtrar)
+        const catParam = selectedCategory === 'Todos' ? undefined : selectedCategory;
+        const temaParam = selectedTheme === 'Todos' ? undefined : selectedTheme;
+        const itemParam = selectedItem === 'Todos' ? undefined : selectedItem;
 
-    const matchesSearch = nome.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'Todos' || categoria === selectedCategory;
-    const matchesTheme = selectedTheme === 'Todos' || tema === selectedTheme;
-    const matchesItem = selectedItem === 'Todos' || item === selectedItem;
-    
-    return matchesSearch && matchesCategory && matchesTheme && matchesItem;
-  });
+        const data = await produtoService.listarTodos(
+          currentPage - 1, 
+          itemsPerPage, 
+          searchTerm, 
+          catParam, 
+          temaParam, 
+          itemParam
+        );
+        
+        if (data && data.content) {
+          setProducts(data.content);
+          setTotalPages(data.totalPages); 
+          setTotalElements(data.totalElements || data.content.length); 
+        } else {
+          setProducts(Array.isArray(data) ? data : []);
+          setTotalPages(1); 
+          setTotalElements(Array.isArray(data) ? data.length : 0); 
+        }
+      } catch (error) {
+        console.error("Erro ao buscar produtos:", error);
+      }
+    };
 
-  // const startIndex = (currentPage - 1) * itemsPerPage;
-  // const endIndex = startIndex + itemsPerPage;
-  // const currentProducts = filteredProducts.slice(startIndex, endIndex);
+    fetchProducts();
+  // Adicionamos as variáveis de filtro aqui para que a tela recarregue quando elas mudarem
+  }, [currentPage, searchTerm, selectedCategory, selectedTheme, selectedItem]);
 
-  const currentProducts = filteredProducts;
+  // REMOVA o bloco de "filteredProducts" pois o backend agora faz o trabalho pesado.
+  // Basta usar o "products" diretamente:
+  const currentProducts = products;
 
   const handleEditProduct = (productId: number) => {
     navigate(`/produtos/editar/${productId}`); 

@@ -262,16 +262,6 @@ export default function App() {
                     </>
                   )}
                 </button>
-                
-                {/* Botão de voltar, caso o usuário desista de logar */}
-                <button
-                  type="button"
-                  onClick={() => setShowForm(false)}
-                  className="w-full text-[#9D8189] text-sm mt-4 hover:text-[#6D6875] transition-colors"
-                  disabled={isLoading}
-                >
-                  Voltar
-                </button>
               </form>
             </div>
           )}

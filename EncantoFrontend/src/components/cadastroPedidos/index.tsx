@@ -81,6 +81,8 @@ export default function App() {
   const [statusId, setStatusId] = useState('');
   const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
   const [searchProduct, setSearchProduct] = useState('');
+  const [deliveryDate, setDeliveryDate] = useState<string>('');
+  const [isDateEdited, setIsDateEdited] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4;
 
@@ -201,13 +203,22 @@ export default function App() {
   const calculateTotalPrice = () => selectedProducts.reduce((sum, sp) => sum + sp.totalPrice, 0);
   const calculateTotalWeight = () => selectedProducts.reduce((sum, sp) => sum + sp.totalWeight, 0);
 
-  const calculateDeliveryDate = () => {
-    if (selectedProducts.length === 0) return '-';
-    const maxDays = Math.max(...selectedProducts.map(sp => sp.product.productionDays));
-    const deliveryDate = new Date();
-    deliveryDate.setDate(deliveryDate.getDate() + maxDays);
-    return deliveryDate.toLocaleDateString('pt-BR');
-  };
+  useEffect(() => {
+    if (!isDateEdited) {
+      if (selectedProducts.length === 0) {
+        setDeliveryDate('');
+        return;
+      }
+      
+      const totalDays = selectedProducts.reduce((sum, sp) => {
+        return sum + (sp.product.productionDays * sp.quantity);
+      }, 0);
+
+      const date = new Date();
+      date.setDate(date.getDate() + totalDays);
+      setDeliveryDate(date.toISOString().split('T')[0]); 
+    }
+  }, [selectedProducts, isDateEdited]);
 
   // ==========================================
   // SALVAR O PEDIDO NA API
@@ -224,6 +235,7 @@ export default function App() {
         origem: "Sistema/Balcão",
         clienteId: parseInt(selectedClientId),
         usuarioId: 1,
+        dataLimite: deliveryDate || undefined,
         produtos: selectedProducts.map(sp => ({
           idProduto: parseInt(sp.product.id),
           quantidade: sp.quantity
@@ -563,9 +575,18 @@ export default function App() {
           <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
             <h2 className="text-[22px] mb-5" style={{ color: '#F4ACB7' }}><strong>Resumo do Pedido</strong></h2>
             <div className="grid grid-cols-3 gap-4 mb-6">
-              <div className="p-4 rounded-lg" style={{ backgroundColor: '#FFCAD4' }}>
-                <p className="text-[14px] mb-1" style={{ color: '#6D6875' }}>Previsão de Entrega</p>
-                <p className="text-[18px]" style={{ color: '#6D6875' }}><strong>{calculateDeliveryDate()}</strong></p>
+              <div className="p-4 rounded-lg flex flex-col justify-center" style={{ backgroundColor: '#FFCAD4' }}>
+                <label className="text-[14px] mb-1 cursor-pointer" style={{ color: '#6D6875' }}>Previsão de Entrega</label>
+                <input
+                  type="date"
+                  value={deliveryDate}
+                  onChange={(e) => {
+                    setDeliveryDate(e.target.value);
+                    setIsDateEdited(true); // Se editou manualmente, trava o cálculo automático
+                  }}
+                  className="w-full text-[18px] bg-transparent border-b border-transparent focus:outline-none focus:border-[#F4ACB7] cursor-pointer"
+                  style={{ color: '#6D6875', fontWeight: 'bold' }}
+                />
               </div>
               <div className="p-4 rounded-lg" style={{ backgroundColor: '#FFCAD4' }}>
                 <p className="text-[14px] mb-1" style={{ color: '#6D6875' }}>Peso Total(g)</p>

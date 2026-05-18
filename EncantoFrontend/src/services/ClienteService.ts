@@ -37,5 +37,9 @@ export const clienteService = {
   atualizar: async (id: string | number, payload: any) => {
     const { data } = await api.put(`/clientes/${id}`, payload);
     return data;
+  },
+  excluir: async (id: string | number) => {
+    const { data } = await api.patch(`/clientes/${id}/mudar-estado`);
+    return data;
   }
 };
