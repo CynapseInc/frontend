@@ -55,3 +55,14 @@ export interface PedidoResponse {
   statusAtual: PedidoStatusPedidoResponse;
   historicoStatus: PedidoStatusPedidoResponse[];
 }
+
+export interface PedidoPageResponse {
+  content: PedidoResponse[];
+  totalElements: number;
+  totalPages: number;
+  size: number;
+  number: number;
+  first: boolean;
+  last: boolean;
+  empty: boolean;
+}
