@@ -15,6 +15,7 @@ import PesquisaProdutosClient from "../components/pesquisaProdutosClient"
 import DetalheProdutoClient from "../components/detalheProdutoClient"
 import Carrinho from "../components/carrinho"
 import Funcionarios from "../components/funcionarios"
+import Clientes from "../components/clientes"
 import DashGestao from "../components/dashboardGestao"
 import ProtectedRoute from "./ProtectedRoutes"
 
@@ -37,6 +38,7 @@ export const route = createBrowserRouter([
           { path: "home", element: <HomeCalendar /> },
           { path: "kanban", element: <Kanban /> },
           { path: "pedidos/detalhes/:id", element: <DetalhesPedido /> },
+          { path: "clientes", element: <Clientes /> },
         ],
       },
       {

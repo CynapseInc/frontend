@@ -101,6 +101,7 @@ export default function Navbar() {
           <nav style={{ display: 'flex', gap: '3vw', fontSize: '1vw' }}>
              <div onClick={() => navigate("/home")} {...getLinkProps("/home")}>Home</div>
              <div onClick={() => navigate("/kanban")} {...getLinkProps("/kanban")}>Pedidos</div>
+             <div onClick={() => navigate("/clientes")} {...getLinkProps("/clientes")}>Clientes</div>
              <div onClick={() => navigate("/dashboard")} {...getLinkProps("/dashboard")}>Financeiro</div>
              <div onClick={() => navigate("/lista-produtos")} {...getLinkProps("/lista-produtos")}>Produtos</div>
              <div onClick={() => navigate("/movimentacao")} {...getLinkProps("/movimentacao")}>Movimentações</div>
@@ -113,6 +114,7 @@ export default function Navbar() {
            <nav style={{ display: 'flex', gap: '3vw', fontSize: '1vw' }}>
            <div onClick={() => navigate("/home")} {...getLinkProps("/home")}>Home</div>
            <div onClick={() => navigate("/kanban")} {...getLinkProps("/kanban")}>Pedidos</div>
+           <div onClick={() => navigate("/clientes")} {...getLinkProps("/clientes")}>Clientes</div>
         </nav>
         )}
 
@@ -120,6 +122,7 @@ export default function Navbar() {
           <nav style={{ display: 'flex', gap: '3vw', fontSize: '1vw' }}>
            <div onClick={() => navigate("/home")} {...getLinkProps("/home")}>Home</div>
            <div onClick={() => navigate("/kanban")} {...getLinkProps("/kanban")}>Pedidos</div>
+           <div onClick={() => navigate("/clientes")} {...getLinkProps("/clientes")}>Clientes</div>
            <div onClick={() => navigate("/lista-produtos")} {...getLinkProps("/lista-produtos")}>Produtos</div>
         </nav>
         )}
