@@ -33,8 +33,9 @@ jobs:
 
       - name: Build Docker image
         run: |
-          cd EncantoFrontend
-          docker build -t israelcoaquira/encanto-frontend:latest .
+          - name: Build image
+          working-directory: EncantoFrontend
+          run: docker build -t israelcoaquira/encanto-frontend:latest .
 
       - name: Push Docker image
         run: |
