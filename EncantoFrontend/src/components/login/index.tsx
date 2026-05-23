@@ -139,7 +139,7 @@ export default function App() {
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="text-center mb-6">
                 <h2 className="text-[#6D6875] mb-2 font-medium">Área do Administrador</h2>
-                <p className="text-[#9D8189] text-sm">Entre com suas credenciais</p>
+                <p className="text-[#9D8189] text-sm">Entre com suas credenciais 😊😱❗🦅</p>
               </div>
 
               {/* Error Message */}
