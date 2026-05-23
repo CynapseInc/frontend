@@ -32,9 +32,8 @@ jobs:
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
       - name: Build Docker image
-        run: |
-          cd EncantoFrontend
-          docker build -t israelcoaquira/encanto-frontend:latest .
+        working-directory: EncantoFrontend
+        run: docker build -t israelcoaquira/encanto-frontend:latest .
 
       - name: Push Docker image
         run: |
@@ -57,7 +56,7 @@ jobs:
         with:
           host: ${{ secrets.EC2_FRONT2 }}
           username: ${{ secrets.EC2_USER }}
-          key: ${{ secrets.EC2_SSH_KEY }}
+          key: ${{ secrets.SSH_KEY }}
           script: |
             cd /opt/encanto
             sudo docker compose pull
