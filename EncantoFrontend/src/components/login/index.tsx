@@ -121,7 +121,7 @@ export default function App() {
             // VISÃO 1: Botão Conectar (Escondendo o formulário)
             <div className="flex flex-col items-center space-y-6 animate-in fade-in zoom-in duration-300">
               <div className="text-center mb-4">
-                <h2 className="text-[#6D6875] text-xl font-medium mb-2">Bem-vindo de volta! 😊</h2>
+                <h2 className="text-[#6D6875] text-xl font-medium mb-2">Bem-vindo de volta!</h2>
                 <p className="text-[#9D8189]">Acesse a área administrativa para gerenciar a Encanto.</p>
               </div>
               
@@ -139,7 +139,7 @@ export default function App() {
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
               <div className="text-center mb-6">
                 <h2 className="text-[#6D6875] mb-2 font-medium">Área do Administrador</h2>
-                <p className="text-[#9D8189] text-sm">Entre com suas credenciais 😊😱❗🦅</p>
+                <p className="text-[#9D8189] text-sm">Entre com suas credenciais</p>
               </div>
 
               {/* Error Message */}
