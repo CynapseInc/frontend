@@ -1,16 +1,15 @@
 import { useEffect, useState } from 'react';
-import { Eye, Search } from 'lucide-react';
+import { Edit2, Filter, Search, Trash2, X } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { Input } from '../ui/input';
 import FeedbackModal from '../ui/FeedbackModal';
+import ConfirmModal from '../ui/ConfirmModal';
 import OrderDetailModal from '../kanbanPedidos/modals/OrderDetailModal';
 import { pedidoService } from '../../services/PedidoService';
 import { statusPedidoService } from '../../services/StatusPedidoService';
 import type { PedidoPageResponse, PedidoResponse, StatusPedidoResponse } from '../../interfaces/Pedido';
 
 const ITEMS_PER_PAGE = 8;
-const DATA_INICIO_HISTORICO = '2000-01-01';
-const DATA_FIM_HISTORICO = '2100-12-31';
 
 const emptyPage: PedidoPageResponse = {
   content: [],
@@ -72,9 +71,18 @@ export default function Pedidos() {
   const [statusTypes, setStatusTypes] = useState<StatusPedidoResponse[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [origem, setOrigem] = useState('');
+  const [statusId, setStatusId] = useState('');
+  const [createdAtInicio, setCreatedAtInicio] = useState('');
+  const [createdAtFim, setCreatedAtFim] = useState('');
+  const [dataLimiteInicio, setDataLimiteInicio] = useState('');
+  const [dataLimiteFim, setDataLimiteFim] = useState('');
+  const [sortBy, setSortBy] = useState('');
+  const [sortDirection, setSortDirection] = useState('asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<PedidoResponse | null>(null);
+  const [orderToDelete, setOrderToDelete] = useState<PedidoResponse | null>(null);
   const [isOrderDetailOpen, setIsOrderDetailOpen] = useState(false);
   const [feedback, setFeedback] = useState<{
     isOpen: boolean;
@@ -94,8 +102,17 @@ export default function Pedidos() {
     setIsLoading(true);
     try {
       const idPesquisa = extrairIdPesquisa(debouncedSearch);
+      const temFiltrosAvancados = Boolean(
+        origem ||
+        statusId ||
+        createdAtInicio ||
+        createdAtFim ||
+        dataLimiteInicio ||
+        dataLimiteFim ||
+        sortBy
+      );
 
-      if (idPesquisa) {
+      if (idPesquisa && !temFiltrosAvancados) {
         const pedido = await pedidoService.buscarPorId(idPesquisa);
         setPedidosPage({
           ...emptyPage,
@@ -112,8 +129,14 @@ export default function Pedidos() {
         size: ITEMS_PER_PAGE,
         ativa: true,
         search: debouncedSearch.trim(),
-        inicio: DATA_INICIO_HISTORICO,
-        fim: DATA_FIM_HISTORICO,
+        origem: origem.trim(),
+        statusId,
+        createdAtInicio,
+        createdAtFim,
+        dataLimiteInicio,
+        dataLimiteFim,
+        sortBy,
+        sortDirection,
       });
 
       setPedidosPage(data);
@@ -154,7 +177,37 @@ export default function Pedidos() {
 
   useEffect(() => {
     carregarPedidos();
-  }, [currentPage, debouncedSearch]);
+  }, [
+    currentPage,
+    debouncedSearch,
+    origem,
+    statusId,
+    createdAtInicio,
+    createdAtFim,
+    dataLimiteInicio,
+    dataLimiteFim,
+    sortBy,
+    sortDirection,
+  ]);
+
+  const limparFiltros = () => {
+    setSearchTerm('');
+    setDebouncedSearch('');
+    setOrigem('');
+    setStatusId('');
+    setCreatedAtInicio('');
+    setCreatedAtFim('');
+    setDataLimiteInicio('');
+    setDataLimiteFim('');
+    setSortBy('');
+    setSortDirection('asc');
+    setCurrentPage(1);
+  };
+
+  const resetarPagina = (callback: () => void) => {
+    callback();
+    setCurrentPage(1);
+  };
 
   const handleOrderClick = (pedido: PedidoResponse) => {
     setSelectedOrder(pedido);
@@ -191,6 +244,19 @@ export default function Pedidos() {
     navigate(`/pedidos/detalhes/${orderId}`);
   };
 
+  const handleDeleteOrder = async () => {
+    if (!orderToDelete) return;
+
+    try {
+      await pedidoService.mudarEstado(orderToDelete.id);
+      showFeedback('Pedido removido do histórico com sucesso.', 'success');
+      setOrderToDelete(null);
+      carregarPedidos();
+    } catch (error) {
+      showFeedback('Não foi possível remover o pedido.', 'error');
+    }
+  };
+
   const getStatusAtual = (pedido: PedidoResponse) => {
     return statusTypes.find((status) => status.id === pedido.statusAtual?.idStatusPedido);
   };
@@ -210,24 +276,134 @@ export default function Pedidos() {
         </div>
 
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
-          <div className="flex items-center justify-between gap-6">
-            <div className="flex-1 max-w-md relative">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-6">
+            <div className="flex-1 min-w-[280px] max-w-md relative">
               <Search
                 className="absolute top-1/2 -translate-y-1/2"
-                style={{ color: '#9D8189', left: '1vw', width: '1.2vw', height: '1.2vw', pointerEvents: 'none' }}
+                style={{ color: '#9D8189', left: 14, width: 17, height: 17, pointerEvents: 'none' }}
               />
               <Input
                 placeholder="Procurar por pedido, cliente ou origem..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="h-11 text-[0.9vw]"
-                style={{ paddingLeft: '3.5vw', borderColor: '#D8E2DC', backgroundColor: '#F9F9F9', color: '#6D6875' }}
+                className="h-11 text-[14px]"
+                style={{ paddingLeft: 44, borderColor: '#D8E2DC', backgroundColor: '#F9F9F9', color: '#6D6875' }}
               />
             </div>
 
-            <div className="px-4 py-2 rounded-md text-[15px]" style={{ backgroundColor: '#FFE5D9', color: '#6D6875' }}>
+            <div className="self-start md:self-auto px-4 py-2 rounded-md text-[15px]" style={{ backgroundColor: '#FFE5D9', color: '#6D6875' }}>
               {pedidosPage.totalElements} pedido(s)
             </div>
+          </div>
+
+          <div className="flex items-center gap-3 mb-4 pb-3" style={{ borderBottom: '1px solid #D8E2DC' }}>
+            <Filter className="size-4" style={{ color: '#9D8189' }} />
+            <span className="text-[15px]" style={{ color: '#9D8189' }}>Filtrar por:</span>
+          </div>
+
+          <div
+            className="grid items-end gap-3"
+            style={{ gridTemplateColumns: '1.1fr 1fr 1.1fr 2.25fr 2.25fr' }}
+          >
+            <div>
+              <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}>Origem</label>
+              <Input
+                placeholder="Ex: Loja, Online..."
+                value={origem}
+                onChange={(e) => resetarPagina(() => setOrigem(e.target.value))}
+                className="h-10 text-[14px]"
+                style={{ borderColor: '#D8E2DC', backgroundColor: '#F9F9F9', color: '#6D6875' }}
+              />
+            </div>
+
+            <div>
+              <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}>Status</label>
+              <select
+                value={statusId}
+                onChange={(e) => resetarPagina(() => setStatusId(e.target.value))}
+                className="w-full h-10 px-3 rounded-md text-[14px] border focus:outline-none focus:border-[#F4ACB7]"
+                style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC', color: '#6D6875' }}
+              >
+                <option value="">Todos</option>
+                {statusTypes.map((status) => (
+                  <option key={status.id} value={status.id}>{status.status}</option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}>Ordenar por</label>
+              <select
+                value={sortBy}
+                onChange={(e) => resetarPagina(() => setSortBy(e.target.value))}
+                className="w-full h-10 px-3 rounded-md text-[14px] border focus:outline-none focus:border-[#F4ACB7]"
+                style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC', color: '#6D6875' }}
+              >
+                <option value="">Padrão</option>
+                <option value="valor">Valor</option>
+                <option value="createdAt">Data de criação</option>
+                <option value="dataLimite">Data de entrega</option>
+              </select>
+            </div>
+
+            <div>
+              <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}>Período de criação</label>
+              <div className="grid items-center gap-2" style={{ gridTemplateColumns: '1fr auto 1fr' }}>
+                <input
+                  type="date"
+                  value={createdAtInicio}
+                  onChange={(e) => resetarPagina(() => setCreatedAtInicio(e.target.value))}
+                  className="min-w-0 w-full h-10 px-3 rounded-md text-[13px] border focus:outline-none focus:border-[#F4ACB7]"
+                  style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC', color: '#6D6875' }}
+                  title="Início do período de criação"
+                />
+                <span className="text-[13px]" style={{ color: '#9D8189' }}>até</span>
+                <input
+                  type="date"
+                  value={createdAtFim}
+                  onChange={(e) => resetarPagina(() => setCreatedAtFim(e.target.value))}
+                  className="min-w-0 w-full h-10 px-3 rounded-md text-[13px] border focus:outline-none focus:border-[#F4ACB7]"
+                  style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC', color: '#6D6875' }}
+                  title="Fim do período de criação"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}>Período de entrega</label>
+              <div className="grid items-center gap-2" style={{ gridTemplateColumns: '1fr auto 1fr' }}>
+                <input
+                  type="date"
+                  value={dataLimiteInicio}
+                  onChange={(e) => resetarPagina(() => setDataLimiteInicio(e.target.value))}
+                  className="min-w-0 w-full h-10 px-3 rounded-md text-[13px] border focus:outline-none focus:border-[#F4ACB7]"
+                  style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC', color: '#6D6875' }}
+                  title="Início do período de entrega"
+                />
+                <span className="text-[13px]" style={{ color: '#9D8189' }}>até</span>
+                <input
+                  type="date"
+                  value={dataLimiteFim}
+                  onChange={(e) => resetarPagina(() => setDataLimiteFim(e.target.value))}
+                  className="min-w-0 w-full h-10 px-3 rounded-md text-[13px] border focus:outline-none focus:border-[#F4ACB7]"
+                  style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC', color: '#6D6875' }}
+                  title="Fim do período de entrega"
+                />
+              </div>
+            </div>
+
+          </div>
+
+          <div className="flex justify-end gap-2 mt-4">
+              <button
+                onClick={limparFiltros}
+                className="h-10 px-4 rounded-md text-[14px] transition-all flex items-center gap-2"
+                style={{ backgroundColor: 'white', color: '#9D8189', border: '1px solid #D8E2DC' }}
+                title="Limpar filtros"
+              >
+                <X className="size-4" />
+                Limpar
+              </button>
           </div>
         </div>
 
@@ -269,9 +445,14 @@ export default function Pedidos() {
                       style={{ borderColor: '#D8E2DC', backgroundColor: index % 2 === 0 ? 'white' : '#F9F9F9' }}
                     >
                       <td className="px-6 py-4">
-                        <span className="text-[15px] px-2 py-1 rounded" style={{ backgroundColor: '#FFE5D9', color: '#6D6875' }}>
+                        <button
+                          onClick={() => handleOrderClick(pedido)}
+                          className="text-[15px] px-2 py-1 rounded transition-all hover:opacity-80"
+                          style={{ backgroundColor: '#FFE5D9', color: '#6D6875', border: '1px solid transparent', cursor: 'pointer' }}
+                          title="Visualizar detalhes"
+                        >
                           {formatarCodigoPedido(pedido.id)}
-                        </span>
+                        </button>
                       </td>
                       <td className="px-6 py-4">
                         <span className="text-[16px]" style={{ color: '#6D6875' }}>
@@ -312,12 +493,20 @@ export default function Pedidos() {
                       <td className="px-6 py-4">
                         <div className="flex gap-2 justify-end">
                           <button
-                            onClick={() => handleOrderClick(pedido)}
+                            onClick={() => handleSeeDetails(pedido.id)}
                             className="p-2 rounded-md transition-all hover:bg-opacity-80"
                             style={{ backgroundColor: '#D8E2DC' }}
-                            title="Visualizar"
+                            title="Editar pedido"
                           >
-                            <Eye className="size-4" style={{ color: '#6D6875' }} />
+                            <Edit2 className="size-4" style={{ color: '#6D6875' }} />
+                          </button>
+                          <button
+                            onClick={() => setOrderToDelete(pedido)}
+                            className="p-2 rounded-md transition-all hover:bg-opacity-80"
+                            style={{ backgroundColor: '#FFE5D9' }}
+                            title="Remover pedido"
+                          >
+                            <Trash2 className="size-4" style={{ color: '#9D8189' }} />
                           </button>
                         </div>
                       </td>
@@ -397,6 +586,16 @@ export default function Pedidos() {
         onClose={() => setFeedback({ ...feedback, isOpen: false })}
         message={feedback.message}
         type={feedback.type}
+      />
+
+      <ConfirmModal
+        isOpen={!!orderToDelete}
+        onClose={() => setOrderToDelete(null)}
+        onConfirm={handleDeleteOrder}
+        title="Remover pedido?"
+        message={`O pedido ${orderToDelete ? formatarCodigoPedido(orderToDelete.id) : ''} será inativado e sairá do histórico.`}
+        confirmText="Remover"
+        cancelText="Cancelar"
       />
     </div>
   );

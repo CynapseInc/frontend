@@ -8,7 +8,22 @@ interface ListarPedidosPaginadoParams {
   search?: string;
   inicio?: string;
   fim?: string;
+  origem?: string;
+  statusId?: number | string;
+  createdAtInicio?: string;
+  createdAtFim?: string;
+  dataLimiteInicio?: string;
+  dataLimiteFim?: string;
+  valorMin?: number | string;
+  valorMax?: number | string;
+  sortBy?: string;
+  sortDirection?: string;
 }
+
+const paramOpcional = (valor?: number | string) => {
+  if (valor === undefined || valor === null || valor === '') return undefined;
+  return valor;
+};
 
 export const pedidoService = {
   listarTodos: async (page = 0, size = 500, ativa = true, search = '', inicio?: string, fim?: string) => {
@@ -28,6 +43,16 @@ export const pedidoService = {
     search = '',
     inicio,
     fim,
+    origem,
+    statusId,
+    createdAtInicio,
+    createdAtFim,
+    dataLimiteInicio,
+    dataLimiteFim,
+    valorMin,
+    valorMax,
+    sortBy,
+    sortDirection,
   }: ListarPedidosPaginadoParams): Promise<PedidoPageResponse> => {
     const { data } = await api.get('/pedidos', {
       params: {
@@ -37,6 +62,16 @@ export const pedidoService = {
         search: search || undefined,
         inicio,
         fim,
+        origem: origem || undefined,
+        statusId: statusId || undefined,
+        createdAtInicio: createdAtInicio || undefined,
+        createdAtFim: createdAtFim || undefined,
+        dataLimiteInicio: dataLimiteInicio || undefined,
+        dataLimiteFim: dataLimiteFim || undefined,
+        valorMin: paramOpcional(valorMin),
+        valorMax: paramOpcional(valorMax),
+        sortBy: sortBy || undefined,
+        sortDirection: sortDirection || undefined,
       },
     });
 
