@@ -121,7 +121,7 @@ export default function App() {
             // VISÃO 1: Botão Conectar (Escondendo o formulário)
             <div className="flex flex-col items-center space-y-6 animate-in fade-in zoom-in duration-300">
               <div className="text-center mb-4">
-                <h2 className="text-[#6D6875] text-xl font-medium mb-2">Bem-vindo de volta!</h2>
+                <h2 className="text-[#6D6875] text-xl font-medium mb-2">Bem-vindo de volta! 😊</h2>
                 <p className="text-[#9D8189]">Acesse a área administrativa para gerenciar a Encanto.</p>
               </div>
               
