@@ -61,6 +61,29 @@ const formatAddressSummary = (addresses: EnderecoCliente[]) => {
   return `${firstSummary} (+${activeAddresses.length - 1})`;
 };
 
+const gerarPaginas = (currentPage: number, totalPages: number) => {
+  const maxPages = 7;
+
+  if (totalPages <= maxPages) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+
+  const pages: (number | string)[] = [1];
+  const start = Math.max(2, currentPage - 2);
+  const end = Math.min(totalPages - 1, currentPage + 2);
+
+  if (start > 2) pages.push('...');
+
+  for (let page = start; page <= end; page += 1) {
+    pages.push(page);
+  }
+
+  if (end < totalPages - 1) pages.push('...');
+  pages.push(totalPages);
+
+  return pages;
+};
+
 export default function Clientes() {
   const [clients, setClients] = useState<Cliente[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -180,6 +203,7 @@ export default function Clientes() {
     setIsModalOpen(true);
   };
 
+  const paginas = gerarPaginas(currentPage, totalPages);
   const startIndex = totalElements === 0 ? 0 : (currentPage - 1) * itemsPerPage + 1;
   const endIndex = Math.min(currentPage * itemsPerPage, totalElements);
 
@@ -302,8 +326,11 @@ export default function Clientes() {
           </table>
         </div>
 
-        <div className="flex items-center justify-between mt-6">
-          <p className="text-[15px]" style={{ color: '#9D8189' }}>
+        <div
+          className="flex items-center justify-between mt-6 bg-white rounded-lg p-4 shadow-sm"
+          style={{ border: '1px solid #D8E2DC' }}
+        >
+          <p className="text-[14px]" style={{ color: '#9D8189' }}>
             Mostrando {startIndex} a {endIndex} de {totalElements} clientes
           </p>
 
@@ -311,22 +338,24 @@ export default function Clientes() {
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-                disabled={currentPage === 1}
-                className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
-                style={{ backgroundColor: 'white', color: '#6D6875', border: '1px solid #D8E2DC' }}
+                disabled={currentPage === 1 || loading}
+                className="px-4 py-2 rounded-md text-[14px] transition-all disabled:opacity-40"
+                style={{ backgroundColor: '#F9F9F9', color: '#6D6875', border: '1px solid #D8E2DC' }}
               >
                 Anterior
               </button>
 
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+              {paginas.map((page, index) => (
                 <button
-                  key={page}
-                  onClick={() => setCurrentPage(page)}
-                  className="px-4 py-2 rounded-md text-[15px] transition-all"
+                  key={`${page}-${index}`}
+                  onClick={() => typeof page === 'number' && setCurrentPage(page)}
+                  disabled={loading || page === '...'}
+                  className="px-4 py-2 rounded-md text-[14px] transition-all disabled:opacity-40"
                   style={{
                     backgroundColor: currentPage === page ? '#F4ACB7' : 'white',
                     color: currentPage === page ? 'white' : '#6D6875',
-                    border: `1px solid ${currentPage === page ? '#F4ACB7' : '#D8E2DC'}`
+                    border: `1px solid ${currentPage === page ? '#F4ACB7' : '#D8E2DC'}`,
+                    cursor: page === '...' ? 'default' : 'pointer',
                   }}
                 >
                   {page}
@@ -335,9 +364,9 @@ export default function Clientes() {
 
               <button
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-                disabled={currentPage === totalPages}
-                className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
-                style={{ backgroundColor: 'white', color: '#6D6875', border: '1px solid #D8E2DC' }}
+                disabled={currentPage === totalPages || loading}
+                className="px-4 py-2 rounded-md text-[14px] transition-all disabled:opacity-40"
+                style={{ backgroundColor: '#F9F9F9', color: '#6D6875', border: '1px solid #D8E2DC' }}
               >
                 Próximo
               </button>
