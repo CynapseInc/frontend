@@ -216,7 +216,7 @@ export default function App() {
             </div>
 
             {/* ÁREA COM SCROLL NO CELULAR, CAIXA NORMAL NO PC */}
-            <div className="flex-1 overflow-y-auto p-6 md:p-0 md:overflow-visible">
+            <div className="flex-1 overflow-y-auto md:p-0 md:overflow-visible">
 
               {/* === ESTA É A SUA CAIXA BRANCA ORIGINAL DO PC === */}
               <div className="bg-white rounded-2xl p-3 shadow-lg border-2 border-[#D8E2DC] sticky top-24">
