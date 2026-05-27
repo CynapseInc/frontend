@@ -181,6 +181,22 @@ export default function App() {
     return `${fmtMesAno(d1)} a ${fmtMesAno(d2)}`;
   }, [filtroDataInicio, filtroDataFim]);
 
+  const periodoResumo = useMemo(() => {
+    if (!filtroDataInicio || !filtroDataFim) return '';
+
+    const dataInicio = new Date(filtroDataInicio + 'T00:00:00');
+    const dataFim = new Date(filtroDataFim + 'T00:00:00');
+    const hojeIso = new Date().toISOString().split('T')[0];
+    const umDiaEmMs = 24 * 60 * 60 * 1000;
+    const quantidadeDias = Math.max(1, Math.floor((dataFim.getTime() - dataInicio.getTime()) / umDiaEmMs) + 1);
+    const dataFimEhHoje = filtroDataFim === hojeIso;
+
+    if (quantidadeDias === 1) return 'no dia selecionado';
+    if (dataFimEhHoje) return `nos últimos ${quantidadeDias} dias`;
+
+    return `em um período de ${quantidadeDias} dias`;
+  }, [filtroDataInicio, filtroDataFim]);
+
   const formatarMes = (mesStr: string) => {
     if (!mesStr) return '';
     const partes = mesStr.split('-');
@@ -204,7 +220,7 @@ export default function App() {
             Dashboard de Gestão de Pedidos
           </h1>
           <p style={{ fontSize: '16px', color: '#9D8189', marginBottom: '2rem' }}>
-            Visão geral operacional da sua equipe. 
+            Visão geral operacional da sua equipe {periodoResumo}.
             <span style={{color: '#e98191', fontWeight: '700'}}>{periodoFiltrado && ` ${periodoFiltrado}`}</span>
           </p>
         </div>
