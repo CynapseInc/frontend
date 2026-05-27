@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Plus, Settings, GripVertical } from 'lucide-react';
+import { BadgeCheck, CheckCircle2, GripVertical, Plus, Settings, Tag, XCircle } from 'lucide-react';
 import { Button } from '../ui/button';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -17,6 +17,37 @@ import { statusPedidoService } from '../../services/StatusPedidoService';
 import type { PedidoResponse, StatusPedidoResponse } from '../../interfaces/Pedido';
 
 import './index-kanban.css';
+
+const getStatusRoleIcon = (role?: StatusPedidoResponse['role'] | string | null) => {
+  switch (role) {
+    case 'ENTREGUE':
+      return {
+        Icon: CheckCircle2,
+        title: 'Status com etiqueta: Entregue',
+        color: '#4CAF50',
+      };
+    case 'CANCELADO':
+      return {
+        Icon: XCircle,
+        title: 'Status com etiqueta: Cancelado',
+        color: '#D45D79',
+      };
+    case 'FINALIZADO':
+      return {
+        Icon: BadgeCheck,
+        title: 'Status com etiqueta: Finalizado',
+        color: '#9D8189',
+      };
+    default:
+      return role
+        ? {
+            Icon: Tag,
+            title: `Status com etiqueta: ${role}`,
+            color: '#9D8189',
+          }
+        : null;
+  }
+};
 
 // ==========================================
 // COMPONENTE DO CARTÃO DO PEDIDO
@@ -138,6 +169,7 @@ function KanbanColumn({ status, index, orders, onDropOrder, onOrderClick, moveCo
   }), [onDropOrder, status.id]); 
 
   const columnColor = status.cor || '#F9F9F9';
+  const roleIcon = getStatusRoleIcon(status.role);
 
   dropOrder(dropColumn(previewColumn(ref)));
 
@@ -167,6 +199,15 @@ function KanbanColumn({ status, index, orders, onDropOrder, onOrderClick, moveCo
           <h2 className="text-[20px]" style={{ color: '#6D6875' }}>
             <strong>{status.status}</strong>
           </h2>
+          {roleIcon && (
+            <span
+              className="size-6 rounded-full flex items-center justify-center bg-white/70 border"
+              style={{ borderColor: '#D8E2DC' }}
+              title={roleIcon.title}
+            >
+              <roleIcon.Icon className="size-4" style={{ color: roleIcon.color }} />
+            </span>
+          )}
         </div>
         <span
           className="size-7 rounded-full flex items-center justify-center text-[14px]"
