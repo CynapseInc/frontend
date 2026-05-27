@@ -75,6 +75,8 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [produtos, setProdutos] = useState<{ id: number; titulo: string }[]>([]);
   const [temas, setTemas] = useState<{ id: number; descricao: string }[]>([]);
+  const [paginaPedidosSemAtualizacao, setPaginaPedidosSemAtualizacao] = useState(1);
+  const itensPorPaginaPedidosSemAtualizacao = 10;
 
   useEffect(() => {
     produtoService.listarTodos(0, 1000).then((data) => setProdutos(data?.content ?? (Array.isArray(data) ? data : []))).catch(() => { });
@@ -161,6 +163,21 @@ export default function App() {
   const pedidosSemAtualizacao = useMemo(() => {
     return dashData?.pedidosSemAtualizacao ?? [];
   }, [dashData]);
+
+  useEffect(() => {
+    setPaginaPedidosSemAtualizacao(1);
+  }, [pedidosSemAtualizacao]);
+
+  const totalPaginasPedidosSemAtualizacao = Math.max(
+    1,
+    Math.ceil(pedidosSemAtualizacao.length / itensPorPaginaPedidosSemAtualizacao)
+  );
+  const indiceInicialPedidosSemAtualizacao = (paginaPedidosSemAtualizacao - 1) * itensPorPaginaPedidosSemAtualizacao;
+  const pedidosSemAtualizacaoPaginados = pedidosSemAtualizacao.slice(
+    indiceInicialPedidosSemAtualizacao,
+    indiceInicialPedidosSemAtualizacao + itensPorPaginaPedidosSemAtualizacao
+  );
+  const temPaginacaoPedidosSemAtualizacao = pedidosSemAtualizacao.length > itensPorPaginaPedidosSemAtualizacao;
 
   // Último lead time mensal para o KPI "Tempo Médio de Entrega"
   const ultimoLeadTime = leadTimeData.length > 0 ? leadTimeData[leadTimeData.length - 1].leadTime : null;
@@ -579,7 +596,7 @@ export default function App() {
               </TableHeader>
               <TableBody>
                 {pedidosSemAtualizacao.length > 0 ? (
-                  pedidosSemAtualizacao.map((pedido) => (
+                  pedidosSemAtualizacaoPaginados.map((pedido) => (
                     <TableRow key={pedido.id} className="border-neutral-100">
                       <TableCell className="text-neutral-800">{pedido.id}</TableCell>
                       <TableCell className="text-neutral-600">{pedido.cliente}</TableCell>
@@ -603,6 +620,38 @@ export default function App() {
                 )}
               </TableBody>
             </Table>
+            {pedidosSemAtualizacao.length > 0 && (
+              <div className="flex items-center justify-between gap-4 border-t border-neutral-100 px-4 py-3">
+                <span className="text-sm text-neutral-500">
+                  {pedidosSemAtualizacao.length} pedidos sem atualização
+                </span>
+                {temPaginacaoPedidosSemAtualizacao && (
+                  <div className="flex items-center gap-3">
+                    <Button
+                      type="button"
+                      disabled={paginaPedidosSemAtualizacao === 1}
+                      onClick={() => setPaginaPedidosSemAtualizacao((pagina) => Math.max(1, pagina - 1))}
+                      className="h-8 px-3 text-sm"
+                      style={{ backgroundColor: '#F4ACB7', color: 'white' }}
+                    >
+                      Anterior
+                    </Button>
+                    <span className="text-sm text-neutral-500">
+                      Página {paginaPedidosSemAtualizacao} de {totalPaginasPedidosSemAtualizacao}
+                    </span>
+                    <Button
+                      type="button"
+                      disabled={paginaPedidosSemAtualizacao === totalPaginasPedidosSemAtualizacao}
+                      onClick={() => setPaginaPedidosSemAtualizacao((pagina) => Math.min(totalPaginasPedidosSemAtualizacao, pagina + 1))}
+                      className="h-8 px-3 text-sm"
+                      style={{ backgroundColor: '#F4ACB7', color: 'white' }}
+                    >
+                      Próxima
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
           </Card>
         </div>
       </main>
