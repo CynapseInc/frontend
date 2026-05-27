@@ -49,7 +49,7 @@ const EncantoLogo = () => (
 );
 
 interface DashData {
-  tiposPedido: { id: number; origem: string; observacoes: string; status: string; tipoPedido: string }[];
+  tiposPedido: { id: number; origem: string; observacoes: string; status: string; statusRole?: string | null; tipoPedido: string }[];
   retrabalhoQuantidadePorMes: { mes: string; quantidadePedidos: number }[];
   leadtimePorEtapa: { etapa: string; leadTime: number }[];
   leadtimePorFuncionario: { funcionario: string; leadTime: number; totalPedidos: number }[];
@@ -75,6 +75,8 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
   const [produtos, setProdutos] = useState<{ id: number; titulo: string }[]>([]);
   const [temas, setTemas] = useState<{ id: number; descricao: string }[]>([]);
+  const [paginaPedidosSemAtualizacao, setPaginaPedidosSemAtualizacao] = useState(1);
+  const itensPorPaginaPedidosSemAtualizacao = 10;
 
   useEffect(() => {
     produtoService.listarTodos(0, 1000).then((data) => setProdutos(data?.content ?? (Array.isArray(data) ? data : []))).catch(() => { });
@@ -104,7 +106,7 @@ export default function App() {
   const kpis = useMemo(() => {
     const pedidos = dashData?.tiposPedido ?? [];
     const total = pedidos.length;
-    const entregues = pedidos.filter(p => p.status === 'Entregue').length;
+    const entregues = pedidos.filter(p => p.statusRole === 'ENTREGUE').length;
     const atrasados = pedidos.filter(p => p.tipoPedido === 'Atrasado').length;
     const retrabalho = pedidos.filter(p => p.tipoPedido === 'Retrabalho').length;
     const semAtualizacao = dashData?.pedidosSemAtualizacao.length ?? 0;
@@ -162,6 +164,21 @@ export default function App() {
     return dashData?.pedidosSemAtualizacao ?? [];
   }, [dashData]);
 
+  useEffect(() => {
+    setPaginaPedidosSemAtualizacao(1);
+  }, [pedidosSemAtualizacao]);
+
+  const totalPaginasPedidosSemAtualizacao = Math.max(
+    1,
+    Math.ceil(pedidosSemAtualizacao.length / itensPorPaginaPedidosSemAtualizacao)
+  );
+  const indiceInicialPedidosSemAtualizacao = (paginaPedidosSemAtualizacao - 1) * itensPorPaginaPedidosSemAtualizacao;
+  const pedidosSemAtualizacaoPaginados = pedidosSemAtualizacao.slice(
+    indiceInicialPedidosSemAtualizacao,
+    indiceInicialPedidosSemAtualizacao + itensPorPaginaPedidosSemAtualizacao
+  );
+  const temPaginacaoPedidosSemAtualizacao = pedidosSemAtualizacao.length > itensPorPaginaPedidosSemAtualizacao;
+
   // Último lead time mensal para o KPI "Tempo Médio de Entrega"
   const ultimoLeadTime = leadTimeData.length > 0 ? leadTimeData[leadTimeData.length - 1].leadTime : null;
 
@@ -179,6 +196,22 @@ export default function App() {
     if (sameMonth) return fmtMesAno(d1);
     if (sameYear) return `${fmtMes(d1)} a ${fmtMesAno(d2)}`;
     return `${fmtMesAno(d1)} a ${fmtMesAno(d2)}`;
+  }, [filtroDataInicio, filtroDataFim]);
+
+  const periodoResumo = useMemo(() => {
+    if (!filtroDataInicio || !filtroDataFim) return '';
+
+    const dataInicio = new Date(filtroDataInicio + 'T00:00:00');
+    const dataFim = new Date(filtroDataFim + 'T00:00:00');
+    const hojeIso = new Date().toISOString().split('T')[0];
+    const umDiaEmMs = 24 * 60 * 60 * 1000;
+    const quantidadeDias = Math.max(1, Math.floor((dataFim.getTime() - dataInicio.getTime()) / umDiaEmMs) + 1);
+    const dataFimEhHoje = filtroDataFim === hojeIso;
+
+    if (quantidadeDias === 1) return 'no dia selecionado';
+    if (dataFimEhHoje) return `nos últimos ${quantidadeDias} dias`;
+
+    return `em um período de ${quantidadeDias} dias`;
   }, [filtroDataInicio, filtroDataFim]);
 
   const formatarMes = (mesStr: string) => {
@@ -204,7 +237,7 @@ export default function App() {
             Dashboard de Gestão de Pedidos
           </h1>
           <p style={{ fontSize: '16px', color: '#9D8189', marginBottom: '2rem' }}>
-            Visão geral operacional da sua equipe. 
+            Visão geral operacional da sua equipe {periodoResumo}.
             <span style={{color: '#e98191', fontWeight: '700'}}>{periodoFiltrado && ` ${periodoFiltrado}`}</span>
           </p>
         </div>
@@ -563,7 +596,7 @@ export default function App() {
               </TableHeader>
               <TableBody>
                 {pedidosSemAtualizacao.length > 0 ? (
-                  pedidosSemAtualizacao.map((pedido) => (
+                  pedidosSemAtualizacaoPaginados.map((pedido) => (
                     <TableRow key={pedido.id} className="border-neutral-100">
                       <TableCell className="text-neutral-800">{pedido.id}</TableCell>
                       <TableCell className="text-neutral-600">{pedido.cliente}</TableCell>
@@ -587,6 +620,38 @@ export default function App() {
                 )}
               </TableBody>
             </Table>
+            {pedidosSemAtualizacao.length > 0 && (
+              <div className="flex items-center justify-between gap-4 border-t border-neutral-100 px-4 py-3">
+                <span className="text-sm text-neutral-500">
+                  {pedidosSemAtualizacao.length} pedidos sem atualização
+                </span>
+                {temPaginacaoPedidosSemAtualizacao && (
+                  <div className="flex items-center gap-3">
+                    <Button
+                      type="button"
+                      disabled={paginaPedidosSemAtualizacao === 1}
+                      onClick={() => setPaginaPedidosSemAtualizacao((pagina) => Math.max(1, pagina - 1))}
+                      className="h-8 px-3 text-sm"
+                      style={{ backgroundColor: '#F4ACB7', color: 'white' }}
+                    >
+                      Anterior
+                    </Button>
+                    <span className="text-sm text-neutral-500">
+                      Página {paginaPedidosSemAtualizacao} de {totalPaginasPedidosSemAtualizacao}
+                    </span>
+                    <Button
+                      type="button"
+                      disabled={paginaPedidosSemAtualizacao === totalPaginasPedidosSemAtualizacao}
+                      onClick={() => setPaginaPedidosSemAtualizacao((pagina) => Math.min(totalPaginasPedidosSemAtualizacao, pagina + 1))}
+                      className="h-8 px-3 text-sm"
+                      style={{ backgroundColor: '#F4ACB7', color: 'white' }}
+                    >
+                      Próxima
+                    </Button>
+                  </div>
+                )}
+              </div>
+            )}
           </Card>
         </div>
       </main>

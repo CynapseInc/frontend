@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { Plus, Settings, GripVertical } from 'lucide-react';
+import { BadgeCheck, GripVertical, Plus, Settings, Tag, Truck, XCircle } from 'lucide-react';
 import { Button } from '../ui/button';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -17,6 +17,37 @@ import { statusPedidoService } from '../../services/StatusPedidoService';
 import type { PedidoResponse, StatusPedidoResponse } from '../../interfaces/Pedido';
 
 import './index-kanban.css';
+
+const getStatusRoleIcon = (role?: StatusPedidoResponse['role'] | string | null) => {
+  switch (role) {
+    case 'ENTREGUE':
+      return {
+        Icon: Truck,
+        title: 'Status com etiqueta: Entregue',
+        color: '#4A90A4',
+      };
+    case 'CANCELADO':
+      return {
+        Icon: XCircle,
+        title: 'Status com etiqueta: Cancelado',
+        color: '#D45D79',
+      };
+    case 'FINALIZADO':
+      return {
+        Icon: BadgeCheck,
+        title: 'Status com etiqueta: Finalizado',
+        color: '#4CAF50',
+      };
+    default:
+      return role
+        ? {
+            Icon: Tag,
+            title: `Status com etiqueta: ${role}`,
+            color: '#9D8189',
+          }
+        : null;
+  }
+};
 
 // ==========================================
 // COMPONENTE DO CARTÃO DO PEDIDO
@@ -138,6 +169,7 @@ function KanbanColumn({ status, index, orders, onDropOrder, onOrderClick, moveCo
   }), [onDropOrder, status.id]); 
 
   const columnColor = status.cor || '#F9F9F9';
+  const roleIcon = getStatusRoleIcon(status.role);
 
   dropOrder(dropColumn(previewColumn(ref)));
 
@@ -167,6 +199,15 @@ function KanbanColumn({ status, index, orders, onDropOrder, onOrderClick, moveCo
           <h2 className="text-[20px]" style={{ color: '#6D6875' }}>
             <strong>{status.status}</strong>
           </h2>
+          {roleIcon && (
+            <span
+              className="size-6 rounded-full flex items-center justify-center bg-white/70 border"
+              style={{ borderColor: '#D8E2DC' }}
+              title={roleIcon.title}
+            >
+              <roleIcon.Icon className="size-4" style={{ color: roleIcon.color }} />
+            </span>
+          )}
         </div>
         <span
           className="size-7 rounded-full flex items-center justify-center text-[14px]"
@@ -303,7 +344,7 @@ export default function Kanban() {
         ? Math.max(...statusTypes.map(st => st.ordemKanban || 0)) + 1 
         : 1;
 
-      const novoStatus = await statusPedidoService.criar(statusType.name, statusType.color, novaOrdem); 
+      const novoStatus = await statusPedidoService.criar(statusType.name, statusType.color, novaOrdem, statusType.role);
       
       setStatusTypes([...statusTypes, novoStatus]);
       setIsStatusTypeModalOpen(false);
@@ -316,7 +357,14 @@ export default function Kanban() {
 
   const handleEditStatusType = async (statusType: any) => {
     try {
-      const statusAtualizado = await statusPedidoService.atualizar(statusType.id, statusType.name, statusType.color);
+      const statusAtual = statusTypes.find(st => st.id === statusType.id);
+      const statusAtualizado = await statusPedidoService.atualizar(
+        statusType.id,
+        statusType.name,
+        statusType.color,
+        statusAtual?.ordemKanban,
+        statusType.role
+      );
       setStatusTypes(statusTypes.map(st => st.id === statusAtualizado.id ? statusAtualizado : st));
       setIsStatusTypeModalOpen(false);
       setEditingStatusType(null);

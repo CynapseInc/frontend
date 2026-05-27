@@ -2,13 +2,13 @@ import { useState, useEffect } from 'react';
 import { X } from 'lucide-react';
 import { Button } from '../../ui/button';
 import { Input } from '../../ui/input';
-import type { StatusPedidoResponse } from '../../../interfaces/Pedido';
+import type { StatusPedidoResponse, StatusPedidoRole } from '../../../interfaces/Pedido';
 
 interface StatusTypeModalProps {
   isOpen: boolean;
   onClose: () => void;
   // O onSave devolve um objeto simples com o que foi digitado para o index.tsx processar
-  onSave: (status: { id?: number; name: string; color: string }) => void;
+  onSave: (status: { id?: number; name: string; color: string; role: StatusPedidoRole | null }) => void;
   statusType: StatusPedidoResponse | null;
 }
 
@@ -20,14 +20,17 @@ const PRESET_COLORS = [
 export default function StatusTypeModal({ isOpen, onClose, onSave, statusType }: StatusTypeModalProps) {
   const [name, setName] = useState('');
   const [color, setColor] = useState(PRESET_COLORS[0]);
+  const [role, setRole] = useState<StatusPedidoRole | ''>('');
 
   useEffect(() => {
     if (statusType) {
       setName(statusType.status || '');
       setColor(statusType.cor || PRESET_COLORS[0]);
+      setRole(statusType.role || '');
     } else {
       setName('');
       setColor(PRESET_COLORS[0]);
+      setRole('');
     }
   }, [statusType, isOpen]);
 
@@ -41,6 +44,7 @@ export default function StatusTypeModal({ isOpen, onClose, onSave, statusType }:
       id: statusType?.id,
       name,
       color,
+      role: role || null,
     });
   };
 
@@ -99,6 +103,23 @@ export default function StatusTypeModal({ isOpen, onClose, onSave, statusType }:
                 />
               ))}
             </div>
+          </div>
+
+          <div>
+            <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}>
+              <strong>Classificação Interna</strong>
+            </label>
+            <select
+              value={role}
+              onChange={(e) => setRole(e.target.value as StatusPedidoRole | '')}
+              className="h-12 w-full rounded-md border px-3 text-[15px] bg-white"
+              style={{ borderColor: '#D8E2DC', color: '#6D6875' }}
+            >
+              <option value="">Sem classificação</option>
+              <option value="FINALIZADO">Finalizado</option>
+              <option value="ENTREGUE">Entregue</option>
+              <option value="CANCELADO">Cancelado</option>
+            </select>
           </div>
 
           <div className="flex justify-end gap-3 pt-4 border-t" style={{ borderColor: '#D8E2DC' }}>

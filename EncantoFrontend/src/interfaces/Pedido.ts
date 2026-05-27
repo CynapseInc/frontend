@@ -1,9 +1,12 @@
 
+export type StatusPedidoRole = 'FINALIZADO' | 'ENTREGUE' | 'CANCELADO';
+
 export interface StatusPedidoResponse {
   id: number;
   status: string;
   cor: string;
   ordemKanban: number;
+  role?: StatusPedidoRole | null;
   created_at?: string;
   updated_at?: string;
 }
