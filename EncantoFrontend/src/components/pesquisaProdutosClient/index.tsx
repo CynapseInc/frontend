@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ShoppingCart, Heart, Star, ChevronLeft, ChevronRight, Search, X, Filter, Grid, List, Eye, Sparkles, TrendingUp, Tag } from 'lucide-react';
+import { ShoppingCart, Heart, Star, ChevronLeft, ChevronRight, Filter, Grid, List, Eye, Sparkles, TrendingUp, Tag, X, Search } from 'lucide-react';
 import { ImageWithFallback } from '../figma/ImageWithFallback';
 import type { Produto } from '../../interfaces/Produto';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, useSearchParams } from 'react-router-dom';
 import { produtoService } from '../../services/ProdutoService';
 import './pesquisa-index.css'
 
@@ -12,7 +12,6 @@ export default function App() {
   const [themes, setThemes] = useState<{ name: string, count: number }[]>([]);
   const [items, setItems] = useState<{ name: string, count: number }[]>([]);
 
-  const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [selectedThemes, setSelectedThemes] = useState<string[]>([]);
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
@@ -30,6 +29,17 @@ export default function App() {
 
   const navigate = useNavigate();
   const location = useLocation();
+  const [searchParams] = useSearchParams();
+
+  // Extrair searchTerm da URL
+  const searchTerm = searchParams.get('search') || '';
+
+  // Fechar filtros no mobile quando há busca
+  useEffect(() => {
+    if (searchTerm && window.innerWidth < 768) {
+      setShowFilters(false);
+    }
+  }, [searchTerm]);
 
   useEffect(() => {
     const fetchCatalog = async () => {
@@ -214,25 +224,6 @@ export default function App() {
                 <div className="flex items-center justify-between mb-4">
                   <h3 className="text-[#6D6875] font-bold text-sm">Filtros</h3>
                   <button onClick={clearFilters} className="text-[#F4ACB7] text-[10px] hover:underline">Limpar</button>
-                </div>
-
-                <div className="mb-6 px-1">
-                  <div className="relative">
-                    <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-[#9D8189]" />
-                    <input
-                      type="text"
-                      placeholder="Busca por Tema, Produto..."
-                      value={searchTerm}
-                      onChange={(e) => setSearchTerm(e.target.value)}
-                      style={{ paddingLeft: '32px', paddingRight: '22px' }}
-                      className="w-full py-1.5 text-xs border-2 border-[#D8E2DC] rounded-xl focus:border-[#F4ACB7] focus:outline-none"
-                    />
-                    {searchTerm && (
-                      <button onClick={() => setSearchTerm('')} className="absolute right-2 top-1/2 -translate-y-1/2">
-                        <X size={14} className="text-[#9D8189]" />
-                      </button>
-                    )}
-                  </div>
                 </div>
 
                 {/* Categorias */}
