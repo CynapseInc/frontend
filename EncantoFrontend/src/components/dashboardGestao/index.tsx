@@ -49,7 +49,7 @@ const EncantoLogo = () => (
 );
 
 interface DashData {
-  tiposPedido: { id: number; origem: string; observacoes: string; status: string; tipoPedido: string }[];
+  tiposPedido: { id: number; origem: string; observacoes: string; status: string; statusRole?: string | null; tipoPedido: string }[];
   retrabalhoQuantidadePorMes: { mes: string; quantidadePedidos: number }[];
   leadtimePorEtapa: { etapa: string; leadTime: number }[];
   leadtimePorFuncionario: { funcionario: string; leadTime: number; totalPedidos: number }[];
@@ -104,7 +104,7 @@ export default function App() {
   const kpis = useMemo(() => {
     const pedidos = dashData?.tiposPedido ?? [];
     const total = pedidos.length;
-    const entregues = pedidos.filter(p => p.status === 'Entregue').length;
+    const entregues = pedidos.filter(p => p.statusRole === 'ENTREGUE').length;
     const atrasados = pedidos.filter(p => p.tipoPedido === 'Atrasado').length;
     const retrabalho = pedidos.filter(p => p.tipoPedido === 'Retrabalho').length;
     const semAtualizacao = dashData?.pedidosSemAtualizacao.length ?? 0;

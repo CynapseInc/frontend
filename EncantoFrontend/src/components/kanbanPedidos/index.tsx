@@ -303,7 +303,7 @@ export default function Kanban() {
         ? Math.max(...statusTypes.map(st => st.ordemKanban || 0)) + 1 
         : 1;
 
-      const novoStatus = await statusPedidoService.criar(statusType.name, statusType.color, novaOrdem); 
+      const novoStatus = await statusPedidoService.criar(statusType.name, statusType.color, novaOrdem, statusType.role);
       
       setStatusTypes([...statusTypes, novoStatus]);
       setIsStatusTypeModalOpen(false);
@@ -316,7 +316,14 @@ export default function Kanban() {
 
   const handleEditStatusType = async (statusType: any) => {
     try {
-      const statusAtualizado = await statusPedidoService.atualizar(statusType.id, statusType.name, statusType.color);
+      const statusAtual = statusTypes.find(st => st.id === statusType.id);
+      const statusAtualizado = await statusPedidoService.atualizar(
+        statusType.id,
+        statusType.name,
+        statusType.color,
+        statusAtual?.ordemKanban,
+        statusType.role
+      );
       setStatusTypes(statusTypes.map(st => st.id === statusAtualizado.id ? statusAtualizado : st));
       setIsStatusTypeModalOpen(false);
       setEditingStatusType(null);

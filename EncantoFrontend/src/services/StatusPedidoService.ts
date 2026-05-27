@@ -1,4 +1,5 @@
 import api from '../provider/api';
+import type { StatusPedidoRole } from '../interfaces/Pedido';
 
 export const statusPedidoService = {
   listarTodos: async (page = 0, ativo = true) => {
@@ -6,17 +7,29 @@ export const statusPedidoService = {
     return data && data.content && Array.isArray(data.content) ? data.content : [];
   },
   
-  async criar(status: string, cor: string, ordemKanban: number) { 
+  async criar(status: string, cor: string, ordemKanban: number, role?: StatusPedidoRole | null) {
     const response = await api.post('/status-pedidos', { 
        status, 
        cor, 
-       ordemKanban 
+       ordemKanban,
+       role
     });
     return response.data;
   },
   
-  atualizar: async (id: string | number, nome: string, cor: string) => {
-    const { data } = await api.put(`/status-pedidos/${id}`, { status: nome, cor: cor });
+  atualizar: async (
+    id: string | number,
+    nome: string,
+    cor: string,
+    ordemKanban?: number,
+    role?: StatusPedidoRole | null
+  ) => {
+    const { data } = await api.put(`/status-pedidos/${id}`, {
+      status: nome,
+      cor,
+      ordemKanban,
+      role
+    });
     return data;
   },
   
