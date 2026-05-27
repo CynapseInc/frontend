@@ -150,7 +150,7 @@ function Navbar() {
                 borderRadius: '0.75rem',
                 padding: '0.5rem 0.75rem',
                 transition: 'all 0.3s ease',
-                width: 'clamp(180px, 15vw, 350px)'
+                width: 'clamp(180px, 30vw, 450px)'
               }}
             >
               <Search size={26} className="text-[#9D8189] flex-shrink-0" />
