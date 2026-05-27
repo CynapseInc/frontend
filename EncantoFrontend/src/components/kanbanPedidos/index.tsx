@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
-import { BadgeCheck, CheckCircle2, GripVertical, Plus, Settings, Tag, XCircle } from 'lucide-react';
+import { BadgeCheck, GripVertical, Plus, Settings, Tag, Truck, XCircle } from 'lucide-react';
 import { Button } from '../ui/button';
 import { DndProvider, useDrag, useDrop } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
@@ -22,9 +22,9 @@ const getStatusRoleIcon = (role?: StatusPedidoResponse['role'] | string | null) 
   switch (role) {
     case 'ENTREGUE':
       return {
-        Icon: CheckCircle2,
+        Icon: Truck,
         title: 'Status com etiqueta: Entregue',
-        color: '#4CAF50',
+        color: '#4A90A4',
       };
     case 'CANCELADO':
       return {
@@ -36,7 +36,7 @@ const getStatusRoleIcon = (role?: StatusPedidoResponse['role'] | string | null) 
       return {
         Icon: BadgeCheck,
         title: 'Status com etiqueta: Finalizado',
-        color: '#9D8189',
+        color: '#4CAF50',
       };
     default:
       return role
