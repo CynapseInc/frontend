@@ -372,7 +372,7 @@ export default function App() {
             {/* Título do Produto */}
             <div>
               <label className="block text-[16px] mb-2" style={{ color: '#6D6875' }}><strong>Título do Produto</strong> <span style={{ color: '#F4ACB7' }}>*</span></label>
-              <Input value={productTitle} onChange={(e) => setProductTitle(e.target.value)} placeholder="Ex: Caneca do Ben 10" className="h-12 text-[15px]" style={{ borderColor: '#D8E2DC', color: '#6D6875' }} required />
+              <Input value={productTitle} onChange={(e) => setProductTitle(e.target.value)} placeholder="Ex: Caneca do Ben 10" className="h-11 text-[15px]" style={{ borderColor: '#D8E2DC', color: '#6D6875' }} required />
             </div>
 
             {/* Descrição */}
@@ -384,7 +384,7 @@ export default function App() {
             {/* Tema */}
             <div>
               <label className="block text-[16px] mb-2" style={{ color: '#6D6875' }}><strong>Tema</strong> <span style={{ color: '#F4ACB7' }}>*</span></label>
-              <select value={selectedThemeId} onChange={(e) => setSelectedThemeId(e.target.value)} className="w-full h-12 px-4 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]" style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }} required>
+              <select value={selectedThemeId} onChange={(e) => setSelectedThemeId(e.target.value)} className="w-full h-11 px-4 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]" style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }} required>
                 <option value="">Selecione um tema</option>
                 {themes.map(theme => <option key={theme.id} value={theme.id}>{theme.description}</option>)}
               </select>
@@ -401,7 +401,7 @@ export default function App() {
             {/* Item */}
             <div>
               <label className="block text-[16px] mb-2" style={{ color: '#6D6875' }}><strong>Item</strong> <span style={{ color: '#F4ACB7' }}>*</span></label>
-              <select value={selectedItemId} onChange={(e) => setSelectedItemId(e.target.value)} className="w-full h-12 px-4 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]" style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }} required>
+              <select value={selectedItemId} onChange={(e) => setSelectedItemId(e.target.value)} className="w-full h-11 px-4 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]" style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }} required>
                 <option value="">Selecione um item</option>
                 {items.map(item => <option key={item.id} value={item.id}>{item.description}</option>)}
               </select>
@@ -430,8 +430,8 @@ export default function App() {
           </div>
 
           <div className="flex justify-end gap-3 mt-6">
-            <Button type="button" onClick={() => navigate('/lista-produtos')} className="px-8 py-3 h-12 text-[16px]" style={{ backgroundColor: 'white', color: '#9D8189', border: '1px solid #D8E2DC' }}>Cancelar</Button>
-            <Button type="submit" className="px-8 py-3 h-12 text-[16px]" style={{ backgroundColor: '#F4ACB7', color: 'white' }}>
+            <Button type="button" onClick={() => navigate('/lista-produtos')} className="px-8 py-3 h-11 text-[16px]" style={{ backgroundColor: 'white', color: '#9D8189', border: '1px solid #D8E2DC' }}>Cancelar</Button>
+            <Button type="submit" className="px-8 py-3 h-11 text-[16px]" style={{ backgroundColor: '#F4ACB7', color: 'white' }}>
               {isEditingProduct ? 'Salvar Alterações' : 'Cadastrar Produto'}
             </Button>
           </div>

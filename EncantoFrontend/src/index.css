@@ -1,57 +1,72 @@
 @import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&display=swap');
 
+:root {
+  --encanto-primary: #F4ACB7;
+  --encanto-text: #6D6875;
+  --encanto-muted: #9D8189;
+  --encanto-border: #D8E2DC;
+  --encanto-background: #F9F9F9;
+  --encanto-surface-soft: #FFE5D9;
+  --encanto-surface-strong: #FFCAD4;
+  --encanto-control-height: 44px;
+  --encanto-radius: 8px;
+  --encanto-control-radius: 6px;
+  --encanto-focus-ring: rgba(244, 172, 183, 0.32);
+}
+
 a {
   font-weight: 500;
-  color: #646cff;
+  color: inherit;
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: var(--encanto-primary);
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  color: var(--encanto-text);
+  background-color: var(--encanto-background);
 }
 
 h1 {
-  font-size: 3.2em;
   line-height: 1.1;
+  margin: 0;
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
   font-family: inherit;
-  /* background-color: #1a1a1a; */
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+[data-slot="button"] {
+  border-radius: var(--encanto-radius);
+  border-color: transparent;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+[data-slot="button"]:hover {
+  border-color: transparent;
+  filter: brightness(0.98);
+}
+
+[data-slot="button"]:focus-visible,
+[data-slot="input"]:focus-visible {
+  border-color: var(--encanto-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--encanto-focus-ring);
+}
+
+[data-slot="input"] {
+  min-height: var(--encanto-control-height);
+  border-color: var(--encanto-border);
+  border-radius: var(--encanto-control-radius);
+  background-color: var(--encanto-background);
+  color: var(--encanto-text);
+  font-size: 15px;
 }
 
 /* Garante que o menu hambúrguer desaparece 100% em ecrãs de computador */

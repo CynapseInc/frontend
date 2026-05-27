@@ -311,7 +311,7 @@ export default function Pedidos() {
                 placeholder="Ex: Loja, Online..."
                 value={origem}
                 onChange={(e) => resetarPagina(() => setOrigem(e.target.value))}
-                className="h-10 text-[14px]"
+                className="h-11 text-[14px]"
                 style={{ borderColor: '#D8E2DC', backgroundColor: '#F9F9F9', color: '#6D6875' }}
               />
             </div>
@@ -321,7 +321,7 @@ export default function Pedidos() {
               <select
                 value={statusId}
                 onChange={(e) => resetarPagina(() => setStatusId(e.target.value))}
-                className="w-full h-10 px-3 rounded-md text-[14px] border focus:outline-none focus:border-[#F4ACB7]"
+                className="w-full h-11 px-3 rounded-md text-[14px] border focus:outline-none focus:border-[#F4ACB7]"
                 style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC', color: '#6D6875' }}
               >
                 <option value="">Todos</option>
@@ -336,7 +336,7 @@ export default function Pedidos() {
               <select
                 value={sortBy}
                 onChange={(e) => resetarPagina(() => setSortBy(e.target.value))}
-                className="w-full h-10 px-3 rounded-md text-[14px] border focus:outline-none focus:border-[#F4ACB7]"
+                className="w-full h-11 px-3 rounded-md text-[14px] border focus:outline-none focus:border-[#F4ACB7]"
                 style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC', color: '#6D6875' }}
               >
                 <option value="">Padrão</option>
@@ -353,7 +353,7 @@ export default function Pedidos() {
                   type="date"
                   value={createdAtInicio}
                   onChange={(e) => resetarPagina(() => setCreatedAtInicio(e.target.value))}
-                  className="min-w-0 w-full h-10 px-3 rounded-md text-[13px] border focus:outline-none focus:border-[#F4ACB7]"
+                  className="min-w-0 w-full h-11 px-3 rounded-md text-[13px] border focus:outline-none focus:border-[#F4ACB7]"
                   style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC', color: '#6D6875' }}
                   title="Início do período de criação"
                 />
@@ -362,7 +362,7 @@ export default function Pedidos() {
                   type="date"
                   value={createdAtFim}
                   onChange={(e) => resetarPagina(() => setCreatedAtFim(e.target.value))}
-                  className="min-w-0 w-full h-10 px-3 rounded-md text-[13px] border focus:outline-none focus:border-[#F4ACB7]"
+                  className="min-w-0 w-full h-11 px-3 rounded-md text-[13px] border focus:outline-none focus:border-[#F4ACB7]"
                   style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC', color: '#6D6875' }}
                   title="Fim do período de criação"
                 />
@@ -376,7 +376,7 @@ export default function Pedidos() {
                   type="date"
                   value={dataLimiteInicio}
                   onChange={(e) => resetarPagina(() => setDataLimiteInicio(e.target.value))}
-                  className="min-w-0 w-full h-10 px-3 rounded-md text-[13px] border focus:outline-none focus:border-[#F4ACB7]"
+                  className="min-w-0 w-full h-11 px-3 rounded-md text-[13px] border focus:outline-none focus:border-[#F4ACB7]"
                   style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC', color: '#6D6875' }}
                   title="Início do período de entrega"
                 />
@@ -385,7 +385,7 @@ export default function Pedidos() {
                   type="date"
                   value={dataLimiteFim}
                   onChange={(e) => resetarPagina(() => setDataLimiteFim(e.target.value))}
-                  className="min-w-0 w-full h-10 px-3 rounded-md text-[13px] border focus:outline-none focus:border-[#F4ACB7]"
+                  className="min-w-0 w-full h-11 px-3 rounded-md text-[13px] border focus:outline-none focus:border-[#F4ACB7]"
                   style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC', color: '#6D6875' }}
                   title="Fim do período de entrega"
                 />
@@ -397,7 +397,7 @@ export default function Pedidos() {
           <div className="flex justify-end gap-2 mt-4">
               <button
                 onClick={limparFiltros}
-                className="h-10 px-4 rounded-md text-[14px] transition-all flex items-center gap-2"
+                className="h-11 px-4 rounded-md text-[14px] transition-all flex items-center gap-2"
                 style={{ backgroundColor: 'white', color: '#9D8189', border: '1px solid #D8E2DC' }}
                 title="Limpar filtros"
               >
