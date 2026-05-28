@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Tag, List, Box, ArrowLeft } from 'lucide-react';
+import { List, ArrowLeft } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { useNavigate, useParams } from 'react-router-dom'; // Adicionado useParams
@@ -358,11 +358,8 @@ export default function App() {
         {/* Botões de gerenciamento */}
         <div className="flex gap-3 mb-6">
           <Button type="button" onClick={() => setIsCategoryListModalOpen(true)} className="no-button-feedback gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#FFE5D9', color: '#6D6875' }}><List className="size-4" /> Categorias</Button>
-          <Button type="button" onClick={() => { setEditingCategory(null); setIsCategoryModalOpen(true); }} className="no-button-feedback gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}><Tag className="size-4" /> Nova Categoria</Button>
           <Button type="button" onClick={() => setIsThemeListModalOpen(true)} className="no-button-feedback gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#FFE5D9', color: '#6D6875' }}><List className="size-4" /> Temas</Button>
-          <Button type="button" onClick={() => { setEditingTheme(null); setIsThemeModalOpen(true); }} className="no-button-feedback gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}><Tag className="size-4" /> Novo Tema</Button>
           <Button type="button" onClick={() => setIsItemListModalOpen(true)} className="no-button-feedback gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#FFE5D9', color: '#6D6875' }}><List className="size-4" /> Itens</Button>
-          <Button type="button" onClick={() => { setEditingItem(null); setIsItemModalOpen(true); }} className="no-button-feedback gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}><Box className="size-4" /> Novo Item</Button>
         </div>
 
         {/* Formulário */}
@@ -440,13 +437,13 @@ export default function App() {
 
       {/* Modais com onSave e onDelete Mapeados */}
       <ProductCategoryModal isOpen={isCategoryModalOpen} onClose={() => { setIsCategoryModalOpen(false); setEditingCategory(null); }} onSave={editingCategory ? handleEditCategory : handleAddCategory} category={editingCategory} />
-      <ProductCategoryListModal isOpen={isCategoryListModalOpen} onClose={() => setIsCategoryListModalOpen(false)} categories={categories} onEdit={(cat) => { setEditingCategory(cat); setIsCategoryModalOpen(true); setIsCategoryListModalOpen(false); }} onDelete={(cat) => setDeleteCategory(cat)} />
+      <ProductCategoryListModal isOpen={isCategoryListModalOpen} onClose={() => setIsCategoryListModalOpen(false)} categories={categories} onCreate={() => { setEditingCategory(null); setIsCategoryListModalOpen(false); setIsCategoryModalOpen(true); }} onEdit={(cat) => { setEditingCategory(cat); setIsCategoryModalOpen(true); setIsCategoryListModalOpen(false); }} onDelete={(cat) => setDeleteCategory(cat)} />
       
       <ThemeModal isOpen={isThemeModalOpen} onClose={() => { setIsThemeModalOpen(false); setEditingTheme(null); }} onSave={editingTheme ? handleEditTheme : handleAddTheme} theme={editingTheme} categories={categories} />
-      <ThemeListModal isOpen={isThemeListModalOpen} onClose={() => setIsThemeListModalOpen(false)} themes={themes} categories={categories} onEdit={(t) => { setEditingTheme(t); setIsThemeModalOpen(true); setIsThemeListModalOpen(false); }} onDelete={(t) => setDeleteTheme(t)} />
+      <ThemeListModal isOpen={isThemeListModalOpen} onClose={() => setIsThemeListModalOpen(false)} themes={themes} categories={categories} onCreate={() => { setEditingTheme(null); setIsThemeListModalOpen(false); setIsThemeModalOpen(true); }} onEdit={(t) => { setEditingTheme(t); setIsThemeModalOpen(true); setIsThemeListModalOpen(false); }} onDelete={(t) => setDeleteTheme(t)} />
       
       <ItemModal isOpen={isItemModalOpen} onClose={() => { setIsItemModalOpen(false); setEditingItem(null); }} onSave={editingItem ? handleEditItem : handleAddItem} item={editingItem} items={items} />
-      <ItemListModal isOpen={isItemListModalOpen} onClose={() => setIsItemListModalOpen(false)} items={items} onEdit={(i) => { setEditingItem(i); setIsItemModalOpen(true); setIsItemListModalOpen(false); }} onDelete={(i) => setDeleteItem(i)} />
+      <ItemListModal isOpen={isItemListModalOpen} onClose={() => setIsItemListModalOpen(false)} items={items} onCreate={() => { setEditingItem(null); setIsItemListModalOpen(false); setIsItemModalOpen(true); }} onEdit={(i) => { setEditingItem(i); setIsItemModalOpen(true); setIsItemListModalOpen(false); }} onDelete={(i) => setDeleteItem(i)} />
 
       {/* Confirmações de Exclusão */}
       <DeleteProductCategoryDialog isOpen={!!deleteCategory} onClose={() => setDeleteCategory(null)} onConfirm={handleDeleteCategory} categoryName={deleteCategory?.description || ''} />
