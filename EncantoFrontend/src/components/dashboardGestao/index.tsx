@@ -343,7 +343,7 @@ export default function App() {
                 setFiltroProdutoId('');
                 setFiltroTemaId('');
               }}
-              className="border-[#D8E2DC] text-[#6D6875] hover:bg-[#F9F9F9]"
+              className="border-[#F4ACB7] bg-[#F4ACB7] text-white hover:bg-[#F4ACB7] hover:opacity-90"
             >
               Limpar Filtros
             </Button>

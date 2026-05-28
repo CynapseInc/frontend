@@ -398,7 +398,7 @@ export default function Pedidos() {
               <button
                 onClick={limparFiltros}
                 className="h-11 px-4 rounded-md text-[14px] transition-all flex items-center gap-2"
-                style={{ backgroundColor: 'white', color: '#9D8189', border: '1px solid #D8E2DC' }}
+                style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
                 title="Limpar filtros"
               >
                 <X className="size-4" />
@@ -532,7 +532,7 @@ export default function Pedidos() {
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                 disabled={currentPage === 1 || isLoading}
                 className="px-4 py-2 rounded-md text-[14px] transition-all disabled:opacity-40"
-                style={{ backgroundColor: '#F9F9F9', color: '#6D6875', border: '1px solid #D8E2DC' }}
+                style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
               >
                 Anterior
               </button>
@@ -558,7 +558,7 @@ export default function Pedidos() {
                 onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages || isLoading}
                 className="px-4 py-2 rounded-md text-[14px] transition-all disabled:opacity-40"
-                style={{ backgroundColor: '#F9F9F9', color: '#6D6875', border: '1px solid #D8E2DC' }}
+                style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
               >
                 Próximo
               </button>

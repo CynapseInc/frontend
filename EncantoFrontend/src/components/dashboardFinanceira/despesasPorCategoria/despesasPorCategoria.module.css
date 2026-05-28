@@ -55,14 +55,15 @@
 }
 
 .scrollArea::-webkit-scrollbar {
-    width: 0.3vw;
+    width: 6px;
 }
 .scrollArea::-webkit-scrollbar-track {
-    background: transparent;
+    background: #F9F9F9;
 }
 .scrollArea::-webkit-scrollbar-thumb {
-    background-color: #D8E2DC;
-    border-radius: 10px;
+    background-color: #F4ACB7;
+    border: 2px solid #F9F9F9;
+    border-radius: 999px;
 }
 
 .itemContainer {

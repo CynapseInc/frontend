@@ -340,7 +340,7 @@ export default function Clientes() {
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1 || loading}
                 className="px-4 py-2 rounded-md text-[14px] transition-all disabled:opacity-40"
-                style={{ backgroundColor: '#F9F9F9', color: '#6D6875', border: '1px solid #D8E2DC' }}
+                style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
               >
                 Anterior
               </button>
@@ -366,7 +366,7 @@ export default function Clientes() {
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages || loading}
                 className="px-4 py-2 rounded-md text-[14px] transition-all disabled:opacity-40"
-                style={{ backgroundColor: '#F9F9F9', color: '#6D6875', border: '1px solid #D8E2DC' }}
+                style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
               >
                 Próximo
               </button>

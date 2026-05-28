@@ -31,9 +31,13 @@
 .listaScroll::-webkit-scrollbar {
     width: 6px;
 }
+.listaScroll::-webkit-scrollbar-track {
+    background-color: #F9F9F9;
+}
 .listaScroll::-webkit-scrollbar-thumb {
-    background-color: #E0E0E0;
-    border-radius: 4px;
+    background-color: #F4ACB7;
+    border: 2px solid #F9F9F9;
+    border-radius: 999px;
 }
 
 .cardItem {

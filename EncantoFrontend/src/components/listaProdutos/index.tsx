@@ -303,11 +303,11 @@ export default function App() {
           </p>
           {totalPages > 1 && (
              <div className="flex items-center gap-2">
-              <button onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1} className="px-4 py-2 rounded-md text-[15px] border transition-all disabled:opacity-40" style={{ backgroundColor: 'white', color: '#6D6875', borderColor: '#D8E2DC' }}>Anterior</button>
+              <button onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1} className="px-4 py-2 rounded-md text-[15px] border transition-all disabled:opacity-40" style={{ backgroundColor: '#F4ACB7', color: 'white', borderColor: '#F4ACB7' }}>Anterior</button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                 <button key={page} onClick={() => setCurrentPage(page)} className="px-4 py-2 rounded-md text-[15px] border transition-all" style={{ backgroundColor: currentPage === page ? '#F4ACB7' : 'white', color: currentPage === page ? 'white' : '#6D6875', borderColor: currentPage === page ? '#F4ACB7' : '#D8E2DC' }}>{page}</button>
               ))}
-              <button onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages} className="px-4 py-2 rounded-md text-[15px] border transition-all disabled:opacity-40" style={{ backgroundColor: 'white', color: '#6D6875', borderColor: '#D8E2DC' }}>Próximo</button>
+              <button onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages} className="px-4 py-2 rounded-md text-[15px] border transition-all disabled:opacity-40" style={{ backgroundColor: '#F4ACB7', color: 'white', borderColor: '#F4ACB7' }}>Próximo</button>
             </div>
           )}
         </div>

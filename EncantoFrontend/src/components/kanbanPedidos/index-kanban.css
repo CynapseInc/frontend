@@ -1131,20 +1131,36 @@
     --tw-ring-color: var(--destructive);
   }
 
-  /* Custom Scrollbar Styles para o Kanban */
-.custom-scrollbar::-webkit-scrollbar {
-  width: 6px;
-  height: 8px;
+  /* Mantem o Kanban com scroll nativo do navegador, mesmo com o scroll global rosa. */
+.kanban-native-scrollbar {
+  scrollbar-color: auto;
+  scrollbar-width: auto;
 }
-.custom-scrollbar::-webkit-scrollbar-track {
-  background: transparent;
+.kanban-native-scrollbar::-webkit-scrollbar,
+.kanban-native-scrollbar::-webkit-scrollbar-track,
+.kanban-native-scrollbar::-webkit-scrollbar-track-piece,
+.kanban-native-scrollbar::-webkit-scrollbar-corner,
+.kanban-native-scrollbar::-webkit-scrollbar-thumb,
+.kanban-native-scrollbar::-webkit-scrollbar-thumb:hover {
+  all: revert;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #D8E2DC;
-  border-radius: 10px;
+
+.kanban-page .kanban-column-scrollbar-hidden {
+  scrollbar-width: none !important;
+  scrollbar-color: transparent transparent !important;
+  -ms-overflow-style: none !important;
 }
-.custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #FFCAD4;
+.kanban-page .kanban-column-scrollbar-hidden::-webkit-scrollbar {
+  width: 0 !important;
+  height: 0 !important;
+  display: none !important;
+  background: transparent !important;
+}
+.kanban-page .kanban-column-scrollbar-hidden::-webkit-scrollbar-track,
+.kanban-page .kanban-column-scrollbar-hidden::-webkit-scrollbar-thumb {
+  display: none !important;
+  background: transparent !important;
+  border: 0 !important;
 }
 
   @supports (color: color-mix(in lab, red, red)) {

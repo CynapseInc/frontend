@@ -14,6 +14,34 @@
   --encanto-focus-ring: rgba(244, 172, 183, 0.32);
 }
 
+html {
+  scrollbar-gutter: stable;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--encanto-primary) var(--encanto-background);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--encanto-background);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--encanto-primary);
+  border: 2px solid var(--encanto-background);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--encanto-surface-strong);
+}
+
 a {
   font-weight: 500;
   color: inherit;
@@ -39,6 +67,50 @@ h1 {
 button {
   font-family: inherit;
   cursor: pointer;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease,
+    filter 0.18s ease,
+    opacity 0.18s ease;
+}
+
+button:disabled,
+button[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+@media (hover: hover) {
+  button:not(.no-button-feedback):not(:disabled):not([aria-disabled="true"]):hover {
+    filter: brightness(0.98);
+    box-shadow: 0 4px 10px rgba(109, 104, 117, 0.14);
+  }
+
+  button[class*="bg-[#"]:not([class*="bg-white"]):not(.no-button-feedback):not(:disabled):not([aria-disabled="true"]):hover,
+  button[class*="bg-gradient"]:not(.no-button-feedback):not(:disabled):not([aria-disabled="true"]):hover,
+  button[style*="background-color: rgb(244, 172, 183)"]:not(.no-button-feedback):not(:disabled):not([aria-disabled="true"]):hover,
+  button[style*="background-color: #F4ACB7"]:not(.no-button-feedback):not(:disabled):not([aria-disabled="true"]):hover,
+  button[style*="background-color:#F4ACB7"]:not(.no-button-feedback):not(:disabled):not([aria-disabled="true"]):hover {
+    transform: translateY(-1px);
+  }
+
+  button.no-button-feedback:hover {
+    filter: none !important;
+    box-shadow: none !important;
+    transform: none !important;
+  }
+}
+
+button:not(.no-button-feedback):not(:disabled):not([aria-disabled="true"]):active {
+  filter: brightness(0.96);
+  box-shadow: 0 2px 5px rgba(109, 104, 117, 0.12);
+}
+
+button.no-button-feedback:active {
+  filter: none !important;
+  box-shadow: none !important;
+  transform: none !important;
 }
 
 [data-slot="button"] {

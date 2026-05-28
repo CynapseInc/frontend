@@ -487,7 +487,7 @@ export default function App() {
             {totalPages > 1 && (
               <div className="bg-white rounded-2xl p-6 shadow-lg border-2 border-[#D8E2DC]">
                 <div className="flex items-center justify-between gap-4">
-                  <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className="px-4 py-2 border-2 border-[#D8E2DC] rounded-xl hover:bg-[#FFE5D9] disabled:opacity-50 text-[#6D6875] flex items-center gap-2">
+                  <button onClick={() => setCurrentPage(Math.max(1, currentPage - 1))} disabled={currentPage === 1} className="px-4 py-2 border-2 border-[#F4ACB7] rounded-xl hover:opacity-90 disabled:opacity-50 text-white bg-[#F4ACB7] flex items-center gap-2">
                     <ChevronLeft className="w-5 h-5" /> Anterior
                   </button>
 
@@ -507,7 +507,7 @@ export default function App() {
                     })}
                   </div>
 
-                  <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className="px-4 py-2 border-2 border-[#D8E2DC] rounded-xl hover:bg-[#FFE5D9] disabled:opacity-50 text-[#6D6875] flex items-center gap-2">
+                  <button onClick={() => setCurrentPage(Math.min(totalPages, currentPage + 1))} disabled={currentPage === totalPages} className="px-4 py-2 border-2 border-[#F4ACB7] rounded-xl hover:opacity-90 disabled:opacity-50 text-white bg-[#F4ACB7] flex items-center gap-2">
                     Próximo <ChevronRight className="w-5 h-5" />
                   </button>
                 </div>
