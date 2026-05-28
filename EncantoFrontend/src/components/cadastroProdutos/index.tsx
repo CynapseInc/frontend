@@ -358,8 +358,8 @@ export default function App() {
         {/* Botões de gerenciamento */}
         <div className="flex gap-3 mb-6">
           <Button type="button" onClick={() => setIsCategoryListModalOpen(true)} className="no-button-feedback gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#FFE5D9', color: '#6D6875' }}><List className="size-4" /> Categorias</Button>
-          <Button type="button" onClick={() => setIsThemeListModalOpen(true)} className="no-button-feedback gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#FFE5D9', color: '#6D6875' }}><List className="size-4" /> Temas</Button>
-          <Button type="button" onClick={() => setIsItemListModalOpen(true)} className="no-button-feedback gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#FFE5D9', color: '#6D6875' }}><List className="size-4" /> Itens</Button>
+          <Button type="button" onClick={() => setIsThemeListModalOpen(true)} className="no-button-feedback gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#FFCAD4', color: '#6D6875' }}><List className="size-4" /> Temas</Button>
+          <Button type="button" onClick={() => setIsItemListModalOpen(true)} className="no-button-feedback gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}><List className="size-4" /> Itens</Button>
         </div>
 
         {/* Formulário */}

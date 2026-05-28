@@ -586,7 +586,7 @@ export default function App() {
           <Card className="bg-white border-[#D8E2DC] shadow-sm overflow-hidden">
             <Table>
               <TableHeader>
-                <TableRow className="bg-[#FFE5D9] border-[#D8E2DC]">
+                <TableRow className="bg-[#FFE5D9] hover:bg-[#FFE5D9] border-[#D8E2DC]">
                   <TableHead className="text-[#6D6875]">ID</TableHead>
                   <TableHead className="text-[#6D6875]">Cliente</TableHead>
                   <TableHead className="text-[#6D6875]">Status Atual</TableHead>
@@ -596,8 +596,15 @@ export default function App() {
               </TableHeader>
               <TableBody>
                 {pedidosSemAtualizacao.length > 0 ? (
-                  pedidosSemAtualizacaoPaginados.map((pedido) => (
-                    <TableRow key={pedido.id} className="border-[#D8E2DC]">
+                  pedidosSemAtualizacaoPaginados.map((pedido, index) => (
+                    <TableRow
+                      key={pedido.id}
+                      className={`border-[#D8E2DC] ${
+                        index % 2 === 0
+                          ? 'bg-[#F9F9F9] hover:bg-[#F9F9F9]'
+                          : 'bg-white hover:bg-white'
+                      }`}
+                    >
                       <TableCell className="text-[#6D6875]">{pedido.id}</TableCell>
                       <TableCell className="text-[#6D6875]">{pedido.cliente}</TableCell>
                       <TableCell>

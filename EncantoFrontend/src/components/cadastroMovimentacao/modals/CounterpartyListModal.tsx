@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../../ui/dialog';
-import { X, Pencil, Trash2, Search } from 'lucide-react';
+import { X, Pencil, Trash2, Search, Users } from 'lucide-react';
 import { Input } from '../../ui/input';
 import { contraparteService } from '../../../services/Contraparte';
 
@@ -16,11 +16,12 @@ interface CounterpartyListModalProps {
   isOpen: boolean;
   onClose: () => void;
   counterparties: Counterparty[];
+  onCreate: () => void;
   onEdit: (counterparty: Counterparty) => void;
   onDelete: (counterparty: Counterparty) => void;
 }
 
-export default function CounterpartyListModal({ isOpen, onClose, counterparties, onEdit, onDelete }: CounterpartyListModalProps) {
+export default function CounterpartyListModal({ isOpen, onClose, counterparties, onCreate, onEdit, onDelete }: CounterpartyListModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [contrapartes, setContrapartes] = useState([])
   const [currentPage, setCurrentPage] = useState(1);
@@ -106,17 +107,28 @@ export default function CounterpartyListModal({ isOpen, onClose, counterparties,
         
         {/* Header */}
         <div className="px-10 py-7 border-b" style={{ borderColor: '#D8E2DC' }}>
-          <div className="flex items-center justify-between">
-            <h2 className="text-[32px]" style={{ color: '#6D6875' }}>
+          <div className="flex items-start justify-between gap-6">
+            <h2 className="text-[32px] leading-tight flex-1" style={{ color: '#6D6875' }}>
               Contrapartes
             </h2>
-            <button 
-              onClick={onClose} 
-              className="p-1.5 rounded-md transition-colors hover:bg-gray-100"
-              style={{ color: '#9D8189' }}
-            >
-              <X className="size-6" />
-            </button>
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={onCreate}
+                className="h-11 px-5 rounded-md text-[15px] transition-all inline-flex items-center gap-2 whitespace-nowrap"
+                style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
+              >
+                <Users className="size-4" />
+                Nova Contraparte
+              </button>
+              <button 
+                onClick={onClose} 
+                className="size-10 rounded-md transition-colors hover:bg-gray-100 inline-flex items-center justify-center"
+                style={{ color: '#9D8189' }}
+              >
+                <X className="size-6" />
+              </button>
+            </div>
           </div>
         </div>
 

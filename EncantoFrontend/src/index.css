@@ -59,6 +59,14 @@ body {
   background-color: var(--encanto-background);
 }
 
+table tbody tr:nth-child(odd) {
+  background-color: #FFF4F6 !important;
+}
+
+table tbody tr:nth-child(even) {
+  background-color: #FFFFFF !important;
+}
+
 h1 {
   line-height: 1.1;
   margin: 0;
