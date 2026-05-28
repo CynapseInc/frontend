@@ -4,6 +4,8 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { useNavigate, useParams } from 'react-router-dom'; // Adicionado useParams
 import FeedbackModal from '../ui/FeedbackModal';
+import ThemeCombobox from './modals/ThemeCombobox';
+import ItemCombobox from './modals/ItemCombobox';
 // Importação dos Modais
 import ProductCategoryModal from './modals/ProductCategoryModal';
 import ProductCategoryListModal from './modals/ProductCategoryListModal';
@@ -384,10 +386,11 @@ export default function App() {
             {/* Tema */}
             <div>
               <label className="block text-[16px] mb-2" style={{ color: '#6D6875' }}><strong>Tema</strong> <span style={{ color: '#F4ACB7' }}>*</span></label>
-              <select value={selectedThemeId} onChange={(e) => setSelectedThemeId(e.target.value)} className="w-full h-12 px-4 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]" style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }} required>
-                <option value="">Selecione um tema</option>
-                {themes.map(theme => <option key={theme.id} value={theme.id}>{theme.description}</option>)}
-              </select>
+                {/* <select value={selectedThemeId} onChange={(e) => setSelectedThemeId(e.target.value)} className="w-full h-12 px-4 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]" style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }} required>
+                  <option value="">Selecione um tema</option>
+                  {themes.map(theme => <option key={theme.id} value={theme.id}>{theme.description}</option>)}
+                </select> */}
+                <ThemeCombobox value={selectedThemeId} onChange={setSelectedThemeId} themes={themes} />
             </div>
 
             {/* Categoria */}
@@ -401,11 +404,12 @@ export default function App() {
             {/* Item */}
             <div>
               <label className="block text-[16px] mb-2" style={{ color: '#6D6875' }}><strong>Item</strong> <span style={{ color: '#F4ACB7' }}>*</span></label>
-              <select value={selectedItemId} onChange={(e) => setSelectedItemId(e.target.value)} className="w-full h-12 px-4 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]" style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }} required>
+              {/* <select value={selectedItemId} onChange={(e) => setSelectedItemId(e.target.value)} className="w-full h-12 px-4 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]" style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }} required>
                 <option value="">Selecione um item</option>
                 {items.map(item => <option key={item.id} value={item.id}>{item.description}</option>)}
-              </select>
-             
+              </select> */}
+
+              <ItemCombobox value={selectedItemId} onChange={setSelectedItemId} items={items} />
             </div>
 
             {/* Informações do Item (Card) */}
