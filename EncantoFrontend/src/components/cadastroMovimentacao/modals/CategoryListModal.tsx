@@ -82,7 +82,7 @@ export default function CategoryListModal({ isOpen, onClose, onCreate, onEdit, o
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="max-w-[900px] p-0 gap-0 [&>button]:hidden max-h-[80vh]"
+        className="!w-[calc(100vw-32px)] sm:!max-w-[760px] p-0 gap-0 [&>button]:hidden max-h-[80vh] overflow-x-hidden"
         style={{ backgroundColor: 'white', border: '1px solid #D8E2DC' }}
       >
         <DialogTitle className="sr-only">
@@ -93,9 +93,9 @@ export default function CategoryListModal({ isOpen, onClose, onCreate, onEdit, o
         </DialogDescription>
         
         {/* Header */}
-        <div className="px-10 py-7 border-b" style={{ borderColor: '#D8E2DC' }}>
-          <div className="flex items-start justify-between gap-6">
-            <h2 className="text-[32px] leading-tight flex-1" style={{ color: '#6D6875' }}>
+        <div className="px-8 py-6 border-b" style={{ borderColor: '#D8E2DC' }}>
+          <div className="flex items-start justify-between gap-4">
+            <h2 className="text-[28px] leading-tight flex-1 min-w-0" style={{ color: '#6D6875' }}>
               Categorias de Movimentação
             </h2>
             <div className="flex items-center gap-3 shrink-0">
@@ -120,7 +120,7 @@ export default function CategoryListModal({ isOpen, onClose, onCreate, onEdit, o
         </div>
 
         {/* Pesquisa */}
-        <div className="px-10 pt-7 pb-5">
+        <div className="px-8 pt-6 pb-5">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-5" style={{ color: '#9D8189' }} />
             <Input
@@ -139,7 +139,7 @@ export default function CategoryListModal({ isOpen, onClose, onCreate, onEdit, o
         </div>
 
         {/* Lista */}
-        <div className="px-10 pb-7 overflow-y-auto" style={{ maxHeight: '450px' }}>
+        <div className="px-8 pb-6 overflow-y-auto overflow-x-hidden" style={{ maxHeight: '420px' }}>
           {categories.length === 0 ? (
             <div className="text-center py-12" style={{ color: '#9D8189' }}>
               <p className="text-[16px]">Nenhuma categoria encontrada</p>
@@ -149,13 +149,13 @@ export default function CategoryListModal({ isOpen, onClose, onCreate, onEdit, o
               {categories.map((category, index) => (
                 <div
                   key={category.id}
-                  className="flex items-center justify-between p-5 rounded-md border transition-colors hover:bg-opacity-50"
+                  className="flex items-center justify-between gap-4 p-5 rounded-md border transition-colors hover:bg-opacity-50"
                   style={{
                     backgroundColor: index % 2 === 0 ? 'white' : '#F9F9F9',
                     borderColor: '#D8E2DC'
                   }}
                 >
-                  <span className="text-[17px]" style={{ color: '#6D6875' }}>
+                  <span className="text-[17px] min-w-0 break-words" style={{ color: '#6D6875' }}>
                     {category.name}
                   </span>
                   <div className="flex gap-2">
@@ -183,7 +183,7 @@ export default function CategoryListModal({ isOpen, onClose, onCreate, onEdit, o
         </div>
 
         {totalPages > 1 && (
-  <div className="flex items-center gap-2">
+  <div className="px-8 pb-5 flex items-center justify-end gap-2 flex-wrap">
     
     {/* Anterior */}
     <button
@@ -227,7 +227,7 @@ export default function CategoryListModal({ isOpen, onClose, onCreate, onEdit, o
 )}
 
         {/* Footer */}
-        <div className="px-10 py-6 border-t flex justify-end" style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC' }}>
+        <div className="px-8 py-5 border-t flex justify-end" style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC' }}>
           <button
             onClick={onClose}
             className="px-7 py-3 rounded-md text-[16px] border transition-all hover:bg-white"

@@ -160,7 +160,7 @@ export default function App() {
         
         <div className="mb-10">
           <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Funcionários</h1>
-          <p className="text-[17px]" style={{ color: '#9D8189' }}>Gerencie toda a sua equipa num só lugar</p>
+          <p className="text-[17px]" style={{ color: '#9D8189' }}>Gerencie toda a sua equipe em um só lugar</p>
         </div>
 
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>

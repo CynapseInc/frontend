@@ -225,6 +225,10 @@ export default function App() {
     return meses[mesIndex];
   };
 
+  const chartLegendFormatter = (value: unknown) => (
+    <span style={{ color: '#6D6875' }}>{String(value)}</span>
+  );
+
   return (
     <div className="min-h-screen bg-[#F9F9F9]">
       {/* Header */}
@@ -234,7 +238,7 @@ export default function App() {
         {/* Page Title */}
         <div style={{ marginBottom: '2vh' }}>
           <h1 style={{ fontSize: '48px', color: '#F4ACB7', marginBottom: '0.5rem', fontWeight: '600' }}>
-            Dashboard de Gestão de Pedidos
+            Gestão de Pedidos
           </h1>
           <p style={{ fontSize: '16px', color: '#9D8189', marginBottom: '2rem' }}>
             Visão geral operacional da sua equipe {periodoResumo}.
@@ -352,85 +356,85 @@ export default function App() {
 
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-          <Card className="p-4 bg-white border-[#D8E2DC] shadow-sm">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-[#9D8189] text-sm">Total de Pedidos</p>
-                <p className="text-[#6D6875] mt-1">{kpis.total}</p>
+          <Card className="min-h-[150px] p-4 bg-white border-[#D8E2DC] shadow-sm flex flex-col justify-between">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[#9D8189] text-sm leading-5 min-h-10">Total de Pedidos</p>
+                <p className="text-[#6D6875] mt-1 text-[18px] leading-6">{kpis.total}</p>
               </div>
-              <div className="bg-[#FFE5D9] p-2 rounded-lg">
+              <div className="bg-[#FFE5D9] p-2 rounded-lg shrink-0">
                 <Package className="size-5 text-[#F4ACB7]" />
               </div>
             </div>
-            <p className="text-[#9D8189] text-sm mt-3">No período</p>
+            <p className="text-[#9D8189] text-sm leading-5">No período</p>
           </Card>
 
-          <Card className="p-4 bg-white border-[#D8E2DC] shadow-sm">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-[#9D8189] text-sm">Pedidos Entregues</p>
-                <p className="text-[#6D6875] mt-1">{kpis.entregues}</p>
+          <Card className="min-h-[150px] p-4 bg-white border-[#D8E2DC] shadow-sm flex flex-col justify-between">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[#9D8189] text-sm leading-5 min-h-10">Pedidos Entregues</p>
+                <p className="text-[#6D6875] mt-1 text-[18px] leading-6">{kpis.entregues}</p>
               </div>
-              <div className="bg-[#FFE5D9] p-2 rounded-lg">
+              <div className="bg-[#FFE5D9] p-2 rounded-lg shrink-0">
                 <CheckCircle2 className="size-5 text-[#F4ACB7]" />
               </div>
             </div>
-            <p className="text-[#F4ACB7] text-sm mt-3">{kpis.percentualEntregues}% de conclusão</p>
+            <p className="text-[#F4ACB7] text-sm leading-5">{kpis.percentualEntregues}% de conclusão</p>
           </Card>
 
-          <Card className="p-4 bg-white border-[#D8E2DC] shadow-sm">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-[#9D8189] text-sm">Pedidos Atrasados</p>
-                <p className="text-[#6D6875] mt-1">{kpis.percentualAtrasados}%</p>
+          <Card className="min-h-[150px] p-4 bg-white border-[#D8E2DC] shadow-sm flex flex-col justify-between">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[#9D8189] text-sm leading-5 min-h-10">Pedidos Atrasados</p>
+                <p className="text-[#6D6875] mt-1 text-[18px] leading-6">{kpis.percentualAtrasados}%</p>
               </div>
-              <div className="bg-[#FFE5D9] p-2 rounded-lg">
+              <div className="bg-[#FFE5D9] p-2 rounded-lg shrink-0">
                 <AlertCircle className="size-5 text-[#F4ACB7]" />
               </div>
             </div>
-            <p className="text-[#6D6875] text-sm mt-3">{kpis.atrasados} pedidos atrasados</p>
+            <p className="text-[#6D6875] text-sm leading-5">{kpis.atrasados} pedidos atrasados</p>
           </Card>
 
-          <Card className="p-4 bg-white border-[#D8E2DC] shadow-sm">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-[#9D8189] text-sm">Tempo Médio de Entrega</p>
-                <p className="text-[#6D6875] mt-1">
+          <Card className="min-h-[150px] p-4 bg-white border-[#D8E2DC] shadow-sm flex flex-col justify-between">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[#9D8189] text-sm leading-5 min-h-10">Tempo Médio de Entrega</p>
+                <p className="text-[#6D6875] mt-1 text-[18px] leading-6">
                   {ultimoLeadTime !== null ? `${ultimoLeadTime} dias` : '—'}
                 </p>
               </div>
-              <div className="bg-[#FFE5D9] p-2 rounded-lg">
+              <div className="bg-[#FFE5D9] p-2 rounded-lg shrink-0">
                 <Clock className="size-5 text-[#F4ACB7]" />
               </div>
             </div>
             {/* TODO: no comparison data in API */}
-            <p className="text-[#9D8189] text-sm mt-3">Último mês do período</p>
+            <p className="text-[#9D8189] text-sm leading-5">Último mês do período</p>
           </Card>
 
-          <Card className="p-4 bg-white border-[#D8E2DC] shadow-sm">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-[#9D8189] text-sm">Sem Atualização</p>
-                <p className="text-[#6D6875] mt-1">{kpis.semAtualizacao}</p>
+          <Card className="min-h-[150px] p-4 bg-white border-[#D8E2DC] shadow-sm flex flex-col justify-between">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[#9D8189] text-sm leading-5 min-h-10">Sem Atualização</p>
+                <p className="text-[#6D6875] mt-1 text-[18px] leading-6">{kpis.semAtualizacao}</p>
               </div>
-              <div className="bg-[#FFE5D9] p-2 rounded-lg">
+              <div className="bg-[#FFE5D9] p-2 rounded-lg shrink-0">
                 <PauseCircle className="size-5 text-[#F4ACB7]" />
               </div>
             </div>
-            <p className="text-[#9D8189] text-sm mt-3">Há 4+ dias parados</p>
+            <p className="text-[#9D8189] text-sm leading-5">Há 4+ dias parados</p>
           </Card>
 
-          <Card className="p-4 bg-white border-[#D8E2DC] shadow-sm">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-[#9D8189] text-sm">Pedidos Refeitos</p>
-                <p className="text-[#6D6875] mt-1">{kpis.retrabalho}</p>
+          <Card className="min-h-[150px] p-4 bg-white border-[#D8E2DC] shadow-sm flex flex-col justify-between">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[#9D8189] text-sm leading-5 min-h-10">Pedidos Refeitos</p>
+                <p className="text-[#6D6875] mt-1 text-[18px] leading-6">{kpis.retrabalho}</p>
               </div>
-              <div className="bg-[#FFE5D9] p-2 rounded-lg">
+              <div className="bg-[#FFE5D9] p-2 rounded-lg shrink-0">
                 <RefreshCw className="size-5 text-[#F4ACB7]" />
               </div>
             </div>
-            <p className="text-[#F4ACB7] text-sm mt-3">No período filtrado</p>
+            <p className="text-[#F4ACB7] text-sm leading-5">No período filtrado</p>
           </Card>
         </div>
 
@@ -444,18 +448,18 @@ export default function App() {
               <h3 className="text-[#6D6875] mb-4" style={{color: '#F4ACB7'}}>Pedidos Criados vs Entregues</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={pedidosMesData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="mes" stroke="#a3a3a3" tickFormatter={formatarMes} />
-                  <YAxis stroke="#a3a3a3" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D8E2DC" />
+                  <XAxis dataKey="mes" stroke="#6D6875" tick={{ fill: '#6D6875' }} tickFormatter={formatarMes} />
+                  <YAxis stroke="#6D6875" tick={{ fill: '#6D6875' }} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#fff',
-                      border: '1px solid #f0f0f0',
+                      border: '1px solid #D8E2DC',
                       borderRadius: '8px'
                     }}
                   />
-                  <Legend />
-                  <Bar dataKey="criados" fill="#D8E2DC" name="Criados" radius={[4, 4, 0, 0]} />
+                  <Legend iconType="square" iconSize={10} formatter={chartLegendFormatter} />
+                  <Bar dataKey="criados" fill="#9D8189" name="Criados" radius={[4, 4, 0, 0]} />
                   <Bar dataKey="entregues" fill="#F4ACB7" name="Entregues" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
@@ -466,17 +470,17 @@ export default function App() {
               <h3 className="text-[#6D6875] mb-4" style={{color: '#F4ACB7'}}>Tempo Médio de Entrega (dias)</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={leadTimeData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="mes" stroke="#a3a3a3" tickFormatter={formatarMes} />
-                  <YAxis stroke="#a3a3a3" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D8E2DC" />
+                  <XAxis dataKey="mes" stroke="#6D6875" tick={{ fill: '#6D6875' }} tickFormatter={formatarMes} />
+                  <YAxis stroke="#6D6875" tick={{ fill: '#6D6875' }} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#fff',
-                      border: '1px solid #f0f0f0',
+                      border: '1px solid #D8E2DC',
                       borderRadius: '8px'
                     }}
                   />
-                  <Legend />
+                  <Legend iconType="square" iconSize={10} formatter={chartLegendFormatter} />
                   <Line
                     type="monotone"
                     dataKey="leadTime"
@@ -496,13 +500,13 @@ export default function App() {
               <h3 className="text-[#6D6875] mb-4" style={{color: '#F4ACB7'}}>Tempo Médio por Etapa (dias)</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={etapasProcessoData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis type="number" stroke="#a3a3a3" />
-                  <YAxis dataKey="etapa" type="category" stroke="#a3a3a3" width={100} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D8E2DC" />
+                  <XAxis type="number" stroke="#6D6875" tick={{ fill: '#6D6875' }} />
+                  <YAxis dataKey="etapa" type="category" stroke="#6D6875" tick={{ fill: '#6D6875' }} width={100} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#fff',
-                      border: '1px solid #f0f0f0',
+                      border: '1px solid #D8E2DC',
                       borderRadius: '8px'
                     }}
                   />
@@ -516,17 +520,17 @@ export default function App() {
               <h3 className="text-[#6D6875] mb-4" style={{color: '#F4ACB7'}}>Pedidos Refeitos por Mês</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={retrabalhoData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="mes" stroke="#a3a3a3" />
-                  <YAxis stroke="#a3a3a3" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D8E2DC" />
+                  <XAxis dataKey="mes" stroke="#6D6875" tick={{ fill: '#6D6875' }} />
+                  <YAxis stroke="#6D6875" tick={{ fill: '#6D6875' }} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#fff',
-                      border: '1px solid #f0f0f0',
+                      border: '1px solid #D8E2DC',
                       borderRadius: '8px'
                     }}
                   />
-                  <Bar dataKey="quantidade" fill="#F4ACB7" name="Pedidos Refeitos" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="quantidade" fill="#9D8189" name="Pedidos Refeitos" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </Card>
@@ -543,13 +547,13 @@ export default function App() {
               <h3 className="text-[#6D6875] mb-4" style={{color: '#F4ACB7'}}>Pedidos Concluídos por Funcionário</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={pedidosConcluidosData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis type="number" stroke="#a3a3a3" />
-                  <YAxis dataKey="funcionario" type="category" stroke="#a3a3a3" width={120} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D8E2DC" />
+                  <XAxis type="number" stroke="#6D6875" tick={{ fill: '#6D6875' }} />
+                  <YAxis dataKey="funcionario" type="category" stroke="#6D6875" tick={{ fill: '#6D6875' }} width={120} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#fff',
-                      border: '1px solid #f0f0f0',
+                      border: '1px solid #D8E2DC',
                       borderRadius: '8px'
                     }}
                   />
@@ -563,17 +567,17 @@ export default function App() {
               <h3 className="text-[#6D6875] mb-4" style={{color: '#F4ACB7'}}>Carga de Trabalho Atual</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={cargaTrabalhoData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis type="number" stroke="#a3a3a3" />
-                  <YAxis dataKey="funcionario" type="category" stroke="#a3a3a3" width={120} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D8E2DC" />
+                  <XAxis type="number" stroke="#6D6875" tick={{ fill: '#6D6875' }} />
+                  <YAxis dataKey="funcionario" type="category" stroke="#6D6875" tick={{ fill: '#6D6875' }} width={120} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#fff',
-                      border: '1px solid #f0f0f0',
+                      border: '1px solid #D8E2DC',
                       borderRadius: '8px'
                     }}
                   />
-                  <Bar dataKey="emAndamento" fill="#D8E2DC" name="Em Andamento" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="emAndamento" fill="#9D8189" name="Em Andamento" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </Card>

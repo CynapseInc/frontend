@@ -347,7 +347,12 @@ export function HomeCalendar() {
         <div className="grid grid-cols-[280px_1fr_320px] gap-6">
           
           {/* COLUNA ESQUERDA - Seletor de Ano e Meses */}
-          <div className="space-y-5">
+          <div
+            className="flex flex-col gap-5"
+            style={{
+              height: calendarCardHeight ? `${calendarCardHeight}px` : undefined
+            }}
+          >
             
             {/* Seletor de Ano */}
             <div className="bg-white rounded-lg p-5 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
@@ -371,11 +376,11 @@ export function HomeCalendar() {
             </div>
 
             {/* Lista de Meses */}
-            <div className="bg-white rounded-lg p-4 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
+            <div className="bg-white rounded-lg p-4 shadow-sm flex flex-col flex-1 min-h-0" style={{ border: '1px solid #D8E2DC' }}>
               <h3 className="text-[16px] mb-3 px-2" style={{ color: '#6D6875' }}>
                 <strong>Meses</strong>
               </h3>
-              <div className="space-y-1">
+              <div className="flex flex-col justify-between flex-1 min-h-0">
                 {monthNames.map((month, index) => {
                   const ordersCount = getOrdersForMonth(currentYear, index);
                   const isSelected = index === currentMonth;

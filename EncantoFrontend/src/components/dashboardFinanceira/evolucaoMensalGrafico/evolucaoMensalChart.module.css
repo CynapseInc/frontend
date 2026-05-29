@@ -41,21 +41,23 @@
 .itemLegenda {
   display: flex;
   align-items: center;
-  gap: 0.5vw;
-  font-size: 0.9vw;
-  color: #9D8189;
+  gap: 8px;
+  font-size: 12px;
+  color: #6D6875;
 }
 
 .quadradoDespesa {
-  width: 0.8vw;
-  height: 0.8vw;
-  background-color: #FFB5C2; 
+  width: 10px;
+  height: 10px;
+  background-color: #F4ACB7; 
   border-radius: 2px;
+  flex-shrink: 0;
 }
 
 .quadradoReceita {
-  width: 0.8vw;
-  height: 0.8vw;
-  background-color: #FFD6E0;
+  width: 10px;
+  height: 10px;
+  background-color: #9D8189;
   border-radius: 2px;
+  flex-shrink: 0;
 }

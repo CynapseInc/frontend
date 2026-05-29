@@ -106,7 +106,7 @@ export function DashFinanceira() {
   const transformarDespesasCategoria = (dados: any[]) => {
     const total = dados.reduce((sum, item) => sum + Math.abs(item.total), 0);
     
-    const cores = ['#FFCAD4', '#F4ACB7', '#FFE5D9', '#D8E2DC'];
+    const cores = ['#F4ACB7', '#9D8189', '#FFCAD4', '#6D6875'];
     
     return dados.map((item, index) => ({
       id: index + 1,
