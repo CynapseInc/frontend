@@ -48,7 +48,7 @@ export function EvolucaoMensalGrafico({ dados = [] }: EvolucaoMensalGraficoProps
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={dados} barGap={4}>
             
-            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#f0f0f0" />
+            <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#D8E2DC" />
             
             <XAxis 
               dataKey="mes" 
@@ -73,13 +73,13 @@ export function EvolucaoMensalGrafico({ dados = [] }: EvolucaoMensalGraficoProps
 
             <Bar 
               dataKey="despesa" 
-              fill="#FFB5C2" 
+              fill="#F4ACB7" 
               radius={[4, 4, 0, 0]} 
               barSize={30} 
             />
             <Bar 
               dataKey="receita" 
-              fill="#FFD6E0" 
+              fill="#9D8189" 
               radius={[4, 4, 0, 0]} 
               barSize={30} 
             />

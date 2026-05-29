@@ -221,9 +221,9 @@ export default function App() {
                 <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875', width: '15%' }}>Foto</th>
                 <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875', width: '30%' }}>Nome do Produto</th>
                 <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875', width: '18%' }}>Categoria</th>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875', width: '18%' }}>Tema</th>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875', width: '12%' }}>Item</th>
-                <th className="text-right px-6 py-4 text-[16px]" style={{ color: '#6D6875', width: '7%' }}>Ações</th>
+                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875', width: '16%' }}>Tema</th>
+                <th className="text-center px-5 py-4 text-[16px]" style={{ color: '#6D6875', width: '14%' }}>Item</th>
+                <th className="text-right px-5 py-4 text-[16px]" style={{ color: '#6D6875', width: '7%' }}>Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -259,12 +259,20 @@ export default function App() {
                         {product.tema?.descricao || 'Sem tema'}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
-                      <span className="inline-flex items-center px-3 py-1 rounded-full text-[14px]" style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}>
+                    <td className="px-5 py-4">
+                      <span
+                        className="mx-auto inline-flex min-h-9 max-w-[160px] items-center justify-center rounded-md px-3 py-1.5 text-center text-[14px] leading-5"
+                        style={{
+                          backgroundColor: '#D8E2DC',
+                          color: '#6D6875',
+                          border: '1px solid #D8E2DC',
+                          wordBreak: 'break-word'
+                        }}
+                      >
                         {product.item?.descricao || 'Sem item'}
                       </span>
                     </td>
-                    <td className="px-6 py-4">
+                    <td className="px-5 py-4">
                       <div className="flex justify-end gap-2">
                         <button
                           onClick={() => setDeleteProduct(product)}
@@ -303,11 +311,11 @@ export default function App() {
           </p>
           {totalPages > 1 && (
              <div className="flex items-center gap-2">
-              <button onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1} className="px-4 py-2 rounded-md text-[15px] border transition-all disabled:opacity-40" style={{ backgroundColor: 'white', color: '#6D6875', borderColor: '#D8E2DC' }}>Anterior</button>
+              <button onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))} disabled={currentPage === 1} className="px-4 py-2 rounded-md text-[15px] border transition-all disabled:opacity-40" style={{ backgroundColor: '#F4ACB7', color: 'white', borderColor: '#F4ACB7' }}>Anterior</button>
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                 <button key={page} onClick={() => setCurrentPage(page)} className="px-4 py-2 rounded-md text-[15px] border transition-all" style={{ backgroundColor: currentPage === page ? '#F4ACB7' : 'white', color: currentPage === page ? 'white' : '#6D6875', borderColor: currentPage === page ? '#F4ACB7' : '#D8E2DC' }}>{page}</button>
               ))}
-              <button onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages} className="px-4 py-2 rounded-md text-[15px] border transition-all disabled:opacity-40" style={{ backgroundColor: 'white', color: '#6D6875', borderColor: '#D8E2DC' }}>Próximo</button>
+              <button onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))} disabled={currentPage === totalPages} className="px-4 py-2 rounded-md text-[15px] border transition-all disabled:opacity-40" style={{ backgroundColor: '#F4ACB7', color: 'white', borderColor: '#F4ACB7' }}>Próximo</button>
             </div>
           )}
         </div>

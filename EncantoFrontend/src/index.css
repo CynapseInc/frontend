@@ -1,57 +1,152 @@
 @import url('https://fonts.googleapis.com/css2?family=Arimo:ital,wght@0,400..700;1,400..700&display=swap');
 
+:root {
+  --encanto-primary: #F4ACB7;
+  --encanto-text: #6D6875;
+  --encanto-muted: #9D8189;
+  --encanto-border: #D8E2DC;
+  --encanto-background: #F9F9F9;
+  --encanto-surface-soft: #FFE5D9;
+  --encanto-surface-strong: #FFCAD4;
+  --encanto-control-height: 44px;
+  --encanto-radius: 8px;
+  --encanto-control-radius: 6px;
+  --encanto-focus-ring: rgba(244, 172, 183, 0.32);
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--encanto-primary) var(--encanto-background);
+}
+
+*::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+*::-webkit-scrollbar-track {
+  background: var(--encanto-background);
+}
+
+*::-webkit-scrollbar-thumb {
+  background-color: var(--encanto-primary);
+  border: 2px solid var(--encanto-background);
+  border-radius: 999px;
+}
+
+*::-webkit-scrollbar-thumb:hover {
+  background-color: var(--encanto-surface-strong);
+}
+
 a {
   font-weight: 500;
-  color: #646cff;
+  color: inherit;
   text-decoration: inherit;
 }
 a:hover {
-  color: #535bf2;
+  color: var(--encanto-primary);
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  color: var(--encanto-text);
+  background-color: var(--encanto-background);
+}
+
+table tbody tr:nth-child(odd) {
+  background-color: #FFF4F6 !important;
+}
+
+table tbody tr:nth-child(even) {
+  background-color: #FFFFFF !important;
 }
 
 h1 {
-  font-size: 3.2em;
   line-height: 1.1;
+  margin: 0;
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
   font-family: inherit;
-  /* background-color: #1a1a1a; */
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  transition:
+    background-color 0.18s ease,
+    border-color 0.18s ease,
+    color 0.18s ease,
+    box-shadow 0.18s ease,
+    filter 0.18s ease,
+    opacity 0.18s ease;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+button:disabled,
+button[aria-disabled="true"] {
+  cursor: not-allowed;
+}
+
+@media (hover: hover) {
+  button:not(.no-button-feedback):not(:disabled):not([aria-disabled="true"]):hover {
+    filter: brightness(0.98);
+    box-shadow: 0 4px 10px rgba(109, 104, 117, 0.14);
   }
-  a:hover {
-    color: #747bff;
+
+  button[class*="bg-[#"]:not([class*="bg-white"]):not(.no-button-feedback):not(:disabled):not([aria-disabled="true"]):hover,
+  button[class*="bg-gradient"]:not(.no-button-feedback):not(:disabled):not([aria-disabled="true"]):hover,
+  button[style*="background-color: rgb(244, 172, 183)"]:not(.no-button-feedback):not(:disabled):not([aria-disabled="true"]):hover,
+  button[style*="background-color: #F4ACB7"]:not(.no-button-feedback):not(:disabled):not([aria-disabled="true"]):hover,
+  button[style*="background-color:#F4ACB7"]:not(.no-button-feedback):not(:disabled):not([aria-disabled="true"]):hover {
+    transform: translateY(-1px);
   }
-  button {
-    background-color: #f9f9f9;
+
+  button.no-button-feedback:hover {
+    filter: none !important;
+    box-shadow: none !important;
+    transform: none !important;
   }
+}
+
+button:not(.no-button-feedback):not(:disabled):not([aria-disabled="true"]):active {
+  filter: brightness(0.96);
+  box-shadow: 0 2px 5px rgba(109, 104, 117, 0.12);
+}
+
+button.no-button-feedback:active {
+  filter: none !important;
+  box-shadow: none !important;
+  transform: none !important;
+}
+
+[data-slot="button"] {
+  border-radius: var(--encanto-radius);
+  border-color: transparent;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+[data-slot="button"]:hover {
+  border-color: transparent;
+  filter: brightness(0.98);
+}
+
+[data-slot="button"]:focus-visible,
+[data-slot="input"]:focus-visible {
+  border-color: var(--encanto-primary);
+  outline: none;
+  box-shadow: 0 0 0 3px var(--encanto-focus-ring);
+}
+
+[data-slot="input"] {
+  min-height: var(--encanto-control-height);
+  border-color: var(--encanto-border);
+  border-radius: var(--encanto-control-radius);
+  background-color: var(--encanto-background);
+  color: var(--encanto-text);
+  font-size: 15px;
 }
 
 /* Garante que o menu hambúrguer desaparece 100% em ecrãs de computador */

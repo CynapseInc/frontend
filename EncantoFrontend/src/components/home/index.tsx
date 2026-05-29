@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Plus, Package, Calendar, Eye, Send, Search, X, Trash2 } from 'lucide-react';
 import { Button } from '../ui/button';
 import { useNavigate } from 'react-router-dom';
@@ -31,6 +31,7 @@ const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 
 export function HomeCalendar() {
   const navigate = useNavigate();
+  const calendarCardRef = useRef<HTMLDivElement>(null);
   
   // Data real de hoje
   const todayObj = new Date();
@@ -45,6 +46,7 @@ export function HomeCalendar() {
   // Estado para guardar os pedidos reais da API
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [calendarCardHeight, setCalendarCardHeight] = useState<number | null>(null);
   
   // Estados para os Modais de Feedback e Confirmação
   const [feedback, setFeedback] = useState<{
@@ -134,6 +136,26 @@ export function HomeCalendar() {
 
     fetchDashboardData();
   }, []);
+
+  useEffect(() => {
+    const calendarCard = calendarCardRef.current;
+    if (!calendarCard) return;
+
+    const updateHeight = () => {
+      setCalendarCardHeight(calendarCard.getBoundingClientRect().height);
+    };
+
+    updateHeight();
+
+    const observer = new ResizeObserver(updateHeight);
+    observer.observe(calendarCard);
+    window.addEventListener('resize', updateHeight);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', updateHeight);
+    };
+  }, [currentMonth, currentYear, orders.length]);
 
   const getDaysInMonth = (year: number, month: number) => {
     return new Date(year, month + 1, 0).getDate();
@@ -325,7 +347,12 @@ export function HomeCalendar() {
         <div className="grid grid-cols-[280px_1fr_320px] gap-6">
           
           {/* COLUNA ESQUERDA - Seletor de Ano e Meses */}
-          <div className="space-y-5">
+          <div
+            className="flex flex-col gap-5"
+            style={{
+              height: calendarCardHeight ? `${calendarCardHeight}px` : undefined
+            }}
+          >
             
             {/* Seletor de Ano */}
             <div className="bg-white rounded-lg p-5 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
@@ -349,11 +376,11 @@ export function HomeCalendar() {
             </div>
 
             {/* Lista de Meses */}
-            <div className="bg-white rounded-lg p-4 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
+            <div className="bg-white rounded-lg p-4 shadow-sm flex flex-col flex-1 min-h-0" style={{ border: '1px solid #D8E2DC' }}>
               <h3 className="text-[16px] mb-3 px-2" style={{ color: '#6D6875' }}>
                 <strong>Meses</strong>
               </h3>
-              <div className="space-y-1">
+              <div className="flex flex-col justify-between flex-1 min-h-0">
                 {monthNames.map((month, index) => {
                   const ordersCount = getOrdersForMonth(currentYear, index);
                   const isSelected = index === currentMonth;
@@ -394,7 +421,7 @@ export function HomeCalendar() {
 
           {/* COLUNA CENTRAL - Calendário */}
           <div>
-            <div className="bg-white rounded-lg p-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
+            <div ref={calendarCardRef} className="bg-white rounded-lg p-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-[24px]" style={{ color: '#F4ACB7' }}>
                   <strong>{monthNames[currentMonth]} {currentYear}</strong>
@@ -445,8 +472,15 @@ export function HomeCalendar() {
 
           {/* COLUNA DIREITA - Pendências */}
           <div>
-            <div className="bg-white rounded-lg p-5 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
-              <h2 className="text-[22px] mb-4" style={{ color: '#F4ACB7' }}>
+            <div
+              className="bg-white rounded-lg p-5 shadow-sm flex flex-col"
+              style={{
+                border: '1px solid #D8E2DC',
+                height: calendarCardHeight ? `${calendarCardHeight}px` : undefined,
+                maxHeight: calendarCardHeight ? `${calendarCardHeight}px` : undefined
+              }}
+            >
+              <h2 className="text-[22px] mb-2" style={{ color: '#F4ACB7' }}>
                 <strong>Próximas Entregas</strong>
               </h2>
 
@@ -473,7 +507,7 @@ export function HomeCalendar() {
               </div>
 
               {/* Lista de Pendências */}
-              <div className="space-y-3 max-h-[calc(100vh-400px)] overflow-y-auto pr-2">
+              <div className="space-y-3 flex-1 min-h-0 overflow-y-auto pr-2">
                 {sortedPendingOrders.map(order => {
                   const dateInfo = formatDeliveryDate(order.deliveryDate);
                   

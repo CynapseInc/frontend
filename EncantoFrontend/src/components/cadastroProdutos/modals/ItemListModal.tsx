@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../../ui/dialog';
-import { X, Pencil, Trash2, Search } from 'lucide-react';
+import { X, Pencil, Trash2, Search, Box } from 'lucide-react';
 import { Input } from '../../ui/input';
 
 interface Item {
@@ -23,11 +23,12 @@ interface ItemListModalProps {
   isOpen: boolean;
   onClose: () => void;
   items: Item[];
+  onCreate: () => void;
   onEdit: (item: Item) => void;
   onDelete: (item: Item) => void;
 }
 
-export default function ItemListModal({ isOpen, onClose, items, onEdit, onDelete }: ItemListModalProps) {
+export default function ItemListModal({ isOpen, onClose, items, onCreate, onEdit, onDelete }: ItemListModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -107,13 +108,24 @@ export default function ItemListModal({ isOpen, onClose, items, onEdit, onDelete
             <h2 className="text-[28px]" style={{ color: '#F4ACB7' }}>
               Itens
             </h2>
-            <button 
-              onClick={onClose} 
-              className="p-1.5 rounded-md transition-colors hover:bg-gray-100"
-              style={{ color: '#9D8189' }}
-            >
-              <X className="size-5" />
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={onCreate}
+                className="h-10 px-4 rounded-md text-[15px] transition-all inline-flex items-center gap-2"
+                style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
+              >
+                <Box className="size-4" />
+                Novo Item
+              </button>
+              <button 
+                onClick={onClose} 
+                className="p-1.5 rounded-md transition-colors hover:bg-gray-100"
+                style={{ color: '#9D8189' }}
+              >
+                <X className="size-5" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -252,6 +264,7 @@ export default function ItemListModal({ isOpen, onClose, items, onEdit, onDelete
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
               className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
+              style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
             >
               Anterior
             </button>
@@ -279,6 +292,7 @@ export default function ItemListModal({ isOpen, onClose, items, onEdit, onDelete
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
               className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
+              style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
             >
               Próximo
             </button>

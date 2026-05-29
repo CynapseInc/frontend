@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../../ui/dialog';
-import { X, Pencil, Trash2, Search } from 'lucide-react';
+import { X, Pencil, Trash2, Search, Users } from 'lucide-react';
 import { Input } from '../../ui/input';
 import { contraparteService } from '../../../services/Contraparte';
 
@@ -16,11 +16,12 @@ interface CounterpartyListModalProps {
   isOpen: boolean;
   onClose: () => void;
   counterparties: Counterparty[];
+  onCreate: () => void;
   onEdit: (counterparty: Counterparty) => void;
   onDelete: (counterparty: Counterparty) => void;
 }
 
-export default function CounterpartyListModal({ isOpen, onClose, counterparties, onEdit, onDelete }: CounterpartyListModalProps) {
+export default function CounterpartyListModal({ isOpen, onClose, counterparties, onCreate, onEdit, onDelete }: CounterpartyListModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [contrapartes, setContrapartes] = useState([])
   const [currentPage, setCurrentPage] = useState(1);
@@ -87,14 +88,14 @@ export default function CounterpartyListModal({ isOpen, onClose, counterparties,
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="p-0 gap-0 [&>button]:hidden"
+        className="!max-w-none p-0 gap-0 [&>button]:hidden overflow-hidden flex flex-col"
         style={{ 
           backgroundColor: 'white', 
           border: '1px solid #D8E2DC',
-          width: '95vw',
-          maxWidth: '1800px',
-          height: '90vh',
-          maxHeight: '900px'
+          width: 'calc(100vw - 160px)',
+          maxWidth: '1480px',
+          minWidth: '1180px',
+          maxHeight: 'calc(100vh - 120px)'
         }}
       >
         <DialogTitle className="sr-only">
@@ -105,23 +106,34 @@ export default function CounterpartyListModal({ isOpen, onClose, counterparties,
         </DialogDescription>
         
         {/* Header */}
-        <div className="px-10 py-7 border-b" style={{ borderColor: '#D8E2DC' }}>
-          <div className="flex items-center justify-between">
-            <h2 className="text-[32px]" style={{ color: '#6D6875' }}>
+        <div className="px-8 py-6 border-b" style={{ borderColor: '#D8E2DC' }}>
+          <div className="flex items-center justify-between gap-4">
+            <h2 className="text-[28px] leading-tight flex-1 min-w-0" style={{ color: '#6D6875' }}>
               Contrapartes
             </h2>
-            <button 
-              onClick={onClose} 
-              className="p-1.5 rounded-md transition-colors hover:bg-gray-100"
-              style={{ color: '#9D8189' }}
-            >
-              <X className="size-6" />
-            </button>
+            <div className="flex items-center gap-3 shrink-0">
+              <button
+                type="button"
+                onClick={onCreate}
+                className="h-11 px-5 rounded-md text-[15px] transition-all inline-flex items-center gap-2 whitespace-nowrap"
+                style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
+              >
+                <Users className="size-4" />
+                Nova Contraparte
+              </button>
+              <button 
+                onClick={onClose} 
+                className="size-10 rounded-md transition-colors hover:bg-gray-100 inline-flex items-center justify-center"
+                style={{ color: '#9D8189' }}
+              >
+                <X className="size-6" />
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Pesquisa */}
-        <div className="px-10 pt-7 pb-5">
+        <div className="px-8 pt-6 pb-5">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-5" style={{ color: '#9D8189' }} />
             <Input
@@ -140,29 +152,29 @@ export default function CounterpartyListModal({ isOpen, onClose, counterparties,
         </div>
 
         {/* Tabela */}
-        <div className="px-10 pb-7 overflow-y-auto" style={{ maxHeight: '600px' }}>
+        <div className="px-8 pb-6 overflow-y-auto overflow-x-hidden flex-1 min-h-0">
           {contrapartes.length === 0 ? (
             <div className="text-center py-12" style={{ color: '#9D8189' }}>
               <p className="text-[16px]">Nenhuma contraparte encontrada</p>
             </div>
           ) : (
             <div className="border rounded-lg overflow-hidden" style={{ borderColor: '#D8E2DC' }}>
-              <table className="w-full">
+              <table className="w-full table-fixed">
                 <thead>
                   <tr style={{ backgroundColor: '#FFE5D9', borderBottom: '1px solid #D8E2DC' }}>
-                    <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875', width: '25%' }}>
+                    <th className="text-left px-4 py-4 text-[15px]" style={{ color: '#6D6875', width: '22%' }}>
                       Nome
                     </th>
-                    <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875', width: '18%' }}>
+                    <th className="text-left px-4 py-4 text-[15px]" style={{ color: '#6D6875', width: '18%' }}>
                       Tipo de Contrato
                     </th>
-                    <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875', width: '15%' }}>
+                    <th className="text-left px-4 py-4 text-[15px]" style={{ color: '#6D6875', width: '17%' }}>
                       Segmento
                     </th>
-                    <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875', width: '32%' }}>
+                    <th className="text-left px-4 py-4 text-[15px]" style={{ color: '#6D6875', width: '31%' }}>
                       Descrição
                     </th>
-                    <th className="text-right px-6 py-4 text-[16px]" style={{ color: '#6D6875', width: '10%' }}>
+                    <th className="text-right px-4 py-4 text-[15px]" style={{ color: '#6D6875', width: '12%' }}>
                       Ações
                     </th>
                   </tr>
@@ -177,19 +189,19 @@ export default function CounterpartyListModal({ isOpen, onClose, counterparties,
                         backgroundColor: index % 2 === 0 ? 'white' : '#F9F9F9'
                       }}
                     >
-                      <td className="px-6 py-4">
-                        <span className="text-[16px]" style={{ color: '#6D6875' }}>
+                      <td className="px-4 py-4 align-middle">
+                        <span className="text-[15px] break-words" style={{ color: '#6D6875' }}>
                           {counterparty.name}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className="text-[15px]" style={{ color: '#9D8189' }}>
+                      <td className="px-4 py-4 align-middle">
+                        <span className="text-[14px] break-words" style={{ color: '#9D8189' }}>
                           {counterparty.contractType}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-4 align-middle">
                         <span 
-                          className="inline-flex items-center px-3 py-1.5 rounded-full text-[14px]"
+                          className="inline-flex max-w-full items-center px-3 py-1.5 rounded-full text-[14px] break-words"
                           style={{
                             backgroundColor: '#D8E2DC',
                             color: '#6D6875'
@@ -198,12 +210,12 @@ export default function CounterpartyListModal({ isOpen, onClose, counterparties,
                           {counterparty.segment}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
-                        <span className="text-[15px]" style={{ color: '#9D8189' }}>
+                      <td className="px-4 py-4 align-middle">
+                        <span className="text-[14px] leading-5 break-words" style={{ color: '#9D8189' }}>
                           {counterparty.description || '-'}
                         </span>
                       </td>
-                      <td className="px-6 py-4">
+                      <td className="px-4 py-4 align-middle">
                         <div className="flex gap-2 justify-end">
                           <button
                             onClick={() => onEdit(counterparty)}
@@ -232,13 +244,14 @@ export default function CounterpartyListModal({ isOpen, onClose, counterparties,
         </div>
 
            {totalPages > 1 && (
-  <div className="flex items-center gap-2">
+  <div className="px-8 pb-5 flex items-center justify-end gap-2 flex-wrap">
     
     {/* Anterior */}
     <button
       onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
       disabled={currentPage === 1}
       className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
+      style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
     >
       Anterior
     </button>
@@ -266,6 +279,7 @@ export default function CounterpartyListModal({ isOpen, onClose, counterparties,
       onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
       disabled={currentPage === totalPages}
       className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
+      style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
     >
       Próximo
     </button>
@@ -274,10 +288,18 @@ export default function CounterpartyListModal({ isOpen, onClose, counterparties,
 )}
 
         {/* Footer */}
-        <div className="px-10 py-6 border-t flex justify-end" style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC' }}>
+        <div
+          className="px-8 border-t flex justify-end shrink-0"
+          style={{
+            backgroundColor: '#F9F9F9',
+            borderColor: '#D8E2DC',
+            paddingTop: '16px',
+            paddingBottom: '28px'
+          }}
+        >
           <button
             onClick={onClose}
-            className="px-7 py-3 rounded-md text-[16px] border transition-all hover:bg-white"
+            className="h-11 px-7 rounded-md text-[16px] border transition-all hover:bg-white"
             style={{
               backgroundColor: 'white',
               borderColor: '#D8E2DC',

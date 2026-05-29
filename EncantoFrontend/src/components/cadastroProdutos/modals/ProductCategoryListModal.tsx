@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../../ui/dialog';
-import { X, Pencil, Trash2, Search } from 'lucide-react';
+import { X, Pencil, Trash2, Search, Tag } from 'lucide-react';
 import { Input } from '../../ui/input';
 
 interface ProductCategory {
@@ -12,11 +12,12 @@ interface ProductCategoryListModalProps {
   isOpen: boolean;
   onClose: () => void;
   categories: ProductCategory[];
+  onCreate: () => void;
   onEdit: (category: ProductCategory) => void;
   onDelete: (category: ProductCategory) => void;
 }
 
-export default function ProductCategoryListModal({ isOpen, onClose, categories, onEdit, onDelete }: ProductCategoryListModalProps) {
+export default function ProductCategoryListModal({ isOpen, onClose, categories, onCreate, onEdit, onDelete }: ProductCategoryListModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
@@ -93,13 +94,24 @@ export default function ProductCategoryListModal({ isOpen, onClose, categories, 
             <h2 className="text-[28px]" style={{ color: '#F4ACB7' }}>
               Categorias
             </h2>
-            <button 
-              onClick={onClose} 
-              className="p-1.5 rounded-md transition-colors hover:bg-gray-100"
-              style={{ color: '#9D8189' }}
-            >
-              <X className="size-5" />
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={onCreate}
+                className="h-10 px-4 rounded-md text-[15px] transition-all inline-flex items-center gap-2"
+                style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
+              >
+                <Tag className="size-4" />
+                Nova Categoria
+              </button>
+              <button 
+                onClick={onClose} 
+                className="p-1.5 rounded-md transition-colors hover:bg-gray-100"
+                style={{ color: '#9D8189' }}
+              >
+                <X className="size-5" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -192,6 +204,7 @@ export default function ProductCategoryListModal({ isOpen, onClose, categories, 
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
               className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
+              style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
             >
               Anterior
             </button>
@@ -219,6 +232,7 @@ export default function ProductCategoryListModal({ isOpen, onClose, categories, 
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
               className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
+              style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
             >
               Próximo
             </button>

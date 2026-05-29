@@ -296,7 +296,7 @@ export default function App() {
     <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
       <div className="max-w-[1400px] mx-auto px-8 py-12">
         <div className="mb-10">
-          <button className="flex items-center gap-2 mb-4 text-[15px] transition-colors hover:opacity-80" style={{ color: '#9D8189' }} onClick={() => navigate('/kanban')}>
+          <button className="no-button-feedback flex items-center gap-2 mb-4 text-[15px]" style={{ color: '#9D8189' }} onClick={() => navigate('/kanban')}>
             <ArrowLeft className="size-5" /> Voltar para Pedidos
           </button>
           <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Novo Pedido</h1>
@@ -312,7 +312,7 @@ export default function App() {
               {/* <select
                 value={selectedClientId}
                 onChange={(e) => { setSelectedClientId(e.target.value); setSelectedAddressId(''); }}
-                className="w-full h-12 px-4 rounded-md text-[15px] border focus:outline-none focus:border-[#F4ACB7]"
+                className="w-full h-11 px-4 rounded-md text-[15px] border focus:outline-none focus:border-[#F4ACB7]"
                 style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }}
               >
                 <option value="">Selecione um cliente</option>
@@ -327,12 +327,12 @@ export default function App() {
                 />
             </div>
             <div className="flex items-end">
-              <Button onClick={() => setIsClientListOpen(true)} className="h-12 px-5 gap-2 text-[15px]" style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}>
+              <Button onClick={() => setIsClientListOpen(true)} className="no-button-feedback h-11 px-5 gap-2 text-[15px]" style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}>
                 <Users className="size-4" /> Listar Clientes
               </Button>
             </div>
             <div className="flex items-end">
-              <Button onClick={() => { setEditingClient(null); setIsClientFormOpen(true); }} className="h-12 px-5 gap-2 text-[15px]" style={{ backgroundColor: '#F4ACB7', color: 'white' }}>
+              <Button onClick={() => { setEditingClient(null); setIsClientFormOpen(true); }} className="no-button-feedback h-11 px-5 gap-2 text-[15px]" style={{ backgroundColor: '#F4ACB7', color: 'white' }}>
                 <Plus className="size-4" /> Novo Cliente
               </Button>
             </div>
@@ -366,7 +366,7 @@ export default function App() {
               <select
                 value={statusId}
                 onChange={(e) => setStatusId(e.target.value)}
-                className="w-full h-12 px-4 rounded-md text-[15px] border focus:outline-none focus:border-[#F4ACB7]"
+                className="w-full h-11 px-4 rounded-md text-[15px] border focus:outline-none focus:border-[#F4ACB7]"
                 style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }}
               >
                 {statusTypes.map(status => (
@@ -387,7 +387,7 @@ export default function App() {
               value={searchProduct}
               onChange={(e) => setSearchProduct(e.target.value)}
               placeholder="Pesquisar produto por nome, tema ou item..."
-              className="w-full h-12 pl-12 pr-4 rounded-md text-[15px] border focus:outline-none focus:border-[#F4ACB7]"
+              className="w-full h-11 pl-12 pr-4 rounded-md text-[15px] border focus:outline-none focus:border-[#F4ACB7]"
               style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }}
             />
           </div>
@@ -397,7 +397,7 @@ export default function App() {
               const temDesconto = product.promotionalPrice > 0 && product.promotionalPrice < product.unitPrice;
 
               return (
-                <div key={product.id} className="border rounded-xl overflow-hidden transition-all hover:shadow-md flex flex-col bg-white aspect-square" style={{ borderColor: '#D8E2DC' }}>
+                <div key={product.id} className="border rounded-lg overflow-hidden transition-all hover:shadow-md flex flex-col bg-white aspect-square" style={{ borderColor: '#D8E2DC' }}>
 
                   <div className="relative flex-1 w-full overflow-hidden bg-gray-50">
                     {product.imageUrl ? (
@@ -469,37 +469,49 @@ export default function App() {
           </div>
 
           {totalPages > 1 && (
-            <div className="flex items-center justify-between border-t pt-4" style={{ borderColor: '#D8E2DC' }}>
+            <div className="flex items-center justify-between gap-4 border-t pt-4" style={{ borderColor: '#D8E2DC' }}>
               <p className="text-sm" style={{ color: '#9D8189' }}>
                 Mostrando <strong>{startIndex + 1}</strong> a <strong>{Math.min(startIndex + itemsPerPage, filteredProducts.length)}</strong> de <strong>{filteredProducts.length}</strong> produtos
               </p>
 
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-3">
                 <button
                   onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                   disabled={currentPage === 1}
-                  className="px-3 py-1.5 rounded-md border text-sm disabled:opacity-50 hover:bg-gray-50 transition-colors"
-                  style={{ borderColor: '#D8E2DC', color: '#6D6875' }}
+                  className="px-4 rounded-md border text-sm disabled:opacity-50 transition-colors"
+                  style={{
+                    minWidth: '92px',
+                    height: '40px',
+                    backgroundColor: '#F4ACB7',
+                    borderColor: '#F4ACB7',
+                    color: 'white',
+                  }}
                 >
                   Anterior
                 </button>
 
-                <div className="flex gap-1">
+                <div className="flex items-center gap-2">
                   {Array.from({ length: totalPages }, (_, i) => i + 1)
                     .filter(p => p === 1 || p === totalPages || Math.abs(currentPage - p) <= 1)
                     .map((p, index, array) => {
                       if (index > 0 && array[index - 1] !== p - 1) {
-                        return <span key={`ellipsis-${p}`} className="px-2 py-1 text-[#9D8189]">...</span>;
+                        return <span key={`ellipsis-${p}`} className="flex h-9 min-w-6 items-center justify-center text-sm text-[#9D8189]">...</span>;
                       }
                       return (
                         <button
                           key={p}
                           onClick={() => setCurrentPage(p)}
-                          className={`w-8 h-8 rounded-md flex items-center justify-center text-sm transition-colors ${currentPage === p ? 'font-bold' : ''}`}
+                          className={`rounded-md border text-sm transition-colors ${currentPage === p ? 'font-bold' : ''}`}
                           style={{
+                            width: '36px',
+                            minWidth: '36px',
+                            height: '36px',
                             backgroundColor: currentPage === p ? '#F4ACB7' : 'transparent',
                             color: currentPage === p ? 'white' : '#6D6875',
-                            border: currentPage === p ? 'none' : '1px solid #D8E2DC'
+                            borderColor: currentPage === p ? '#F4ACB7' : '#D8E2DC',
+                            display: 'inline-flex',
+                            alignItems: 'center',
+                            justifyContent: 'center'
                           }}
                         >
                           {p}
@@ -511,8 +523,14 @@ export default function App() {
                 <button
                   onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                   disabled={currentPage === totalPages}
-                  className="px-3 py-1.5 rounded-md border text-sm disabled:opacity-50 hover:bg-gray-50 transition-colors"
-                  style={{ borderColor: '#D8E2DC', color: '#6D6875' }}
+                  className="px-4 rounded-md border text-sm disabled:opacity-50 transition-colors"
+                  style={{
+                    minWidth: '92px',
+                    height: '40px',
+                    backgroundColor: '#F4ACB7',
+                    borderColor: '#F4ACB7',
+                    color: 'white',
+                  }}
                 >
                   Próximo
                 </button>
@@ -545,23 +563,23 @@ export default function App() {
                   <div className="grid grid-cols-5 gap-4">
                     <div>
                       <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}><strong>Quantidade</strong></label>
-                      <input type="number" min="1" value={sp.quantity} onChange={(e) => handleUpdateQuantity(sp.product.id, parseInt(e.target.value) || 1)} className="w-full h-10 px-3 rounded-md border focus:outline-none focus:border-[#F4ACB7]" style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }} />
+                      <input type="number" min="1" value={sp.quantity} onChange={(e) => handleUpdateQuantity(sp.product.id, parseInt(e.target.value) || 1)} className="w-full h-11 px-3 rounded-md border focus:outline-none focus:border-[#F4ACB7]" style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }} />
                     </div>
                     <div>
                       <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}><strong>Preço Unit.</strong></label>
-                      <div className="w-full h-10 px-3 rounded-md border flex items-center" style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC', color: '#9D8189' }}>R$ {sp.unitPrice.toFixed(2)}</div>
+                      <div className="w-full h-11 px-3 rounded-md border flex items-center" style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC', color: '#9D8189' }}>R$ {sp.unitPrice.toFixed(2)}</div>
                     </div>
                     <div>
                       <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}><strong>Preço Total</strong></label>
-                      <div className="w-full h-10 px-3 rounded-md border flex items-center" style={{ backgroundColor: '#D8E2DC', borderColor: '#D8E2DC', color: '#6D6875' }}><strong>R$ {sp.totalPrice.toFixed(2)}</strong></div>
+                      <div className="w-full h-11 px-3 rounded-md border flex items-center" style={{ backgroundColor: '#D8E2DC', borderColor: '#D8E2DC', color: '#6D6875' }}><strong>R$ {sp.totalPrice.toFixed(2)}</strong></div>
                     </div>
                     <div>
                       <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}><strong>Peso Unit. (g)</strong></label>
-                      <div className="w-full h-10 px-3 rounded-md border flex items-center" style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC', color: '#9D8189' }}>{sp.unitWeight} g</div>
+                      <div className="w-full h-11 px-3 rounded-md border flex items-center" style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC', color: '#9D8189' }}>{sp.unitWeight} g</div>
                     </div>
                     <div>
                       <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}><strong>Peso Total (g)</strong></label>
-                      <div className="w-full h-10 px-3 rounded-md border flex items-center" style={{ backgroundColor: '#D8E2DC', borderColor: '#D8E2DC', color: '#6D6875' }}><strong>{sp.totalWeight.toFixed(2)} g</strong></div>
+                      <div className="w-full h-11 px-3 rounded-md border flex items-center" style={{ backgroundColor: '#D8E2DC', borderColor: '#D8E2DC', color: '#6D6875' }}><strong>{sp.totalWeight.toFixed(2)} g</strong></div>
                     </div>
                   </div>
                 </div>

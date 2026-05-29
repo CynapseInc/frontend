@@ -55,7 +55,7 @@ export function GraficoVendasCategoria({ dados = [] }: GraficoVendasCategoriaPro
           >
              
             <CartesianGrid 
-              stroke="#e0e0e0" 
+              stroke="#D8E2DC" 
               vertical={true} 
               horizontal={true}
               strokeDasharray="4 4" 
@@ -91,7 +91,7 @@ export function GraficoVendasCategoria({ dados = [] }: GraficoVendasCategoriaPro
             />
 
             <Tooltip 
-              cursor={{ fill: 'rgba(0,0,0,0.05)' }}
+              cursor={{ fill: 'rgba(109, 104, 117, 0.06)' }}
               contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.15)' }}
               formatter={(value: any) => {
                 if (typeof value === 'number' && value > 1000) {
@@ -104,16 +104,18 @@ export function GraficoVendasCategoria({ dados = [] }: GraficoVendasCategoriaPro
             <Legend 
               verticalAlign="bottom" 
               height={20} 
-              iconType="circle"
-               fontSize={10}
-              wrapperStyle={{ paddingTop: '0px', paddingBottom: '0px' }} 
+              iconType="square"
+              iconSize={10}
+              fontSize={10}
+              wrapperStyle={{ paddingTop: '0px', paddingBottom: '0px', color: '#6D6875' }}
+              formatter={(value) => <span style={{ color: '#6D6875' }}>{value}</span>}
             />
 
             <Bar 
               yAxisId="esquerda" 
               dataKey="receita" 
               name="Receita (R$)" 
-              fill="#FFC8DD" 
+              fill="#F4ACB7" 
               radius={[12, 12, 0, 0]} 
             />
 
@@ -122,9 +124,9 @@ export function GraficoVendasCategoria({ dados = [] }: GraficoVendasCategoriaPro
               type="monotone" 
               dataKey="quantidade" 
               name="Quantidade de Pedidos"
-              stroke="#9D8189" 
+              stroke="#6D6875" 
               strokeWidth={4}
-              dot={{ r: 6, fill: '#9D8189', strokeWidth: 0 }} 
+              dot={{ r: 6, fill: '#6D6875', strokeWidth: 0 }} 
               activeDot={{ r: 8 }}
             />
 

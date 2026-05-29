@@ -1,7 +1,9 @@
 .input{
-    border-radius: 0.5vw;
+    border-radius: 6px;
     border-color: #D8E2DC;
     border-style: solid;
-    height: 5vh;
+    height: 44px;
     width: 100%;
+    color: #6D6875;
+    background-color: #F9F9F9;
 }

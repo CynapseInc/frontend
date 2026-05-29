@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Search, Pencil, Trash2, Plus, Filter, Tag, List, Users } from 'lucide-react';
+import { Search, Pencil, Trash2, Plus, Filter, List, Users } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import CategoryModal from './modals/CategoryModal';
@@ -346,26 +346,10 @@ export default function App() {
               <Button 
                 onClick={() => setIsCounterpartyListModalOpen(true)}
                 className="gap-2 h-11 px-6 text-[15px]"
-                style={{ backgroundColor: '#FFE5D9', color: '#6D6875' }}
+                style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}
               >
                 <Users className="size-5" />
                 Contrapartes
-              </Button>
-              <Button 
-                onClick={openAddCategoryModal}
-                className="gap-2 h-11 px-6 text-[15px]"
-                style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}
-              >
-                <Tag className="size-5" />
-                Nova Categoria
-              </Button>
-              <Button 
-                onClick={openAddCounterpartyModal}
-                className="gap-2 h-11 px-6 text-[15px]"
-                style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}
-              >
-                <Users className="size-5" />
-                Nova Contraparte
               </Button>
               <Button 
                 onClick={openAddTransactionModal}
@@ -519,6 +503,7 @@ export default function App() {
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
                 className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
+                style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
               >
                 Anterior
               </button>
@@ -544,6 +529,7 @@ export default function App() {
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
                 className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
+                style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
               >
                 Próximo
               </button>
@@ -588,6 +574,11 @@ export default function App() {
         isOpen={isCategoryListModalOpen}
         onClose={() => setIsCategoryListModalOpen(false)}
         categories={categories}
+        onCreate={() => {
+          setEditingCategory(null);
+          setIsCategoryListModalOpen(false);
+          setIsCategoryModalOpen(true);
+        }}
         onEdit={openEditCategoryModal}
         onDelete={(category) => setDeleteCategory(category)}
       />
@@ -596,6 +587,11 @@ export default function App() {
         isOpen={isCounterpartyListModalOpen}
         onClose={() => setIsCounterpartyListModalOpen(false)}
         counterparties={counterparties}
+        onCreate={() => {
+          setEditingCounterparty(null);
+          setIsCounterpartyListModalOpen(false);
+          setIsCounterpartyModalOpen(true);
+        }}
         onEdit={openEditCounterpartyModal}
         onDelete={(counterparty) => setDeleteCounterparty(counterparty)}
       />

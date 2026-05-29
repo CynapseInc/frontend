@@ -55,7 +55,7 @@ export function ProximosPagamentos({ pagamentos = [] }: ProximosPagamentosProps)
   if (!pagamentos || pagamentos.length === 0) {
     return (
       <Card classeCss={styles.containerPagamentos}>
-        <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
           <div className={styles.cabecalho}>
             <h3 className={styles.titulo}>Próximos Pagamentos</h3>
           </div>
@@ -77,7 +77,7 @@ export function ProximosPagamentos({ pagamentos = [] }: ProximosPagamentosProps)
 
   return (
     <Card classeCss={styles.containerPagamentos}>
-            <div style={{ display: 'flex', flexDirection: 'column', height: '100%', overflow: 'hidden' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', flex: 1, minHeight: 0, overflow: 'hidden' }}>
         <div className={styles.cabecalho}>
             <h3 className={styles.titulo}>Próximos Pagamentos</h3>
         </div>
