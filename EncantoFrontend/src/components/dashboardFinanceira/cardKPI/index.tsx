@@ -34,13 +34,12 @@ export function CardKPI({ titulo, valor, icone, porcentagem, textoAbaixo, tipo, 
       {/* 2. O Rodapé continua separado embaixo */}
 
       <div className={styles.rodape}>
-       {titulo !== 'A Pagar' && (
+       
         <div className={tipo === 'positivo' ? styles.verde : styles.vermelho}>
           {tipo === 'positivo' ? <FaArrowTrendUp/> : <FaArrowTrendDown/>}
           <span>{porcentagem}</span>
         </div>
-       )}
-        {titulo !== 'A Pagar' && (
+        { (
           <span className={styles.textoCinza}> {textoAbaixo}</span>
         )}
       </div>
