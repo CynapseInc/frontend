@@ -88,14 +88,14 @@ export default function CounterpartyListModal({ isOpen, onClose, counterparties,
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="!max-w-none p-0 gap-0 [&>button]:hidden overflow-hidden"
+        className="!max-w-none p-0 gap-0 [&>button]:hidden overflow-hidden flex flex-col"
         style={{ 
           backgroundColor: 'white', 
           border: '1px solid #D8E2DC',
           width: 'calc(100vw - 160px)',
           maxWidth: '1480px',
           minWidth: '1180px',
-          maxHeight: '82vh'
+          maxHeight: 'calc(100vh - 120px)'
         }}
       >
         <DialogTitle className="sr-only">
@@ -152,7 +152,7 @@ export default function CounterpartyListModal({ isOpen, onClose, counterparties,
         </div>
 
         {/* Tabela */}
-        <div className="px-8 pb-6 overflow-y-auto overflow-x-hidden" style={{ maxHeight: '48vh' }}>
+        <div className="px-8 pb-6 overflow-y-auto overflow-x-hidden flex-1 min-h-0">
           {contrapartes.length === 0 ? (
             <div className="text-center py-12" style={{ color: '#9D8189' }}>
               <p className="text-[16px]">Nenhuma contraparte encontrada</p>
@@ -288,10 +288,18 @@ export default function CounterpartyListModal({ isOpen, onClose, counterparties,
 )}
 
         {/* Footer */}
-        <div className="px-8 py-5 border-t flex justify-end" style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC' }}>
+        <div
+          className="px-8 border-t flex justify-end shrink-0"
+          style={{
+            backgroundColor: '#F9F9F9',
+            borderColor: '#D8E2DC',
+            paddingTop: '16px',
+            paddingBottom: '28px'
+          }}
+        >
           <button
             onClick={onClose}
-            className="px-7 py-3 rounded-md text-[16px] border transition-all hover:bg-white"
+            className="h-11 px-7 rounded-md text-[16px] border transition-all hover:bg-white"
             style={{
               backgroundColor: 'white',
               borderColor: '#D8E2DC',
