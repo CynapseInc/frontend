@@ -176,7 +176,7 @@ function KanbanColumn({ status, index, orders, onDropOrder, onOrderClick, moveCo
   return (
     <div
       ref={ref as any}
-      className="flex flex-col shrink-0 rounded-lg p-4"
+      className="flex flex-col shrink-0 rounded-lg p-4 mb-2"
       style={{
         width: '325px', 
         height: 'calc(100vh - 300px)', 
@@ -466,7 +466,7 @@ export default function Kanban() {
           <div 
             ref={scrollContainerRef}
             onDragOver={handleDragOverContainer}
-            className="flex flex-nowrap gap-6 overflow-x-auto pb-6 items-start kanban-native-scrollbar w-full flex-1 min-h-0"
+            className="flex flex-nowrap gap-6 overflow-x-auto pb-3 items-stretch kanban-native-scrollbar w-full flex-1 min-h-0"
           >
             {statusTypes.map((status, index) => (
               <KanbanColumn
