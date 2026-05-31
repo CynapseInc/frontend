@@ -15,7 +15,6 @@ import './index-cadastro-mov.css'
 import { movimentacaoService } from '../../services/MovimentacaoService';
 import { categoriaMovService } from '../../services/CategoriaMov';
 import { contraparteService } from '../../services/Contraparte';
-import { statusPedidoService } from '../../services/StatusPedidoService';
 
 interface Category {
   id: string;
@@ -34,6 +33,7 @@ interface Transaction {
   id: string;
   counterpartyId: string;
   counterpartyName: string;
+  contractType?: string; // Trazido da API
   description: string;
   categoryId: string;
   category: string;
@@ -45,29 +45,24 @@ interface Transaction {
   updatedAt?: string;
 }
 
-const mockCategories: Category[] = [
-  { id: '1', name: 'Pagamento de Funcionário' },
-  { id: '2', name: 'Prolabore' },
-  { id: '3', name: 'Fornecedor' },
-  { id: '4', name: 'Prestador de Serviço' },
-  { id: '5', name: 'Venda de Produto' },
-];
-
-const mockCounterparties: Counterparty[] = [
-  { id: '1', name: 'Ana Carolina Silva', contractType: 'Funcionário', segment: 'Recursos Humanos', description: 'Funcionária do setor administrativo' },
-  { id: '2', name: 'Shopee Brasil', contractType: 'Empresa', segment: 'E-commerce', description: 'Marketplace online' },
-  { id: '3', name: 'Tecidos Premium Ltda', contractType: 'Fornecedor', segment: 'Comércio', description: 'Fornecedor de tecidos e materiais' },
-  { id: '4', name: 'Instagram Store', contractType: 'Empresa', segment: 'E-commerce', description: 'Vendas via Instagram' },
-  { id: '5', name: 'João Silva - Designer', contractType: 'Prestador de Serviço', segment: 'Design', description: 'Designer freelancer' },
-  { id: '6', name: 'Elo7 Brasil', contractType: 'Empresa', segment: 'E-commerce', description: 'Marketplace de produtos artesanais' },
-];
+// --- FUNÇÃO AUXILIAR PARA CORRIGIR AS DATAS ---
+const formatarDataSegura = (dataString?: string) => {
+  if (!dataString) return '-';
+  const data = new Date(dataString.includes('T') ? dataString : `${dataString}T12:00:00`);
+  return isNaN(data.getTime()) ? '-' : data.toLocaleDateString('pt-BR');
+};
 
 export default function App() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
-  const [categories, setCategories] = useState<Category[]>(mockCategories);
-  const [counterparties, setCounterparties] = useState<Counterparty[]>(mockCounterparties);
+  
+  // Mocks Removidos! Inicializando com arrays vazios.
+  // Os comboboxes e os modais de listagem já fazem o fetch na API de forma independente.
+  const [categories] = useState<Category[]>([]);
+  const [counterparties] = useState<Counterparty[]>([]);
+  
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('Todos');
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState('Todos');
   const [currentPage, setCurrentPage] = useState(1);
   
   // Modals state
@@ -87,9 +82,9 @@ export default function App() {
   const [deleteCategory, setDeleteCategory] = useState<Category | null>(null);
   const [deleteCounterparty, setDeleteCounterparty] = useState<Counterparty | null>(null);
 
-  // paginacao 
+  // Paginação 
   const [totalPages, setTotalPages] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(10);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const [totalElements, setTotalElements] = useState(0);
@@ -131,19 +126,22 @@ export default function App() {
       const response = await movimentacaoService.listar({
         search: searchTerm || undefined,
         tipo: selectedFilter !== 'Todos' ? selectedFilter : undefined,
+        statusPagamento: selectedStatusFilter !== 'Todos' ? selectedStatusFilter.toUpperCase() : undefined,
         page: currentPage - 1
       });
 
       setTransactions(response.content.map((mov: any) => ({
         id: mov.id.toString(),
-        counterpartyId: mov.idContraparte?.toString() || mov.id.toString(), 
-        counterpartyName: mov.descricao, 
+        counterpartyId: mov.contraparte?.id?.toString() || '', 
+        counterpartyName: mov.contraparte?.nome || '-', 
+        contractType: mov.contraparte?.tipoContrato || '-', // Pegando tipo de contrato real da API
         description: mov.descricao,
-        category: mov.tipo, 
+        categoryId: mov.categoria?.id?.toString() || '', 
+        category: mov.categoria?.descricao || '-', 
         value: mov.valor,
         date: mov.dataPagamento,
         type: mov.tipo === 'Receita' ? 'Receita' : 'Despesa',
-        paymentStatus: mov.statusPagamento,
+        paymentStatus: mov.statusPagamento?.toLowerCase() as 'pago' | 'pendente' | undefined,
         dueDate: mov.dataVencimento
       }))); 
 
@@ -156,28 +154,21 @@ export default function App() {
 
   useEffect(() => {
     carregarMovimentacoes();
-  }, [searchTerm, selectedFilter, currentPage]);
+  }, [searchTerm, selectedFilter, selectedStatusFilter, currentPage]);
 
-  const filters = ['Todos', 'Receita', 'Despesa'];
-
-  // Calcular subtotal da página (soma receitas e subtrai despesas)
   const total = transactions.reduce((sum, t) => {
     return t.type === 'Despesa' ? sum - t.value : sum + t.value;
   }, 0);
 
   // Category handlers
   const handleAddCategory = (category: Category) => {
-    const data = {
-      descricao: category.name
-    }
+    const data = { descricao: category.name }
     categoriaMovService.cadastrar(data);
     setIsCategoryModalOpen(false);
   };
 
   const handleEditCategory = (category: Category) => {
-    const data = {
-      descricao: category.name
-    }
+    const data = { descricao: category.name }
     categoriaMovService.editar(Number(category.id), data);
     setIsCategoryModalOpen(false);
     setEditingCategory(null);
@@ -187,8 +178,6 @@ export default function App() {
     if (deleteCategory) {
       categoriaMovService.deletar(Number(deleteCategory.id));
       setDeleteCategory(null);
-      setIsCategoryListModalOpen(false);
-      setIsCategoryListModalOpen(true);
     }
   };
 
@@ -244,7 +233,7 @@ export default function App() {
       dataPagamento: transaction.date,
       idContraparte: Number(transaction.counterpartyId),
       idCategoriaMovimentacao: Number(transaction.categoryId)
-    });
+    }).then(() => carregarMovimentacoes());
     setIsTransactionModalOpen(false);
   };
 
@@ -271,24 +260,8 @@ export default function App() {
     setIsTransactionModalOpen(true);
   };
 
-  const openAddCategoryModal = () => {
-    setEditingCategory(null);
-    setIsCategoryModalOpen(true);
-  };
-
-  const openAddCounterpartyModal = () => {
-    setEditingCounterparty(null);
-    setIsCounterpartyModalOpen(true);
-  };
-
   const formatCurrency = (value: number) => {
     return value.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-  };
-
-  // Obter tipo de contrato da contraparte
-  const getCounterpartyContractType = (counterpartyId: string) => {
-    const counterparty = counterparties.find(cp => cp.id === counterpartyId);
-    return counterparty?.contractType || '-';
   };
 
   return (
@@ -302,19 +275,14 @@ export default function App() {
         </div>
 
         {/* Barra de pesquisa e filtros */}
-        <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
-          <div className="flex items-center justify-between gap-6 mb-5">
-            {/* Pesquisa */}
+        <div className="bg-white rounded-lg p-6 mb-6 shadow-sm flex flex-col gap-5" style={{ border: '1px solid #D8E2DC' }}>
+          
+          {/* Linha 1: Pesquisa e Botões de Ação */}
+          <div className="flex items-center justify-between gap-6">
             <div className="flex-1 max-w-md relative">
               <Search 
                 className="absolute top-1/2 -translate-y-1/2" 
-                style={{ 
-                  color: '#9D8189', 
-                  left: '1vw', 
-                  width: '1.2vw', 
-                  height: '1.2vw',
-                  pointerEvents: 'none'
-                }} 
+                style={{ color: '#9D8189', left: '1vw', width: '1.2vw', height: '1.2vw', pointerEvents: 'none' }} 
               />
               <Input
                 placeholder="Buscar por nome ou descrição..."
@@ -324,67 +292,70 @@ export default function App() {
                   setCurrentPage(1);
                 }}
                 className="h-11 text-[0.9vw]"
-                style={{ 
-                  paddingLeft: '3.5vw',
-                  borderColor: '#D8E2DC',
-                  backgroundColor: '#F9F9F9',
-                  color: '#6D6875'
-                }}
+                style={{ paddingLeft: '3.5vw', borderColor: '#D8E2DC', backgroundColor: '#F9F9F9', color: '#6D6875' }}
               />
             </div>
             
-            {/* Botões */}
             <div className="flex gap-3">
-              <Button 
-                onClick={() => setIsCategoryListModalOpen(true)}
-                className="gap-2 h-11 px-6 text-[15px]"
-                style={{ backgroundColor: '#FFE5D9', color: '#6D6875' }}
-              >
-                <List className="size-5" />
-                Categorias
+              <Button onClick={() => setIsCategoryListModalOpen(true)} className="gap-2 h-11 px-6 text-[15px]" style={{ backgroundColor: '#FFE5D9', color: '#6D6875' }}>
+                <List className="size-5" /> Categorias
               </Button>
-              <Button 
-                onClick={() => setIsCounterpartyListModalOpen(true)}
-                className="gap-2 h-11 px-6 text-[15px]"
-                style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}
-              >
-                <Users className="size-5" />
-                Contrapartes
+              <Button onClick={() => setIsCounterpartyListModalOpen(true)} className="gap-2 h-11 px-6 text-[15px]" style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}>
+                <Users className="size-5" /> Contrapartes
               </Button>
-              <Button 
-                onClick={openAddTransactionModal}
-                className="gap-2 h-11 px-6 text-[15px]"
-                style={{ backgroundColor: '#F4ACB7', color: 'white' }}
-              >
-                <Plus className="size-5" />
-                Nova Movimentação
+              <Button onClick={openAddTransactionModal} className="gap-2 h-11 px-6 text-[15px]" style={{ backgroundColor: '#F4ACB7', color: 'white' }}>
+                <Plus className="size-5" /> Nova Movimentação
               </Button>
             </div>
           </div>
 
-          {/* Filtros */}
-          <div className="flex items-center gap-3">
-            <Filter className="size-4" style={{ color: '#9D8189' }} />
-            <span className="text-[15px]" style={{ color: '#9D8189' }}>Filtrar por tipo:</span>
-            <div className="flex gap-2">
-              {filters.map(filter => (
-                <button
-                  key={filter}
-                  onClick={() => {
-                    setSelectedFilter(filter);
-                    setCurrentPage(1);
-                  }}
-                  className="px-4 py-1.5 rounded-md text-[15px] transition-all"
-                  style={{
-                    backgroundColor: selectedFilter === filter ? '#FFCAD4' : 'transparent',
-                    color: selectedFilter === filter ? '#6D6875' : '#9D8189',
-                    border: `1px solid ${selectedFilter === filter ? '#FFCAD4' : '#D8E2DC'}`
-                  }}
-                >
-                  {filter}
-                </button>
-              ))}
+          {/* Linha 2: Área de Filtros */}
+          <div className="flex flex-wrap items-center gap-8 pt-5 border-t" style={{ borderColor: '#D8E2DC' }}>
+            
+            {/* Filtro por Tipo */}
+            <div className="flex items-center gap-3">
+              <Filter className="size-4" style={{ color: '#9D8189' }} />
+              <span className="text-[15px]" style={{ color: '#9D8189' }}>Tipo:</span>
+              <div className="flex gap-2">
+                {['Todos', 'Receita', 'Despesa'].map(filter => (
+                  <button
+                    key={filter}
+                    onClick={() => { setSelectedFilter(filter); setCurrentPage(1); }}
+                    className="px-4 py-1.5 rounded-md text-[15px] transition-all"
+                    style={{
+                      backgroundColor: selectedFilter === filter ? '#FFCAD4' : 'transparent',
+                      color: selectedFilter === filter ? '#6D6875' : '#9D8189',
+                      border: `1px solid ${selectedFilter === filter ? '#FFCAD4' : '#D8E2DC'}`
+                    }}
+                  >
+                    {filter}
+                  </button>
+                ))}
+              </div>
             </div>
+
+            {/* Filtro por Status */}
+            <div className="flex items-center gap-3">
+              <Filter className="size-4" style={{ color: '#9D8189' }} />
+              <span className="text-[15px]" style={{ color: '#9D8189' }}>Status:</span>
+              <div className="flex gap-2">
+                {['Todos', 'Pago', 'Pendente'].map(filter => (
+                  <button
+                    key={filter}
+                    onClick={() => { setSelectedStatusFilter(filter); setCurrentPage(1); }}
+                    className="px-4 py-1.5 rounded-md text-[15px] transition-all"
+                    style={{
+                      backgroundColor: selectedStatusFilter === filter ? '#D8E2DC' : 'transparent', 
+                      color: selectedStatusFilter === filter ? '#6D6875' : '#9D8189',
+                      border: `1px solid ${selectedStatusFilter === filter ? '#D8E2DC' : '#D8E2DC'}`
+                    }}
+                  >
+                    {filter}
+                  </button>
+                ))}
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -408,44 +379,18 @@ export default function App() {
                 <tr 
                   key={transaction.id}
                   className="border-b transition-colors hover:bg-opacity-50"
-                  style={{ 
-                    borderColor: '#D8E2DC',
-                    backgroundColor: index % 2 === 0 ? 'white' : '#F9F9F9'
-                  }}
+                  style={{ borderColor: '#D8E2DC', backgroundColor: index % 2 === 0 ? 'white' : '#F9F9F9' }}
                 >
+                  <td className="px-6 py-4"><span className="text-[16px]" style={{ color: '#6D6875' }}>{transaction.counterpartyName}</span></td>
+                  <td className="px-6 py-4"><span className="text-[15px]" style={{ color: '#9D8189' }}>{transaction.description}</span></td>
+                  <td className="px-6 py-4"><span className="text-[15px]" style={{ color: '#9D8189' }}>{transaction.contractType}</span></td>
                   <td className="px-6 py-4">
-                    <span className="text-[16px]" style={{ color: '#6D6875' }}>
-                      {transaction.counterpartyName}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-[15px]" style={{ color: '#9D8189' }}>
-                      {transaction.description}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className="text-[15px]" style={{ color: '#9D8189' }}>
-                      {getCounterpartyContractType(transaction.counterpartyId)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4">
-                    <span 
-                      className="inline-flex items-center px-3 py-1 rounded-full text-[14px]"
-                      style={{
-                        backgroundColor: '#D8E2DC',
-                        color: '#6D6875'
-                      }}
-                    >
+                    <span className="inline-flex items-center px-3 py-1 rounded-full text-[14px]" style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}>
                       {transaction.category}
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span 
-                      className="text-[16px] font-semibold"
-                      style={{ 
-                        color: transaction.type === 'Receita' ? '#4CAF50' : '#d2445a'
-                      }}
-                    >
+                    <span className="text-[16px] font-semibold" style={{ color: transaction.type === 'Receita' ? '#4CAF50' : '#d2445a' }}>
                       {formatCurrency(transaction.value)}
                     </span>
                   </td>
@@ -456,25 +401,18 @@ export default function App() {
                   </td>
                   <td className="px-6 py-4">
                     <span className="text-[15px]" style={{ color: '#9D8189' }}>
-                      {new Date(transaction.date).toLocaleDateString('pt-BR')}
+                      {transaction.paymentStatus === 'pendente' 
+                        ? `Vence em: ${formatarDataSegura(transaction.dueDate)}`
+                        : formatarDataSegura(transaction.date)
+                      }
                     </span>
                   </td>
                   <td className="px-6 py-4">
                     <div className="flex gap-2 justify-end">
-                      <button
-                        onClick={() => openEditTransactionModal(transaction)}
-                        className="p-2 rounded-md transition-all hover:bg-opacity-80"
-                        style={{ backgroundColor: '#D8E2DC' }}
-                        title="Editar"
-                      >
+                      <button onClick={() => openEditTransactionModal(transaction)} className="p-2 rounded-md transition-all hover:bg-opacity-80" style={{ backgroundColor: '#D8E2DC' }} title="Editar">
                         <Pencil className="size-4" style={{ color: '#6D6875' }} />
                       </button>
-                      <button
-                        onClick={() => setDeleteTransaction(transaction)}
-                        className="p-2 rounded-md transition-all hover:bg-opacity-80"
-                        style={{ backgroundColor: '#FFCAD4' }}
-                        title="Excluir"
-                      >
+                      <button onClick={() => setDeleteTransaction(transaction)} className="p-2 rounded-md transition-all hover:bg-opacity-80" style={{ backgroundColor: '#FFCAD4' }} title="Excluir">
                         <Trash2 className="size-4" style={{ color: '#6D6875' }} />
                       </button>
                     </div>
@@ -492,13 +430,12 @@ export default function App() {
               Mostrando {startIndex + 1} a {Math.min(endIndex, totalElements)} de {totalElements} movimentações
             </p>
             <p className="text-[17px]" style={{ color: total >= 0 ? '#4CAF50' : '#d2445a' }}>
-              <strong>Subtotal: {formatCurrency(total)}</strong>
+              <strong>Subtotal da página: {formatCurrency(total)}</strong>
             </p>
           </div>
 
           {totalPages > 1 && (
             <div className="flex items-center gap-2">
-              
               <button
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
@@ -540,30 +477,21 @@ export default function App() {
 
       <CategoryModal
         isOpen={isCategoryModalOpen}
-        onClose={() => {
-          setIsCategoryModalOpen(false);
-          setEditingCategory(null);
-        }}
+        onClose={() => { setIsCategoryModalOpen(false); setEditingCategory(null); }}
         onSave={editingCategory ? handleEditCategory : handleAddCategory}
         category={editingCategory}
       />
 
       <CounterpartyModal
         isOpen={isCounterpartyModalOpen}
-        onClose={() => {
-          setIsCounterpartyModalOpen(false);
-          setEditingCounterparty(null);
-        }}
+        onClose={() => { setIsCounterpartyModalOpen(false); setEditingCounterparty(null); }}
         onSave={editingCounterparty ? handleEditCounterparty : handleAddCounterparty}
         counterparty={editingCounterparty}
       />
 
       <TransactionModal
         isOpen={isTransactionModalOpen}
-        onClose={() => {
-          setIsTransactionModalOpen(false);
-          setEditingTransaction(null);
-        }}
+        onClose={() => { setIsTransactionModalOpen(false); setEditingTransaction(null); }}
         onSave={editingTransaction ? handleEditTransaction : handleAddTransaction}
         transaction={editingTransaction}
         categories={categories}

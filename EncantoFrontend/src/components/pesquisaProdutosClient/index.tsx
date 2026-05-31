@@ -21,7 +21,8 @@ export default function App() {
   const [quickFilter, setQuickFilter] = useState<string | null>(null);
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid');
   const [sortBy, setSortBy] = useState('newest');
-  const [showFilters, setShowFilters] = useState(true);
+  // INICIALIZAÇÃO INTELIGENTE: Aberto (true) no PC/Tablet, Fechado (false) no Telemóvel
+  const [showFilters, setShowFilters] = useState(() => window.innerWidth >= 768);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(12);
@@ -29,7 +30,8 @@ export default function App() {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const [searchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
+
 
   // Extrair searchTerm da URL
   const searchTerm = searchParams.get('search') || '';
@@ -121,8 +123,17 @@ export default function App() {
     navigate(`/detalhe-produto/${productId}`);
   };
 
+  const normalizarTexto = (texto: string) => {
+    if (!texto) return '';
+    return texto
+      .normalize('NFD') // Separa os acentos das letras
+      .replace(/[\u0300-\u036f]/g, "") // Remove os acentos
+      .toLowerCase(); // Deixa tudo minúsculo
+  };
+
   const clearFilters = () => {
-    setSearchTerm('');
+    searchParams.delete('search');
+    setSearchParams(searchParams);
     setSelectedCategories([]);
     setSelectedThemes([]);
     setSelectedItems([]);
@@ -133,11 +144,25 @@ export default function App() {
   };
 
   const filteredProducts = products.filter(product => {
-    if (searchTerm && !product.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      !product.theme.toLowerCase().includes(searchTerm.toLowerCase()) &&
-      !product.item.toLowerCase().includes(searchTerm.toLowerCase())) {
-      return false;
+    // NOVA LÓGICA DE PESQUISA (Ignorando acentos e maiúsculas)
+    if (searchTerm) {
+      const termoNormalizado = normalizarTexto(searchTerm);
+
+      const nomeNormalizado = normalizarTexto(product.name);
+      const temaNormalizado = normalizarTexto(product.theme);
+      const itemNormalizado = normalizarTexto(product.item);
+
+      // O .includes() garante que a sequência exata de letras digitadas seja encontrada
+      if (
+        !nomeNormalizado.includes(termoNormalizado) &&
+        !temaNormalizado.includes(termoNormalizado) &&
+        !itemNormalizado.includes(termoNormalizado)
+      ) {
+        return false; // Se não achar a sequência em nenhum dos campos, descarta o produto
+      }
     }
+
+    // ... RESTANTE DOS SEUS FILTROS (MANTENHA COMO ESTÃO)
     if (selectedCategories.length > 0 && !selectedCategories.includes(product.category)) {
       return false;
     }
@@ -165,6 +190,7 @@ export default function App() {
     if (quickFilter === 'promo' && !product.isPromo) {
       return false;
     }
+
     return true;
   });
 
@@ -202,9 +228,10 @@ export default function App() {
 
       <div className="w-full px-8 py-8">
         <div className="flex gap-4">
-          {/* SIDEBAR DE FILTROS - 100% ISOLADA PARA NÃO QUEBRAR O PC */}
-          <aside className={`filter-sidebar-container ${showFilters ? 'is-open' : 'is-closed'} md:static md:w-[104px] md:min-w-[104px] md:h-auto md:overflow-visible shrink-0`}>
-            {/* CABEÇALHO DO MODAL */}
+          {/* SIDEBAR DE FILTROS - USANDO AS CLASSES MANUAIS */}
+          <aside className={`filter-sidebar-container ${showFilters ? 'is-open' : 'is-closed'} shrink-0 aside-ancora`}>
+            
+            {/* CABEÇALHO DO MODAL (MANTÉM IGUAL) */}
             <div className="cabecalho-mobile-filtro md:hidden flex items-center justify-between p-6 border-b border-[#D8E2DC] shrink-0 bg-white">
               <div className="flex items-center gap-3">
                 <Filter className="w-6 h-6 text-[#F4ACB7]" />
@@ -215,25 +242,37 @@ export default function App() {
               </button>
             </div>
 
-            {/* ÁREA COM SCROLL NO CELULAR, CAIXA NORMAL NO PC */}
-            <div className="flex-1 overflow-y-auto md:p-0 md:overflow-visible">
+            {/* ÁREA DA CAIXA BRANCA */}
+            {/* 1. md:overflow-hidden "mata" o scroll geral no PC, mantendo no celular */}
+            <div className="flex-1 overflow-y-auto md:overflow-hidden md:p-0 conteudo-flutuante">
 
-              {/* === ESTA É A SUA CAIXA BRANCA ORIGINAL DO PC === */}
-              <div className="bg-white rounded-2xl p-3 shadow-lg border-2 border-[#D8E2DC] sticky top-24">
-
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-[#6D6875] font-bold text-sm">Filtros</h3>
+              {/* === CAIXA BRANCA DOS FILTROS === */}
+              {/* overflow-hidden principal para garantir que nada sai da caixa */}
+              <div className="bg-white rounded-2xl p-3 shadow-lg border-2 border-[#D8E2DC] h-full flex flex-col overflow-hidden">
+                  
+                {/* CABEÇALHO FIXO NO TOPO */}
+                <div className="flex items-center justify-between mb-4 shrink-0">
+                  <div className="flex items-center gap-2">
+                    <Filter className="w-4 h-4 text-[#6D6875]" />
+                    <h3 className="text-[#6D6875] font-bold text-sm m-0">Filtros</h3>
+                  </div>
                   <button onClick={clearFilters} className="text-[#F4ACB7] text-[10px] hover:underline">Limpar</button>
                 </div>
 
-                {/* Categorias */}
-                {categories.length > 0 && (
-                  <div className="mb-6">
-                    <h4 className="text-[#6D6875] mb-3">Categoria</h4>
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
-                      {categories.map((cat) => (
-                        <label key={cat.name} className="flex items-center gap-3 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg">
-                          <div
+                {/* CONTAINER FLEXÍVEL CENTRAL */}
+                {/* overflow-hidden barra qualquer crescimento excessivo das 3 listas juntas */}
+                <div className="flex-1 flex flex-col gap-3 overflow-hidden">
+                  
+                  {/* Categorias */}
+                  {categories.length > 0 && (
+                    // Aqui está o segredo: flex-1 + overflow-hidden força a lista a ter EXATAMENTE 1/3 do espaço!
+                    <div className="flex-1 flex flex-col overflow-hidden">
+                      <h4 className="text-[#6D6875] mb-2 shrink-0">Categoria</h4>
+                      {/* E aqui a área de scroll ganha vida apenas no espaço que lhe foi dado */}
+                      <div className="flex-1 overflow-y-auto pr-1 space-y-2">
+                        {categories.map((cat) => (
+                          <div 
+                            key={cat.name} 
                             onClick={() => {
                               if (selectedCategories.includes(cat.name)) {
                                 setSelectedCategories(selectedCategories.filter(c => c !== cat.name));
@@ -241,28 +280,29 @@ export default function App() {
                                 setSelectedCategories([...selectedCategories, cat.name]);
                               }
                             }}
-                            className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${selectedCategories.includes(cat.name) ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'}`}
+                            className="flex items-center gap-3 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg"
                           >
-                            {selectedCategories.includes(cat.name) && (
-                              <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                            )}
+                            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all ${selectedCategories.includes(cat.name) ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'}`}>
+                              {selectedCategories.includes(cat.name) && (
+                                <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                              )}
+                            </div>
+                            <span className="text-[#6D6875] flex-1 truncate" title={cat.name}>{cat.name}</span>
+                            <span className="text-[#9D8189] text-sm shrink-0">({cat.count})</span>
                           </div>
-                          <span className="text-[#6D6875] flex-1 truncate" title={cat.name}>{cat.name}</span>
-                          <span className="text-[#9D8189] text-sm">({cat.count})</span>
-                        </label>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Temas */}
-                {themes.length > 0 && (
-                  <div className="mb-6">
-                    <h4 className="text-[#6D6875] mb-3">Tema</h4>
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
-                      {themes.map((theme) => (
-                        <label key={theme.name} className="flex items-center gap-3 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg">
-                          <div
+                  {/* Temas */}
+                  {themes.length > 0 && (
+                    <div className="flex-1 flex flex-col overflow-hidden border-t border-[#D8E2DC]/50 pt-2">
+                      <h4 className="text-[#6D6875] mb-2 shrink-0">Tema</h4>
+                      <div className="flex-1 overflow-y-auto pr-1 space-y-2">
+                        {themes.map((theme) => (
+                          <div 
+                            key={theme.name} 
                             onClick={() => {
                               if (selectedThemes.includes(theme.name)) {
                                 setSelectedThemes(selectedThemes.filter(t => t !== theme.name));
@@ -270,28 +310,29 @@ export default function App() {
                                 setSelectedThemes([...selectedThemes, theme.name]);
                               }
                             }}
-                            className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${selectedThemes.includes(theme.name) ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'}`}
+                            className="flex items-center gap-3 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg"
                           >
-                            {selectedThemes.includes(theme.name) && (
-                              <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                            )}
+                            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all ${selectedThemes.includes(theme.name) ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'}`}>
+                              {selectedThemes.includes(theme.name) && (
+                                <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                              )}
+                            </div>
+                            <span className="text-[#6D6875] flex-1 truncate" title={theme.name}>{theme.name}</span>
+                            <span className="text-[#9D8189] text-sm shrink-0">({theme.count})</span>
                           </div>
-                          <span className="text-[#6D6875] flex-1 truncate" title={theme.name}>{theme.name}</span>
-                          <span className="text-[#9D8189] text-sm">({theme.count})</span>
-                        </label>
-                      ))}
+                        ))}
+                      </div>
                     </div>
-                  </div>
-                )}
+                  )}
 
-                {/* Itens */}
-                {items.length > 0 && (
-                  <div className="mb-6">
-                    <h4 className="text-[#6D6875] mb-3">Item</h4>
-                    <div className="space-y-2 max-h-48 overflow-y-auto">
-                      {items.map((item) => (
-                        <label key={item.name} className="flex items-center gap-3 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg">
-                          <div
+                  {/* Itens */}
+                  {items.length > 0 && (
+                    <div className="flex-1 flex flex-col overflow-hidden border-t border-[#D8E2DC]/50 pt-2">
+                      <h4 className="text-[#6D6875] mb-2 shrink-0">Item</h4>
+                      <div className="flex-1 overflow-y-auto pr-1 space-y-2">
+                        {items.map((item) => (
+                          <div 
+                            key={item.name} 
                             onClick={() => {
                               if (selectedItems.includes(item.name)) {
                                 setSelectedItems(selectedItems.filter(i => i !== item.name));
@@ -299,49 +340,60 @@ export default function App() {
                                 setSelectedItems([...selectedItems, item.name]);
                               }
                             }}
-                            className={`w-5 h-5 rounded border-2 flex items-center justify-center transition-all ${selectedItems.includes(item.name) ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'}`}
+                            className="flex items-center gap-3 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg"
                           >
-                            {selectedItems.includes(item.name) && (
-                              <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                            )}
+                            <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all ${selectedItems.includes(item.name) ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'}`}>
+                              {selectedItems.includes(item.name) && (
+                                <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>
+                              )}
+                            </div>
+                            <span className="text-[#6D6875] flex-1 truncate" title={item.name}>{item.name}</span>
+                            <span className="text-[#9D8189] text-sm shrink-0">({item.count})</span>
                           </div>
-                          <span className="text-[#6D6875] flex-1 truncate" title={item.name}>{item.name}</span>
-                          <span className="text-[#9D8189] text-sm">({item.count})</span>
-                        </label>
-                      ))}
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                </div>
+
+                {/* FIXO NO RODAPÉ: Preço e Checkboxes */}
+                <div className="shrink-0 mt-3 border-t border-[#D8E2DC] pt-4 space-y-4">
+                  <div>
+                    <h4 className="text-[#6D6875] mb-2">Preço</h4>
+                    <div className="space-y-3">
+                      <input type="range" min="0" max="1000" value={priceRange[1]} onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])} className="w-full accent-[#F4ACB7]" />
+                      <div className="flex items-center gap-1">
+                        <input type="number" value={priceRange[0]} onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])} className="w-full px-1 py-2 text-sm border-2 border-[#D8E2DC] rounded-lg focus:border-[#F4ACB7] focus:outline-none text-[#6D6875] text-center" placeholder="Min" />
+                        <span className="text-[#9D8189] text-xs shrink-0 whitespace-nowrap">até</span>
+                        <input type="number" value={priceRange[1]} onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])} className="w-full px-1 py-2 text-sm border-2 border-[#D8E2DC] rounded-lg focus:border-[#F4ACB7] focus:outline-none text-[#6D6875] text-center" placeholder="Max" />
+                      </div>
                     </div>
                   </div>
-                )}
 
-                {/* Preço e Checkboxes */}
-                <div className="mb-6">
-                  <h4 className="text-[#6D6875] mb-3">Preço</h4>
-                  <div className="space-y-3">
-                    <input type="range" min="0" max="1000" value={priceRange[1]} onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])} className="w-full accent-[#F4ACB7]" />
-                    <div className="flex items-center gap-1">
-                      <input type="number" value={priceRange[0]} onChange={(e) => setPriceRange([parseInt(e.target.value), priceRange[1]])} className="w-full px-1 py-2 text-sm border-2 border-[#D8E2DC] rounded-lg focus:border-[#F4ACB7] focus:outline-none text-[#6D6875]" placeholder="Min" />
-                      <span className="text-[#9D8189] text-xs">até</span>
-                      <input type="number" value={priceRange[1]} onChange={(e) => setPriceRange([priceRange[0], parseInt(e.target.value)])} className="w-full px-1 py-2 text-sm border-2 border-[#D8E2DC] rounded-lg focus:border-[#F4ACB7] focus:outline-none text-[#6D6875]" placeholder="Max" />
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg" onClick={() => setOnlyPromo(!onlyPromo)}>
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all ${onlyPromo ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'}`}>
+                        {onlyPromo && <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                      </div>
+                      <span className="text-[#6D6875]">Apenas promoções</span>
+                    </div>
+                    
+                    <div className="flex items-center gap-3 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg" onClick={() => setInStock(!inStock)}>
+                      <div className={`w-5 h-5 rounded border-2 flex items-center justify-center shrink-0 transition-all ${inStock ? 'bg-[#F4ACB7] border-[#F4ACB7]' : 'bg-white border-[#D8E2DC]'}`}>
+                        {inStock && <svg className="w-3 h-3 text-white" viewBox="0 0 12 12" fill="none"><path d="M10 3L4.5 8.5L2 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" /></svg>}
+                      </div>
+                      <span className="text-[#6D6875]">Em estoque</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="space-y-3">
-                  <label className="flex items-center gap-2 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg">
-                    <input type="checkbox" checked={onlyPromo} onChange={(e) => setOnlyPromo(e.target.checked)} className="w-4 h-4 accent-[#F4ACB7]" />
-                    <span className="text-[#6D6875]">Apenas promoções</span>
-                  </label>
-                  <label className="flex items-center gap-2 cursor-pointer hover:bg-[#F9F9F9] p-2 rounded-lg">
-                    <input type="checkbox" checked={inStock} onChange={(e) => setInStock(e.target.checked)} className="w-4 h-4 accent-[#F4ACB7]" />
-                    <span className="text-[#6D6875]">Em estoque</span>
-                  </label>
-                </div>
               </div>
             </div>
 
             {/* RODAPÉ DO MODAL (APARECE APENAS NO CELULAR) */}
             <div className="rodape-mobile-filtro md:hidden p-6 border-t border-[#D8E2DC] bg-white shrink-0">
-              <button 
+              <button
                 onClick={() => setShowFilters(false)}
                 className="w-full bg-gradient-to-r from-[#F4ACB7] to-[#FFCAD4] text-white py-4 rounded-xl font-bold shadow-md uppercase tracking-wider text-lg"
               >

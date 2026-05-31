@@ -3,6 +3,7 @@ import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../../ui/
 import { X, Pencil, Trash2, Search, Tag } from 'lucide-react';
 import { Input } from '../../ui/input';
 import { categoriaMovService } from '../../../services/CategoriaMov';
+
 interface Category {
   id: string;
   name: string;
@@ -11,7 +12,7 @@ interface Category {
 interface CategoryListModalProps {
   isOpen: boolean;
   onClose: () => void;
-  categories: Category[];
+  categories?: Category[]; // Marcado como opcional, pois o componente faz o próprio fetch
   onCreate: () => void;
   onEdit: (category: Category) => void;
   onDelete: (category: Category) => void;
@@ -19,65 +20,75 @@ interface CategoryListModalProps {
 
 export default function CategoryListModal({ isOpen, onClose, onCreate, onEdit, onDelete }: CategoryListModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [categories, setCategories] = useState([]);
+  // Nome alterado para localCategories para evitar conflito com a prop categories
+  const [localCategories, setLocalCategories] = useState<Category[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
 
   const [totalPages, setTotalPages] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10); // Corrigido de 1 para 10
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const [totalElements, setTotalElements] = useState(0);
 
   const gerarPaginas = (currentPage: number, totalPages: number) => {
-  const maxPages = 7;
-  const pages: (number | string)[] = [];
+    const maxPages = 7;
+    const pages: (number | string)[] = [];
 
-  if (totalPages <= maxPages) {
-    return Array.from({ length: totalPages }, (_, i) => i + 1);
-  }
+    if (totalPages <= maxPages) {
+      return Array.from({ length: totalPages }, (_, i) => i + 1);
+    }
 
-  const start = Math.max(2, currentPage - 2);
-  const end = Math.min(totalPages - 1, currentPage + 2);
+    const start = Math.max(2, currentPage - 2);
+    const end = Math.min(totalPages - 1, currentPage + 2);
 
-  pages.push(1);
+    pages.push(1);
 
-  if (start > 2) {
-    pages.push('...');
-  }
+    if (start > 2) {
+      pages.push('...');
+    }
 
-  for (let i = start; i <= end; i++) {
-    pages.push(i);
-  }
+    for (let i = start; i <= end; i++) {
+      pages.push(i);
+    }
 
-  if (end < totalPages - 1) {
-    pages.push('...');
-  }
+    if (end < totalPages - 1) {
+      pages.push('...');
+    }
 
-  pages.push(totalPages);
+    pages.push(totalPages);
 
-  return pages;
-};
+    return pages;
+  };
+
   const paginas = gerarPaginas(currentPage, totalPages);
 
   const carregarCategorias = async () => {
-    const response = await categoriaMovService.listar({
-      search: searchTerm || undefined,
-      page: currentPage - 1
-    });
-    setCategories(response.content.map((cat) => ({
-      id: cat.id.toString(),
-      name: cat.descricao
-     })));
-    setTotalPages(response.totalPages);
-    setTotalElements(response.totalElements);
+    try {
+      const response = await categoriaMovService.listar({
+        search: searchTerm || undefined,
+        page: currentPage - 1
+      });
+      setLocalCategories(response.content.map((cat: any) => ({
+        id: cat.id.toString(),
+        name: cat.descricao
+      })));
+      setTotalPages(response.totalPages);
+      setTotalElements(response.totalElements);
+    } catch (error) {
+      console.error('Erro ao carregar categorias:', error);
+    }
   }
 
+  // Volta à página 1 sempre que o termo de pesquisa é alterado
   useEffect(() => {
-    // setCurrentPage(1);
-    carregarCategorias();
-  }, [searchTerm, currentPage, isOpen]);
+    setCurrentPage(1);
+  }, [searchTerm]);
 
- 
+  useEffect(() => {
+    if (isOpen) {
+      carregarCategorias();
+    }
+  }, [searchTerm, currentPage, isOpen]);
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -140,13 +151,13 @@ export default function CategoryListModal({ isOpen, onClose, onCreate, onEdit, o
 
         {/* Lista */}
         <div className="px-8 pb-6 overflow-y-auto overflow-x-hidden" style={{ maxHeight: '420px' }}>
-          {categories.length === 0 ? (
+          {localCategories.length === 0 ? (
             <div className="text-center py-12" style={{ color: '#9D8189' }}>
               <p className="text-[16px]">Nenhuma categoria encontrada</p>
             </div>
           ) : (
             <div className="space-y-3">
-              {categories.map((category, index) => (
+              {localCategories.map((category, index) => (
                 <div
                   key={category.id}
                   className="flex items-center justify-between gap-4 p-5 rounded-md border transition-colors hover:bg-opacity-50"
@@ -182,49 +193,45 @@ export default function CategoryListModal({ isOpen, onClose, onCreate, onEdit, o
           )}
         </div>
 
+        {/* Paginação */}
         {totalPages > 1 && (
-  <div className="px-8 pb-5 flex items-center justify-end gap-2 flex-wrap">
-    
-    {/* Anterior */}
-    <button
-      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-      disabled={currentPage === 1}
-      className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
-      style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
-    >
-      Anterior
-    </button>
+          <div className="px-8 pb-5 flex items-center justify-end gap-2 flex-wrap">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
+              style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
+            >
+              Anterior
+            </button>
 
-    {/* Páginas */}
-    {paginas.map((page, index) => (
-      <button
-        key={index}
-        onClick={() => typeof page === 'number' && setCurrentPage(page)}
-        disabled={page === '...'}
-        className="px-4 py-2 rounded-md text-[15px] transition-all"
-        style={{
-          backgroundColor: currentPage === page ? '#F4ACB7' : 'white',
-          color: currentPage === page ? 'white' : '#6D6875',
-          border: `1px solid ${currentPage === page ? '#F4ACB7' : '#D8E2DC'}`,
-          cursor: page === '...' ? 'default' : 'pointer'
-        }}
-      >
-        {page}
-      </button>
-    ))}
+            {paginas.map((page, index) => (
+              <button
+                key={index}
+                onClick={() => typeof page === 'number' && setCurrentPage(page)}
+                disabled={page === '...'}
+                className="px-4 py-2 rounded-md text-[15px] transition-all"
+                style={{
+                  backgroundColor: currentPage === page ? '#F4ACB7' : 'white',
+                  color: currentPage === page ? 'white' : '#6D6875',
+                  border: `1px solid ${currentPage === page ? '#F4ACB7' : '#D8E2DC'}`,
+                  cursor: page === '...' ? 'default' : 'pointer'
+                }}
+              >
+                {page}
+              </button>
+            ))}
 
-    {/* Próximo */}
-    <button
-      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-      disabled={currentPage === totalPages}
-      className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
-      style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
-    >
-      Próximo
-    </button>
-
-  </div>
-)}
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
+              style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
+            >
+              Próximo
+            </button>
+          </div>
+        )}
 
         {/* Footer */}
         <div className="px-8 py-5 border-t flex justify-end" style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC' }}>

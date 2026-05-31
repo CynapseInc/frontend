@@ -15,74 +15,86 @@ interface Counterparty {
 interface CounterpartyListModalProps {
   isOpen: boolean;
   onClose: () => void;
-  counterparties: Counterparty[];
+  counterparties?: Counterparty[]; // Pode ser opcional já que o componente faz o fetch
   onCreate: () => void;
   onEdit: (counterparty: Counterparty) => void;
   onDelete: (counterparty: Counterparty) => void;
 }
 
-export default function CounterpartyListModal({ isOpen, onClose, counterparties, onCreate, onEdit, onDelete }: CounterpartyListModalProps) {
+export default function CounterpartyListModal({ isOpen, onClose, onCreate, onEdit, onDelete }: CounterpartyListModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
-  const [contrapartes, setContrapartes] = useState([])
+  const [localCounterparties, setLocalCounterparties] = useState<Counterparty[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   
-    const [totalPages, setTotalPages] = useState(1);
-    const [itemsPerPage, setItemsPerPage] = useState(1);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const [totalElements, setTotalElements] = useState(0);
-  
-    const gerarPaginas = (currentPage: number, totalPages: number) => {
+  const [totalPages, setTotalPages] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10); // Corrigido de 1 para 10
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const [totalElements, setTotalElements] = useState(0);
+
+  const gerarPaginas = (currentPage: number, totalPages: number) => {
     const maxPages = 7;
     const pages: (number | string)[] = [];
-  
+
     if (totalPages <= maxPages) {
       return Array.from({ length: totalPages }, (_, i) => i + 1);
     }
-  
+
     const start = Math.max(2, currentPage - 2);
     const end = Math.min(totalPages - 1, currentPage + 2);
-  
+
     pages.push(1);
-  
+
     if (start > 2) {
       pages.push('...');
     }
-  
+
     for (let i = start; i <= end; i++) {
       pages.push(i);
     }
-  
+
     if (end < totalPages - 1) {
       pages.push('...');
     }
-  
+
     pages.push(totalPages);
-  
+
     return pages;
   };
-    const paginas = gerarPaginas(currentPage, totalPages);
-  
-    const carregarContrapartes = async () => {
+
+  const paginas = gerarPaginas(currentPage, totalPages);
+
+  const carregarContrapartes = async () => {
+    try {
       const response = await contraparteService.listar({
         search: searchTerm || undefined,
         page: currentPage - 1
       });
-      setContrapartes(response.content.map((contraparte) => ({
-        id: contraparte.id,
+      setLocalCounterparties(response.content.map((contraparte: any) => ({
+        id: contraparte.id.toString(), // Garantir que o ID é uma string
         name: contraparte.nome,
         contractType: contraparte.tipoContrato,
         segment: contraparte.segmento,
         description: contraparte.descricao
       })));
       setTotalPages(response.totalPages);
-      setItemsPerPage(response.size);
+      setItemsPerPage(response.size || 10);
       setTotalElements(response.totalElements);
+    } catch (error) {
+      console.error('Erro ao carregar contrapartes:', error);
     }
+  }
 
-    useEffect(() => {
+  // Volta à página 1 sempre que o termo de pesquisa é alterado
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  useEffect(() => {
+    if (isOpen) {
       carregarContrapartes();
-    }, [searchTerm, currentPage, isOpen]);
+    }
+  }, [searchTerm, currentPage, isOpen]);
 
 
   return (
@@ -153,7 +165,7 @@ export default function CounterpartyListModal({ isOpen, onClose, counterparties,
 
         {/* Tabela */}
         <div className="px-8 pb-6 overflow-y-auto overflow-x-hidden flex-1 min-h-0">
-          {contrapartes.length === 0 ? (
+          {localCounterparties.length === 0 ? (
             <div className="text-center py-12" style={{ color: '#9D8189' }}>
               <p className="text-[16px]">Nenhuma contraparte encontrada</p>
             </div>
@@ -180,7 +192,7 @@ export default function CounterpartyListModal({ isOpen, onClose, counterparties,
                   </tr>
                 </thead>
                 <tbody>
-                  {contrapartes.map((counterparty, index) => (
+                  {localCounterparties.map((counterparty, index) => (
                     <tr
                       key={counterparty.id}
                       className="border-b transition-colors hover:bg-opacity-50"
@@ -243,49 +255,49 @@ export default function CounterpartyListModal({ isOpen, onClose, counterparties,
           )}
         </div>
 
-           {totalPages > 1 && (
-  <div className="px-8 pb-5 flex items-center justify-end gap-2 flex-wrap">
-    
-    {/* Anterior */}
-    <button
-      onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-      disabled={currentPage === 1}
-      className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
-      style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
-    >
-      Anterior
-    </button>
+        {totalPages > 1 && (
+          <div className="px-8 pb-5 flex items-center justify-end gap-2 flex-wrap">
+            
+            {/* Anterior */}
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+              disabled={currentPage === 1}
+              className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
+              style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
+            >
+              Anterior
+            </button>
 
-    {/* Páginas */}
-    {paginas.map((page, index) => (
-      <button
-        key={index}
-        onClick={() => typeof page === 'number' && setCurrentPage(page)}
-        disabled={page === '...'}
-        className="px-4 py-2 rounded-md text-[15px] transition-all"
-        style={{
-          backgroundColor: currentPage === page ? '#F4ACB7' : 'white',
-          color: currentPage === page ? 'white' : '#6D6875',
-          border: `1px solid ${currentPage === page ? '#F4ACB7' : '#D8E2DC'}`,
-          cursor: page === '...' ? 'default' : 'pointer'
-        }}
-      >
-        {page}
-      </button>
-    ))}
+            {/* Páginas */}
+            {paginas.map((page, index) => (
+              <button
+                key={index}
+                onClick={() => typeof page === 'number' && setCurrentPage(page)}
+                disabled={page === '...'}
+                className="px-4 py-2 rounded-md text-[15px] transition-all"
+                style={{
+                  backgroundColor: currentPage === page ? '#F4ACB7' : 'white',
+                  color: currentPage === page ? 'white' : '#6D6875',
+                  border: `1px solid ${currentPage === page ? '#F4ACB7' : '#D8E2DC'}`,
+                  cursor: page === '...' ? 'default' : 'pointer'
+                }}
+              >
+                {page}
+              </button>
+            ))}
 
-    {/* Próximo */}
-    <button
-      onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-      disabled={currentPage === totalPages}
-      className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
-      style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
-    >
-      Próximo
-    </button>
+            {/* Próximo */}
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+              disabled={currentPage === totalPages}
+              className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
+              style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
+            >
+              Próximo
+            </button>
 
-  </div>
-)}
+          </div>
+        )}
 
         {/* Footer */}
         <div

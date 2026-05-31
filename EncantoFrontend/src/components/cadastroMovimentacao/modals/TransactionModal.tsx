@@ -56,6 +56,12 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
   });
 
   useEffect(() => {
+    // Pegar a data local correta no formato YYYY-MM-DD
+    const hoje = new Date();
+    const dataLocal = new Date(hoje.getTime() - (hoje.getTimezoneOffset() * 60000))
+      .toISOString()
+      .split('T')[0];
+
     if (transaction) {
       setFormData(transaction);
     } else {
@@ -63,9 +69,10 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
         counterpartyId: counterparties.length > 0 ? counterparties[0].id : '',
         counterpartyName: counterparties.length > 0 ? counterparties[0].name : '',
         description: '',
+        categoryId: categories.length > 0 ? categories[0].id : '',
         category: categories.length > 0 ? categories[0].name : '',
         value: 0,
-        date: new Date().toISOString().split('T')[0],
+        date: dataLocal, // <-- Uso da data com o fuso horário corrigido
         type: 'Receita',
         paymentStatus: 'pago',
         dueDate: '',
@@ -73,31 +80,22 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
     }
   }, [transaction, isOpen, categories, counterparties]);
 
-  const handleCounterpartyChange = (counterpartyId: string) => {
-    const counterparty = counterparties.find(cp => cp.id === counterpartyId);
-    if (counterparty) {
-      setFormData({ 
-        ...formData, 
-        counterpartyId: counterparty.id,
-        counterpartyName: counterparty.name 
-      });
-    }
-  };
-
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log(formData)
-    if (formData.counterpartyId && formData.category && formData.value && formData.date) {
+    if (formData.counterpartyId && formData.categoryId && formData.value && formData.date) {
       const transactionData = {
         ...formData,
         updatedAt: transaction ? new Date().toISOString() : undefined,
       } as Transaction;
       
       onSave(transactionData);
+      
+      // Limpa o formulário após salvar
       setFormData({
         counterpartyId: '',
         counterpartyName: '',
         description: '',
+        categoryId: '',
         category: '',
         value: 0,
         date: '',
@@ -154,27 +152,15 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
                 <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
                   Nome
                 </label>
-
-                 <CounterpartyCombobox 
-    value={formData.counterpartyId || ''}
-    onChange={(id, name) => setFormData({ 
-      ...formData, 
-      counterpartyId: id,
-      counterpartyName: name 
-    })}
-    isErr={!formData.counterpartyId}
-  />
-                
-                  {/* {counterparties.length === 0 ? (
-                    <option value="">Nenhum contratante cadastrado</option>
-                  ) : (
-                    counterparties.map(cp => (
-                      <option key={cp.id} value={cp.id}>
-                        {cp.name}
-                      </option>
-                    ))
-                  )} */}
-                {/* </select> */}
+                <CounterpartyCombobox 
+                  value={formData.counterpartyId || ''}
+                  onChange={(id, name) => setFormData({ 
+                    ...formData, 
+                    counterpartyId: id,
+                    counterpartyName: name 
+                  })}
+                  isErr={!formData.counterpartyId}
+                />
               </div>
 
               {/* Descrição */}
@@ -271,11 +257,11 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
               </div>
 
               {/* Categoria */}
-              <div>
+              <div className="col-span-2">
                 <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
                   Categoria de movimentação
                 </label>
-                 <CategoryCombobox 
+                <CategoryCombobox 
                   value={formData.categoryId || ''}
                   onChange={(id, name) => setFormData({ 
                     ...formData, 
@@ -284,7 +270,6 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
                   })}
                   isErr={!formData.categoryId}
                 />
-               
               </div>
 
               {/* Status de Pagamento */}
@@ -295,24 +280,24 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
                 <div className="flex gap-3">
                   <button
                     type="button"
-                    onClick={() => setFormData({ ...formData, paymentStatus: 'PAGO' })}
+                    onClick={() => setFormData({ ...formData, paymentStatus: 'pago' })} // <-- Corrigido para minúsculas
                     className="flex-1 px-4 py-2.5 rounded-md text-[15px] transition-all"
                     style={{
-                      backgroundColor: formData.paymentStatus === 'PAGO' ? '#D8E2DC' : '#F9F9F9',
-                      color: formData.paymentStatus === 'PAGO' ? '#6D6875' : '#9D8189',
-                      border: `1px solid ${formData.paymentStatus === 'PAGO' ? '#D8E2DC' : '#D8E2DC'}`
+                      backgroundColor: formData.paymentStatus === 'pago' ? '#D8E2DC' : '#F9F9F9',
+                      color: formData.paymentStatus === 'pago' ? '#6D6875' : '#9D8189',
+                      border: `1px solid ${formData.paymentStatus === 'pago' ? '#D8E2DC' : '#D8E2DC'}`
                     }}
                   >
                     Pago
                   </button>
                   <button
                     type="button"
-                    onClick={() => setFormData({ ...formData, paymentStatus: 'PENDENTE' })}
+                    onClick={() => setFormData({ ...formData, paymentStatus: 'pendente' })} // <-- Corrigido para minúsculas
                     className="flex-1 px-4 py-2.5 rounded-md text-[15px] transition-all"
                     style={{
-                      backgroundColor: formData.paymentStatus === 'PENDENTE' ? '#FFF4E6' : '#F9F9F9',
-                      color: formData.paymentStatus === 'PENDENTE' ? '#6D6875' : '#9D8189',
-                      border: `1px solid ${formData.paymentStatus === 'PENDENTE' ? '#FFD89B' : '#D8E2DC'}`
+                      backgroundColor: formData.paymentStatus === 'pendente' ? '#FFF4E6' : '#F9F9F9',
+                      color: formData.paymentStatus === 'pendente' ? '#6D6875' : '#9D8189',
+                      border: `1px solid ${formData.paymentStatus === 'pendente' ? '#FFD89B' : '#D8E2DC'}`
                     }}
                   >
                     Pendente
@@ -321,7 +306,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
               </div>
 
               {/* Data de Vencimento (aparece apenas se pendente) */}
-              {formData.paymentStatus === 'PENDENTE' && (
+              {formData.paymentStatus === 'pendente' && (
                 <div>
                   <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
                     Data de vencimento
