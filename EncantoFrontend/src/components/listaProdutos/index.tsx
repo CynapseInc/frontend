@@ -56,8 +56,8 @@ export default function App() {
         ]);
 
         // Mapeia os arrays de objetos para arrays de strings (usando os mesmos nomes de propriedades que usou na listagem)
-        const categoriasNomes = categoriasData.map((c: any) => c.titulo).filter(Boolean);
-        const temasNomes = temasData.map((t: any) => t.descricao).filter(Boolean);
+        const categoriasNomes = categoriasData.content.map((c: any) => c.titulo).filter(Boolean);
+        const temasNomes = temasData.content.map((t: any) => t.descricao).filter(Boolean);
         const itensNomes = itensData.map((i: any) => i.descricao).filter(Boolean); 
 
         // Atualiza os estados, garantindo que o 'Todos' fica sempre no início e removendo possíveis duplicados com o Set

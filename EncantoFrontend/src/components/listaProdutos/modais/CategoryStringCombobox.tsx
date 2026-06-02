@@ -1,67 +1,29 @@
 import { useState, useEffect, useRef } from 'react';
 import { Check, ChevronDown, X } from 'lucide-react';
-import {categoriaTemaService} from '../../../services/CategoriaTemaService';
-
-interface ProductCategory {
-  id: string;
-  description: string;
-}
 
 interface CategoryComboboxProps {
   value: string;
-  onChange: (id: string) => void;
-  categories: ProductCategory[];
+  onChange: (value: string) => void;
+  categories: string[];
   isErr?: boolean;
 }
 
 export default function CategoryCombobox({ value, onChange, categories, isErr }: CategoryComboboxProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const searchTimeoutRef = useRef<number | null>(null);
   const [selectedName, setSelectedName] = useState('');
-  const [categoriasFiltradas, setCategoriasFiltradas] = useState<ProductCategory[]>(categories);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (value) {
-      const selected = categories.find(cat => cat.id === value);
+      const selected = categories.find(cat => cat === value);
       if (selected) {
-        setSelectedName(selected.description);
+        setSelectedName(selected);
       }
     } else {
       setSelectedName('');
     }
   }, [value, categories]);
-
-
-  useEffect(() => {
-    
-      
-      if(searchTimeoutRef.current) {
-        window.clearTimeout(searchTimeoutRef.current);
-      }
-
-      searchTimeoutRef.current = window.setTimeout(async () => {
-
-      try {
-        const data = await categoriaTemaService.listarTodos({ search });
-        
-        
-        // mapear os nomes da resposta para o formato esperado
-        const mappedCategories = data.content.map((cat: any) => ({
-          id: cat.id,
-          description: cat.titulo
-        }));
-        setCategoriasFiltradas(mappedCategories);
-      } catch (error) {
-        console.error('Erro ao buscar categorias:', error);
-      }
-    },
-    500)
-   
-    
-  }, [search])
-
 
   // Fechar ao clicar fora
   useEffect(() => {
@@ -76,12 +38,12 @@ export default function CategoryCombobox({ value, onChange, categories, isErr }:
   }, []);
 
   const filteredCategories = categories.filter(cat =>
-    cat.description.toLowerCase().includes(search.toLowerCase())
+    cat.toLowerCase().includes(search.toLowerCase())
   );
 
-  const handleSelect = (category: ProductCategory) => {
-    onChange(category.id);
-    setSelectedName(category.description);
+  const handleSelect = (category: string) => {
+    onChange(category);
+    setSelectedName(category);
     setOpen(false);
     setSearch('');
   };
@@ -145,26 +107,26 @@ export default function CategoryCombobox({ value, onChange, categories, isErr }:
           </div>
 
           <div className="max-h-[300px] overflow-y-auto">
-            {categoriasFiltradas.length === 0 ? (
+            {filteredCategories.length === 0 ? (
               <div className="py-6 text-center text-[14px]" style={{ color: '#9D8189' }}>
                 Nenhuma categoria encontrada
               </div>
             ) : (
-              categoriasFiltradas.map((category) => (
+              filteredCategories.map((category) => (
                 <button
-                  key={category.id}
+                  key={category}
                   type="button"
                   onClick={() => handleSelect(category)}
                   className="w-full px-4 py-2.5 text-left text-[14px] flex items-center justify-between hover:bg-gray-100 transition-colors border-0"
                   style={{
                     color: '#6D6875',
-                    backgroundColor: value === category.id ? '#F0F0F0' : 'transparent'
+                    backgroundColor: value === category ? '#F0F0F0' : 'transparent'
                   }}
                 >
                   <div className="flex-1">
-                    {category.description}
+                    {category}
                   </div>
-                  {value === category.id && (
+                  {value === category && (
                     <Check className="size-4 ml-2" style={{ color: '#F4ACB7' }} />
                   )}
                 </button>

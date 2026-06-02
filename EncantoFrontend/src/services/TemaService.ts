@@ -1,12 +1,27 @@
 import api from '../provider/api';
 
 export const temaService = {
-  listarTodos: async () => {
-    const { data } = await api.get('/temas');
-    if (data && data.content && Array.isArray(data.content)) {
-      return data.content;
+  listarTodos: async ( params?:
+    {
+      search?: string,
+      page?: number
     }
-    return Array.isArray(data) ? data : [];
+  ) => {
+    const { data } = await api.get('/temas', { params });
+
+    if(!data){
+            return {
+                content:[],
+                totalElements: 0, 
+                totalPages: 0,
+                number: 0,
+                size: 0
+            }
+        }
+
+    return data;
+    
+    
   },
   criar: async (descricao: string, categoriaTemaId: number) => {
     const { data } = await api.post('/temas', { descricao, categoriaTemaId });

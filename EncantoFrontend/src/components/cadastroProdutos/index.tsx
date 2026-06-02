@@ -88,7 +88,7 @@ export default function App() {
         ]);
 
         const todosOsTemas: Theme[] = [];
-        const categoriasFormatadas = categoriasData.map((c: any) => {
+        const categoriasFormatadas = categoriasData.content.map((c: any) => {
           if (c.temas && Array.isArray(c.temas)) {
             c.temas.forEach((t: any) => {
               todosOsTemas.push({ id: t.id.toString(), description: t.descricao, categoryId: c.id.toString() });
