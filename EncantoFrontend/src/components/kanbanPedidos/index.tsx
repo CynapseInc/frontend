@@ -176,7 +176,7 @@ function KanbanColumn({ status, index, orders, onDropOrder, onOrderClick, moveCo
   return (
     <div
       ref={ref as any}
-      className="flex flex-col shrink-0 rounded-lg p-4"
+      className="flex flex-col shrink-0 rounded-lg p-4 mb-2"
       style={{
         width: '325px', 
         height: 'calc(100vh - 300px)', 
@@ -217,7 +217,7 @@ function KanbanColumn({ status, index, orders, onDropOrder, onOrderClick, moveCo
         </span>
       </div>
 
-      <div className="flex-1 overflow-y-auto space-y-3 pr-2 pb-2 custom-scrollbar min-h-0">
+      <div className="flex-1 overflow-y-auto space-y-3 pr-2 pb-2 kanban-column-scrollbar-hidden min-h-0">
         {orders.map(order => (
           <OrderCard key={order.id} order={order} onClick={onOrderClick} />
         ))}
@@ -421,11 +421,11 @@ export default function Kanban() {
   
   return (
     <DndProvider backend={HTML5Backend}>
-      <div className="h-[calc(100vh-80px)] flex flex-col" style={{ backgroundColor: '#F9F9F9' }}>
+      <div className="kanban-page h-[calc(100vh-80px)] flex flex-col" style={{ backgroundColor: '#F9F9F9' }}>
         <div className="w-full max-w-[1600px] mx-auto px-8 py-10 box-border flex flex-col h-full overflow-hidden">
           
           <div className="mb-6 shrink-0">
-            <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Pedidos</h1>
+            <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Kanban</h1>
             <p className="text-[17px]" style={{ color: '#9D8189' }}>
               Visão rápida dos pedidos nos últimos 30 dias
             </p>
@@ -466,7 +466,7 @@ export default function Kanban() {
           <div 
             ref={scrollContainerRef}
             onDragOver={handleDragOverContainer}
-            className="flex flex-nowrap gap-6 overflow-x-auto pb-4 items-start custom-scrollbar w-full flex-1 min-h-0"
+            className="flex flex-nowrap gap-6 overflow-x-auto pb-3 items-stretch kanban-native-scrollbar w-full flex-1 min-h-0"
           >
             {statusTypes.map((status, index) => (
               <KanbanColumn

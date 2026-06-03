@@ -20,7 +20,7 @@ interface CounterpartyModalProps {
 export default function CounterpartyModal({ isOpen, onClose, onSave, counterparty }: CounterpartyModalProps) {
   const [formData, setFormData] = useState<Partial<Counterparty>>({
     name: '',
-    contractType: 'Funcionário',
+    contractType: '', // <-- Inicia vazio em vez de forçar 'Funcionário'
     segment: '',
     description: '',
   });
@@ -31,7 +31,7 @@ export default function CounterpartyModal({ isOpen, onClose, onSave, counterpart
     } else {
       setFormData({
         name: '',
-        contractType: 'Funcionário',
+        contractType: '', // <-- Inicia vazio
         segment: '',
         description: '',
       });
@@ -45,7 +45,7 @@ export default function CounterpartyModal({ isOpen, onClose, onSave, counterpart
       onSave(formData as Counterparty);
       setFormData({
         name: '',
-        contractType: 'Funcionário',
+        contractType: '',
         segment: '',
         description: '',
       });
@@ -104,12 +104,14 @@ export default function CounterpartyModal({ isOpen, onClose, onSave, counterpart
                 />
               </div>
 
-              {/* Tipo de contrato */}
+              {/* Tipo de contrato - Transformado em campo de texto */}
               <div>
                 <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
                   Tipo de contrato
                 </label>
-                <select
+                <input
+                  type="text"
+                  placeholder="Ex: Mensal, CLT, PJ, Fornecedor..."
                   value={formData.contractType}
                   onChange={(e) => setFormData({ ...formData, contractType: e.target.value })}
                   className="w-full px-4 py-2.5 rounded-md border text-[15px] focus:outline-none focus:border-[#F4ACB7] transition-colors"
@@ -118,12 +120,8 @@ export default function CounterpartyModal({ isOpen, onClose, onSave, counterpart
                     borderColor: '#D8E2DC',
                     color: '#6D6875'
                   }}
-                >
-                  <option value="Funcionário">Funcionário</option>
-                  <option value="Empresa">Empresa</option>
-                  <option value="Fornecedor">Fornecedor</option>
-                  <option value="Prestador de Serviço">Prestador de Serviço</option>
-                </select>
+                  required
+                />
               </div>
 
               {/* Segmento */}

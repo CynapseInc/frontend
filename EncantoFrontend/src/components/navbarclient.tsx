@@ -93,26 +93,26 @@ function Navbar() {
     <>
       {/* 1. NAVBAR (Header) */}
       <header
-        className="sticky top-0 z-50 bg-white border-b border-[#D8E2DC] w-full h-[10vh] min-h-[64px]"
+        className="sticky top-0 z-50 bg-white border-b border-[#D8E2DC] w-full"
         style={{
           position: 'sticky',
           top: 0,
           zIndex: 50,
           backgroundColor: 'white',
           borderBottom: '1px solid #D8E2DC',
-          width: '100%',
-          height: '10vh',
-          minHeight: '64px'
+          width: '100%'
+          /* REMOVEMOS A ALTURA DAQUI PARA O CABEÇALHO PODER CRESCER NO CELULAR */
         }}
       >
         <div
-          className="flex items-center justify-between w-full h-full px-8 md:px-[3vw]"
+          className="flex items-center justify-between w-full px-8 md:px-[3vw]"
           style={{
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'space-between',
             width: '100%',
-            height: '100%'
+            height: '10vh', /* MOVEMOS A ALTURA PARA CÁ! */
+            minHeight: '64px'
           }}
         >
 

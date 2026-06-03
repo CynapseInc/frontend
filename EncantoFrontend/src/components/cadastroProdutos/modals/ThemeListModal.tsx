@@ -1,6 +1,6 @@
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../../ui/dialog';
-import { X, Pencil, Trash2, Search } from 'lucide-react';
+import { X, Pencil, Trash2, Search, Tag } from 'lucide-react';
 import { Input } from '../../ui/input';
 import { temaService } from '../../../services/TemaService';
 
@@ -21,6 +21,7 @@ interface ThemeListModalProps {
   onClose: () => void;
   themes: Theme[];
   categories: ProductCategory[];
+  onCreate: () => void;
   onEdit: (theme: Theme) => void;
   onDelete: (theme: Theme) => void;
 }
@@ -140,13 +141,24 @@ export default function ThemeListModal({ isOpen, onClose, themes, categories, on
             <h2 className="text-[28px]" style={{ color: '#F4ACB7' }}>
               Temas
             </h2>
-            <button 
-              onClick={onClose} 
-              className="p-1.5 rounded-md transition-colors hover:bg-gray-100"
-              style={{ color: '#9D8189' }}
-            >
-              <X className="size-5" />
-            </button>
+            <div className="flex items-center gap-3">
+              <button
+                type="button"
+                onClick={onCreate}
+                className="h-10 px-4 rounded-md text-[15px] transition-all inline-flex items-center gap-2"
+                style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
+              >
+                <Tag className="size-4" />
+                Novo Tema
+              </button>
+              <button 
+                onClick={onClose} 
+                className="p-1.5 rounded-md transition-colors hover:bg-gray-100"
+                style={{ color: '#9D8189' }}
+              >
+                <X className="size-5" />
+              </button>
+            </div>
           </div>
         </div>
 
@@ -253,6 +265,7 @@ export default function ThemeListModal({ isOpen, onClose, themes, categories, on
               onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
               disabled={currentPage === 1}
               className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
+              style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
             >
               Anterior
             </button>
@@ -280,6 +293,7 @@ export default function ThemeListModal({ isOpen, onClose, themes, categories, on
               onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
               disabled={currentPage === totalPages}
               className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
+              style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
             >
               Próximo
             </button>

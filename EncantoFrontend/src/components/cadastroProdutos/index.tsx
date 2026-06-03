@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Tag, List, Box, ArrowLeft } from 'lucide-react';
+import { List, ArrowLeft } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { useNavigate, useParams } from 'react-router-dom'; // Adicionado useParams
@@ -352,7 +352,7 @@ export default function App() {
       <div className="max-w-[1200px] mx-auto px-8 py-12">
         {/* Cabeçalho */}
         <div className="mb-10">
-          <button type="button" className="flex items-center gap-2 mb-4 text-[15px] transition-colors hover:opacity-80" style={{ color: '#9D8189' }} onClick={() => navigate('/lista-produtos')}>
+          <button type="button" className="no-button-feedback flex items-center gap-2 mb-4 text-[15px]" style={{ color: '#9D8189' }} onClick={() => navigate('/lista-produtos')}>
             <ArrowLeft className="size-5" /> Voltar para Produtos
           </button>
           
@@ -368,12 +368,9 @@ export default function App() {
 
         {/* Botões de gerenciamento */}
         <div className="flex gap-3 mb-6">
-          <Button type="button" onClick={() => setIsCategoryListModalOpen(true)} className="gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#FFE5D9', color: '#6D6875' }}><List className="size-4" /> Categorias</Button>
-          <Button type="button" onClick={() => { setEditingCategory(null); setIsCategoryModalOpen(true); }} className="gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}><Tag className="size-4" /> Nova Categoria</Button>
-          <Button type="button" onClick={() => setIsThemeListModalOpen(true)} className="gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#FFE5D9', color: '#6D6875' }}><List className="size-4" /> Temas</Button>
-          <Button type="button" onClick={() => { setEditingTheme(null); setIsThemeModalOpen(true); }} className="gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}><Tag className="size-4" /> Novo Tema</Button>
-          <Button type="button" onClick={() => setIsItemListModalOpen(true)} className="gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#FFE5D9', color: '#6D6875' }}><List className="size-4" /> Itens</Button>
-          <Button type="button" onClick={() => { setEditingItem(null); setIsItemModalOpen(true); }} className="gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}><Box className="size-4" /> Novo Item</Button>
+          <Button type="button" onClick={() => setIsCategoryListModalOpen(true)} className="no-button-feedback gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#FFE5D9', color: '#6D6875' }}><List className="size-4" /> Categorias</Button>
+          <Button type="button" onClick={() => setIsThemeListModalOpen(true)} className="no-button-feedback gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#FFCAD4', color: '#6D6875' }}><List className="size-4" /> Temas</Button>
+          <Button type="button" onClick={() => setIsItemListModalOpen(true)} className="no-button-feedback gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}><List className="size-4" /> Itens</Button>
         </div>
 
         {/* Formulário */}
@@ -383,7 +380,7 @@ export default function App() {
             {/* Título do Produto */}
             <div>
               <label className="block text-[16px] mb-2" style={{ color: '#6D6875' }}><strong>Título do Produto</strong> <span style={{ color: '#F4ACB7' }}>*</span></label>
-              <Input value={productTitle} onChange={(e) => setProductTitle(e.target.value)} placeholder="Ex: Caneca do Ben 10" className="h-12 text-[15px]" style={{ borderColor: '#D8E2DC', color: '#6D6875' }} required />
+              <Input value={productTitle} onChange={(e) => setProductTitle(e.target.value)} placeholder="Ex: Caneca do Ben 10" className="h-11 text-[15px]" style={{ borderColor: '#D8E2DC', color: '#6D6875' }} required />
             </div>
 
             {/* Descrição */}
@@ -462,8 +459,8 @@ export default function App() {
           </div>
 
           <div className="flex justify-end gap-3 mt-6">
-            <Button type="button" onClick={() => navigate('/lista-produtos')} className="px-8 py-3 h-12 text-[16px]" style={{ backgroundColor: 'white', color: '#9D8189', border: '1px solid #D8E2DC' }}>Cancelar</Button>
-            <Button type="submit" className="px-8 py-3 h-12 text-[16px]" style={{ backgroundColor: '#F4ACB7', color: 'white' }}>
+            <Button type="button" onClick={() => navigate('/lista-produtos')} className="px-8 py-3 h-11 text-[16px]" style={{ backgroundColor: 'white', color: '#9D8189', border: '1px solid #D8E2DC' }}>Cancelar</Button>
+            <Button type="submit" className="px-8 py-3 h-11 text-[16px]" style={{ backgroundColor: '#F4ACB7', color: 'white' }}>
               {isEditingProduct ? 'Salvar Alterações' : 'Cadastrar Produto'}
             </Button>
           </div>
@@ -472,13 +469,13 @@ export default function App() {
 
       {/* Modais com onSave e onDelete Mapeados */}
       <ProductCategoryModal isOpen={isCategoryModalOpen} onClose={() => { setIsCategoryModalOpen(false); setEditingCategory(null); }} onSave={editingCategory ? handleEditCategory : handleAddCategory} category={editingCategory} />
-      <ProductCategoryListModal isOpen={isCategoryListModalOpen} onClose={() => setIsCategoryListModalOpen(false)} categories={categories} onEdit={(cat) => { setEditingCategory(cat); setIsCategoryModalOpen(true); setIsCategoryListModalOpen(false); }} onDelete={(cat) => setDeleteCategory(cat)} />
+      <ProductCategoryListModal isOpen={isCategoryListModalOpen} onClose={() => setIsCategoryListModalOpen(false)} categories={categories} onCreate={() => { setEditingCategory(null); setIsCategoryListModalOpen(false); setIsCategoryModalOpen(true); }} onEdit={(cat) => { setEditingCategory(cat); setIsCategoryModalOpen(true); setIsCategoryListModalOpen(false); }} onDelete={(cat) => setDeleteCategory(cat)} />
       
       <ThemeModal isOpen={isThemeModalOpen} onClose={() => { setIsThemeModalOpen(false); setEditingTheme(null); }} onSave={editingTheme ? handleEditTheme : handleAddTheme} theme={editingTheme} categories={categories} />
-      <ThemeListModal isOpen={isThemeListModalOpen} onClose={() => setIsThemeListModalOpen(false)} themes={themes} categories={categories} onEdit={(t) => { setEditingTheme(t); setIsThemeModalOpen(true); setIsThemeListModalOpen(false); }} onDelete={(t) => setDeleteTheme(t)} />
+      <ThemeListModal isOpen={isThemeListModalOpen} onClose={() => setIsThemeListModalOpen(false)} themes={themes} categories={categories} onCreate={() => { setEditingTheme(null); setIsThemeListModalOpen(false); setIsThemeModalOpen(true); }} onEdit={(t) => { setEditingTheme(t); setIsThemeModalOpen(true); setIsThemeListModalOpen(false); }} onDelete={(t) => setDeleteTheme(t)} />
       
       <ItemModal isOpen={isItemModalOpen} onClose={() => { setIsItemModalOpen(false); setEditingItem(null); }} onSave={editingItem ? handleEditItem : handleAddItem} item={editingItem} items={items} />
-      <ItemListModal isOpen={isItemListModalOpen} onClose={() => setIsItemListModalOpen(false)} items={items} onEdit={(i) => { setEditingItem(i); setIsItemModalOpen(true); setIsItemListModalOpen(false); }} onDelete={(i) => setDeleteItem(i)} />
+      <ItemListModal isOpen={isItemListModalOpen} onClose={() => setIsItemListModalOpen(false)} items={items} onCreate={() => { setEditingItem(null); setIsItemListModalOpen(false); setIsItemModalOpen(true); }} onEdit={(i) => { setEditingItem(i); setIsItemModalOpen(true); setIsItemListModalOpen(false); }} onDelete={(i) => setDeleteItem(i)} />
 
       {/* Confirmações de Exclusão */}
       <DeleteProductCategoryDialog isOpen={!!deleteCategory} onClose={() => setDeleteCategory(null)} onConfirm={handleDeleteCategory} categoryName={deleteCategory?.description || ''} />

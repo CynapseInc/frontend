@@ -160,7 +160,7 @@ export default function App() {
         
         <div className="mb-10">
           <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Funcionários</h1>
-          <p className="text-[17px]" style={{ color: '#9D8189' }}>Gerencie toda a sua equipa num só lugar</p>
+          <p className="text-[17px]" style={{ color: '#9D8189' }}>Gerencie toda a sua equipe em um só lugar</p>
         </div>
 
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
@@ -307,7 +307,7 @@ export default function App() {
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
                 className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
-                style={{ backgroundColor: 'white', color: '#6D6875', border: '1px solid #D8E2DC' }}
+                style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
               >
                 Anterior
               </button>
@@ -331,7 +331,7 @@ export default function App() {
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}
                 className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
-                style={{ backgroundColor: 'white', color: '#6D6875', border: '1px solid #D8E2DC' }}
+                style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
               >
                 Próximo
               </button>

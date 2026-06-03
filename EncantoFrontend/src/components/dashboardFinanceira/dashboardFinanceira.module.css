@@ -92,9 +92,9 @@
 /* Estilo para os inputs de data */
 .inputFiltro {
     width: 38vw; /* Define uma largura que cresce com a tela */
-    height: 5vh; /* Altura proporcional */
+    height: 44px;
     border: 1px solid #D8E2DC;
-    border-radius: 0.5vw;
+    border-radius: 6px;
     padding: 0 1vw; /* Espaço interno para o texto não colar na borda */
     font-size: 0.9vw;
     color: #6D6875;
@@ -104,10 +104,10 @@
 
 /* Estilo para o botão acompanhar o tamanho dos inputs */
 .botaoFiltro {
-    height: 5vh;
+    height: 44px;
     padding: 0 2vw;
     font-size: 0.9vw;
-    border-radius: 0.5vw;
+    border-radius: 8px;
     cursor: pointer;
 }
 
@@ -145,7 +145,8 @@
     justify-content: flex-start;
     background-color: white;
     border: 1px solid #D8E2DC;
-    border-radius: 0.5vw;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px 0 #0000001a, 0 1px 2px -1px #0000001a;
 }
 
 .containerFiltro {
@@ -171,6 +172,14 @@
 /* Gráficos */
 .containerCardGraficos {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* Divide a meio por padrão */
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    grid-auto-rows: 420px;
     gap: 2vw;
+    align-items: stretch;
+}
+
+.containerCardGraficos > * {
+    min-width: 0;
+    width: 100%;
+    height: 100%;
 }

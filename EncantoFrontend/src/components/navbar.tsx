@@ -102,12 +102,12 @@ export default function Navbar() {
              <div onClick={() => navigate("/home")} {...getLinkProps("/home")}>Home</div>
              <div onClick={() => navigate("/kanban")} {...getLinkProps("/kanban")}>Kanban</div>
              <div onClick={() => navigate("/pedidos")} {...getLinkProps("/pedidos")}>Pedidos</div>
-             <div onClick={() => navigate("/clientes")} {...getLinkProps("/clientes")}>Clientes</div>
-             <div onClick={() => navigate("/dashboard")} {...getLinkProps("/dashboard")}>Financeiro</div>
+             <div onClick={() => navigate("/dashboard-gestao")} {...getLinkProps("/dashboard-gestao")}>Gestão</div>
              <div onClick={() => navigate("/lista-produtos")} {...getLinkProps("/lista-produtos")}>Produtos</div>
+             <div onClick={() => navigate("/clientes")} {...getLinkProps("/clientes")}>Clientes</div>
              <div onClick={() => navigate("/movimentacao")} {...getLinkProps("/movimentacao")}>Movimentações</div>
+             <div onClick={() => navigate("/dashboard")} {...getLinkProps("/dashboard")}>Financeiro</div>
              <div onClick={() => navigate("/funcionarios")} {...getLinkProps("/funcionarios")}>Funcionários</div>
-             <div onClick={() => navigate("/dashboard-gestao")} {...getLinkProps("/dashboard-gestao")}>Dashboard Gestão</div>
           </nav>
         )}
 

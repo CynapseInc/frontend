@@ -41,10 +41,10 @@ import { temaService } from '../../services/TemaService';
 // Logo simples para Encanto Personalizados
 const EncantoLogo = () => (
   <div className="flex items-center gap-2">
-    <div className="bg-[#e67e96] text-white px-3 py-1 rounded-lg">
+    <div className="bg-[#F4ACB7] text-white px-3 py-1 rounded-lg">
       <span className="font-semibold">E</span>
     </div>
-    <span className="text-neutral-800 font-semibold">Encanto Personalizados</span>
+    <span className="text-[#6D6875] font-semibold">Encanto Personalizados</span>
   </div>
 );
 
@@ -225,8 +225,12 @@ export default function App() {
     return meses[mesIndex];
   };
 
+  const chartLegendFormatter = (value: unknown) => (
+    <span style={{ color: '#6D6875' }}>{String(value)}</span>
+  );
+
   return (
-    <div className="min-h-screen bg-[#faf8f7]">
+    <div className="min-h-screen bg-[#F9F9F9]">
       {/* Header */}
 
 
@@ -234,31 +238,31 @@ export default function App() {
         {/* Page Title */}
         <div style={{ marginBottom: '2vh' }}>
           <h1 style={{ fontSize: '48px', color: '#F4ACB7', marginBottom: '0.5rem', fontWeight: '600' }}>
-            Dashboard de Gestão de Pedidos
+            Gestão de Pedidos
           </h1>
           <p style={{ fontSize: '16px', color: '#9D8189', marginBottom: '2rem' }}>
             Visão geral operacional da sua equipe {periodoResumo}.
-            <span style={{color: '#e98191', fontWeight: '700'}}>{periodoFiltrado && ` ${periodoFiltrado}`}</span>
+            <span style={{color: '#F4ACB7', fontWeight: '700'}}>{periodoFiltrado && ` ${periodoFiltrado}`}</span>
           </p>
         </div>
 
         {error && <p className="text-red-500 text-sm">{error}</p>}
 
         {/* Filtros Globais */}
-        <Card className="p-6 bg-white border-neutral-100 shadow-sm">
+        <Card className="p-6 bg-white border-[#D8E2DC] shadow-sm">
           <div className="flex items-center gap-2 mb-4">
-            <Filter className="size-5 text-[#e67e96]" />
-            <h3 className="text-neutral-800">Filtros da Dashboard</h3>
+            <Filter className="size-5 text-[#F4ACB7]" />
+            <h3 className="text-[#6D6875]">Filtros da Dashboard</h3>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-4">
             {/* Tipo de Pedido */}
             <div className="space-y-2">
-              <label className="text-sm text-neutral-600">Tipo de Pedido</label>
+              <label className="text-sm text-[#6D6875]">Tipo de Pedido</label>
               <select
                 value={filtroTipo}
                 onChange={(e) => setFiltroTipo(e.target.value)}
-                className="w-full h-9 rounded-md border border-neutral-200 bg-white px-3 text-sm text-neutral-800 focus:outline-none focus:ring-1 focus:ring-[#e67e96]"
+                className="w-full h-11 rounded-md border border-[#D8E2DC] bg-white px-3 text-sm text-[#6D6875] focus:outline-none focus:ring-1 focus:ring-[#F4ACB7]/30"
               >
                 <option value="">Todos</option>
                 <option value="Normal">Normal</option>
@@ -269,11 +273,11 @@ export default function App() {
 
             {/* Produto */}
             <div className="space-y-2">
-              <label className="text-sm text-neutral-600">Produto</label>
+              <label className="text-sm text-[#6D6875]">Produto</label>
               <select
                 value={filtroProdutoId}
                 onChange={(e) => setFiltroProdutoId(e.target.value)}
-                className="w-full h-9 rounded-md border border-neutral-200 bg-white px-3 text-sm text-neutral-800 focus:outline-none focus:ring-1 focus:ring-[#e67e96]"
+                className="w-full h-11 rounded-md border border-[#D8E2DC] bg-white px-3 text-sm text-[#6D6875] focus:outline-none focus:ring-1 focus:ring-[#F4ACB7]/30"
               >
                 <option value="">Todos</option>
                 {produtos.map((p) => (
@@ -284,11 +288,11 @@ export default function App() {
 
             {/* Tema */}
             <div className="space-y-2">
-              <label className="text-sm text-neutral-600">Tema</label>
+              <label className="text-sm text-[#6D6875]">Tema</label>
               <select
                 value={filtroTemaId}
                 onChange={(e) => setFiltroTemaId(e.target.value)}
-                className="w-full h-9 rounded-md border border-neutral-200 bg-white px-3 text-sm text-neutral-800 focus:outline-none focus:ring-1 focus:ring-[#e67e96]"
+                className="w-full h-11 rounded-md border border-[#D8E2DC] bg-white px-3 text-sm text-[#6D6875] focus:outline-none focus:ring-1 focus:ring-[#F4ACB7]/30"
               >
                 <option value="">Todos</option>
                 {temas.map((t) => (
@@ -299,23 +303,23 @@ export default function App() {
 
             {/* Data Início */}
             <div className="space-y-2">
-              <label className="text-sm text-neutral-600">Data Início</label>
+              <label className="text-sm text-[#6D6875]">Data Início</label>
               <Input
                 type="date"
                 value={filtroDataInicio}
                 onChange={(e) => setFiltroDataInicio(e.target.value)}
-                className="bg-white border-neutral-200"
+                className="bg-white border-[#D8E2DC]"
               />
             </div>
 
             {/* Data Fim */}
             <div className="space-y-2">
-              <label className="text-sm text-neutral-600">Data Fim</label>
+              <label className="text-sm text-[#6D6875]">Data Fim</label>
               <Input
                 type="date"
                 value={filtroDataFim}
                 onChange={(e) => setFiltroDataFim(e.target.value)}
-                className="bg-white border-neutral-200"
+                className="bg-white border-[#D8E2DC]"
               />
             </div>
           </div>
@@ -323,13 +327,13 @@ export default function App() {
           {/* Contador + Limpar Filtros */}
           <div className="mt-4 flex items-center justify-between">
             {loading ? (
-              <span className="flex items-center gap-2 text-sm text-neutral-400">
-                <Loader2 className="size-4 animate-spin text-[#e67e96]" />
+              <span className="flex items-center gap-2 text-sm text-[#9D8189]">
+                <Loader2 className="size-4 animate-spin text-[#F4ACB7]" />
                 Atualizando dados...
               </span>
             ) : (
-              <p className="text-sm text-neutral-500">
-                Exibindo <span className="text-[#e67e96] font-medium">{dashData?.tiposPedido.length ?? 0}</span> pedidos
+              <p className="text-sm text-[#9D8189]">
+                Exibindo <span className="text-[#F4ACB7] font-medium">{dashData?.tiposPedido.length ?? 0}</span> pedidos
               </p>
             )}
             <Button
@@ -343,7 +347,7 @@ export default function App() {
                 setFiltroProdutoId('');
                 setFiltroTemaId('');
               }}
-              className="border-neutral-200 text-neutral-700 hover:bg-neutral-50"
+              className="border-[#F4ACB7] bg-[#F4ACB7] text-white hover:bg-[#F4ACB7] hover:opacity-90"
             >
               Limpar Filtros
             </Button>
@@ -352,138 +356,138 @@ export default function App() {
 
         {/* KPIs */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4">
-          <Card className="p-4 bg-white border-neutral-100 shadow-sm">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-neutral-400 text-sm">Total de Pedidos</p>
-                <p className="text-neutral-800 mt-1">{kpis.total}</p>
+          <Card className="min-h-[150px] p-4 bg-white border-[#D8E2DC] shadow-sm flex flex-col justify-between">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[#9D8189] text-sm leading-5 min-h-10">Total de Pedidos</p>
+                <p className="text-[#6D6875] mt-1 text-[18px] leading-6">{kpis.total}</p>
               </div>
-              <div className="bg-[#fce4e8] p-2 rounded-lg">
-                <Package className="size-5 text-[#e67e96]" />
-              </div>
-            </div>
-            <p className="text-neutral-400 text-sm mt-3">No período</p>
-          </Card>
-
-          <Card className="p-4 bg-white border-neutral-100 shadow-sm">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-neutral-400 text-sm">Pedidos Entregues</p>
-                <p className="text-neutral-800 mt-1">{kpis.entregues}</p>
-              </div>
-              <div className="bg-[#fce4e8] p-2 rounded-lg">
-                <CheckCircle2 className="size-5 text-[#e67e96]" />
+              <div className="bg-[#FFE5D9] p-2 rounded-lg shrink-0">
+                <Package className="size-5 text-[#F4ACB7]" />
               </div>
             </div>
-            <p className="text-[#e67e96] text-sm mt-3">{kpis.percentualEntregues}% de conclusão</p>
+            <p className="text-[#9D8189] text-sm leading-5">No período</p>
           </Card>
 
-          <Card className="p-4 bg-white border-neutral-100 shadow-sm">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-neutral-400 text-sm">Pedidos Atrasados</p>
-                <p className="text-neutral-800 mt-1">{kpis.percentualAtrasados}%</p>
+          <Card className="min-h-[150px] p-4 bg-white border-[#D8E2DC] shadow-sm flex flex-col justify-between">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[#9D8189] text-sm leading-5 min-h-10">Pedidos Entregues</p>
+                <p className="text-[#6D6875] mt-1 text-[18px] leading-6">{kpis.entregues}</p>
               </div>
-              <div className="bg-[#fce4e8] p-2 rounded-lg">
-                <AlertCircle className="size-5 text-[#e67e96]" />
+              <div className="bg-[#FFE5D9] p-2 rounded-lg shrink-0">
+                <CheckCircle2 className="size-5 text-[#F4ACB7]" />
               </div>
             </div>
-            <p className="text-[#dc6b84] text-sm mt-3">{kpis.atrasados} pedidos atrasados</p>
+            <p className="text-[#F4ACB7] text-sm leading-5">{kpis.percentualEntregues}% de conclusão</p>
           </Card>
 
-          <Card className="p-4 bg-white border-neutral-100 shadow-sm">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-neutral-400 text-sm">Tempo Médio de Entrega</p>
-                <p className="text-neutral-800 mt-1">
+          <Card className="min-h-[150px] p-4 bg-white border-[#D8E2DC] shadow-sm flex flex-col justify-between">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[#9D8189] text-sm leading-5 min-h-10">Pedidos Atrasados</p>
+                <p className="text-[#6D6875] mt-1 text-[18px] leading-6">{kpis.percentualAtrasados}%</p>
+              </div>
+              <div className="bg-[#FFE5D9] p-2 rounded-lg shrink-0">
+                <AlertCircle className="size-5 text-[#F4ACB7]" />
+              </div>
+            </div>
+            <p className="text-[#6D6875] text-sm leading-5">{kpis.atrasados} pedidos atrasados</p>
+          </Card>
+
+          <Card className="min-h-[150px] p-4 bg-white border-[#D8E2DC] shadow-sm flex flex-col justify-between">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[#9D8189] text-sm leading-5 min-h-10">Tempo Médio de Entrega</p>
+                <p className="text-[#6D6875] mt-1 text-[18px] leading-6">
                   {ultimoLeadTime !== null ? `${ultimoLeadTime} dias` : '—'}
                 </p>
               </div>
-              <div className="bg-[#fce4e8] p-2 rounded-lg">
-                <Clock className="size-5 text-[#e67e96]" />
+              <div className="bg-[#FFE5D9] p-2 rounded-lg shrink-0">
+                <Clock className="size-5 text-[#F4ACB7]" />
               </div>
             </div>
             {/* TODO: no comparison data in API */}
-            <p className="text-neutral-400 text-sm mt-3">Último mês do período</p>
+            <p className="text-[#9D8189] text-sm leading-5">Último mês do período</p>
           </Card>
 
-          <Card className="p-4 bg-white border-neutral-100 shadow-sm">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-neutral-400 text-sm">Sem Atualização</p>
-                <p className="text-neutral-800 mt-1">{kpis.semAtualizacao}</p>
+          <Card className="min-h-[150px] p-4 bg-white border-[#D8E2DC] shadow-sm flex flex-col justify-between">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[#9D8189] text-sm leading-5 min-h-10">Sem Atualização</p>
+                <p className="text-[#6D6875] mt-1 text-[18px] leading-6">{kpis.semAtualizacao}</p>
               </div>
-              <div className="bg-[#fce4e8] p-2 rounded-lg">
-                <PauseCircle className="size-5 text-[#e67e96]" />
+              <div className="bg-[#FFE5D9] p-2 rounded-lg shrink-0">
+                <PauseCircle className="size-5 text-[#F4ACB7]" />
               </div>
             </div>
-            <p className="text-neutral-400 text-sm mt-3">Há 4+ dias parados</p>
+            <p className="text-[#9D8189] text-sm leading-5">Há 4+ dias parados</p>
           </Card>
 
-          <Card className="p-4 bg-white border-neutral-100 shadow-sm">
-            <div className="flex items-start justify-between">
-              <div>
-                <p className="text-neutral-400 text-sm">Pedidos Refeitos</p>
-                <p className="text-neutral-800 mt-1">{kpis.retrabalho}</p>
+          <Card className="min-h-[150px] p-4 bg-white border-[#D8E2DC] shadow-sm flex flex-col justify-between">
+            <div className="flex items-start justify-between gap-3">
+              <div className="min-w-0">
+                <p className="text-[#9D8189] text-sm leading-5 min-h-10">Pedidos Refeitos</p>
+                <p className="text-[#6D6875] mt-1 text-[18px] leading-6">{kpis.retrabalho}</p>
               </div>
-              <div className="bg-[#fce4e8] p-2 rounded-lg">
-                <RefreshCw className="size-5 text-[#e67e96]" />
+              <div className="bg-[#FFE5D9] p-2 rounded-lg shrink-0">
+                <RefreshCw className="size-5 text-[#F4ACB7]" />
               </div>
             </div>
-            <p className="text-[#e67e96] text-sm mt-3">No período filtrado</p>
+            <p className="text-[#F4ACB7] text-sm leading-5">No período filtrado</p>
           </Card>
         </div>
 
         {/* Gráficos Operacionais */}
         <div className="space-y-4">
-          <h2 className="text-neutral-800" style={{color: '#f097a5'}}>Gráficos Operacionais</h2>
+          <h2 className="text-[#6D6875]" style={{color: '#F4ACB7'}}>Gráficos Operacionais</h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Pedidos criados x entregues */}
-            <Card className="p-6 bg-white border-neutral-100 shadow-sm">
-              <h3 className="text-neutral-800 mb-4" style={{color: '#f097a5'}}>Pedidos Criados vs Entregues</h3>
+            <Card className="p-6 bg-white border-[#D8E2DC] shadow-sm">
+              <h3 className="text-[#6D6875] mb-4" style={{color: '#F4ACB7'}}>Pedidos Criados vs Entregues</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={pedidosMesData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="mes" stroke="#a3a3a3" tickFormatter={formatarMes} />
-                  <YAxis stroke="#a3a3a3" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D8E2DC" />
+                  <XAxis dataKey="mes" stroke="#6D6875" tick={{ fill: '#6D6875' }} tickFormatter={formatarMes} />
+                  <YAxis stroke="#6D6875" tick={{ fill: '#6D6875' }} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#fff',
-                      border: '1px solid #f0f0f0',
+                      border: '1px solid #D8E2DC',
                       borderRadius: '8px'
                     }}
                   />
-                  <Legend />
-                  <Bar dataKey="criados" fill="#f7b4c4" name="Criados" radius={[4, 4, 0, 0]} />
-                  <Bar dataKey="entregues" fill="#e67e96" name="Entregues" radius={[4, 4, 0, 0]} />
+                  <Legend iconType="square" iconSize={10} formatter={chartLegendFormatter} />
+                  <Bar dataKey="criados" fill="#9D8189" name="Criados" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="entregues" fill="#F4ACB7" name="Entregues" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </Card>
 
             {/* Lead Time */}
-            <Card className="p-6 bg-white border-neutral-100 shadow-sm">
-              <h3 className="text-neutral-800 mb-4" style={{color: '#f097a5'}}>Tempo Médio de Entrega (dias)</h3>
+            <Card className="p-6 bg-white border-[#D8E2DC] shadow-sm">
+              <h3 className="text-[#6D6875] mb-4" style={{color: '#F4ACB7'}}>Tempo Médio de Entrega (dias)</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={leadTimeData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="mes" stroke="#a3a3a3" tickFormatter={formatarMes} />
-                  <YAxis stroke="#a3a3a3" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D8E2DC" />
+                  <XAxis dataKey="mes" stroke="#6D6875" tick={{ fill: '#6D6875' }} tickFormatter={formatarMes} />
+                  <YAxis stroke="#6D6875" tick={{ fill: '#6D6875' }} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#fff',
-                      border: '1px solid #f0f0f0',
+                      border: '1px solid #D8E2DC',
                       borderRadius: '8px'
                     }}
                   />
-                  <Legend />
+                  <Legend iconType="square" iconSize={10} formatter={chartLegendFormatter} />
                   <Line
                     type="monotone"
                     dataKey="leadTime"
-                    stroke="#e67e96"
+                    stroke="#F4ACB7"
                     strokeWidth={3}
                     name="Tempo de Entrega"
-                    dot={{ fill: '#e67e96', r: 5 }}
+                    dot={{ fill: '#F4ACB7', r: 5 }}
                   />
                 </LineChart>
               </ResponsiveContainer>
@@ -492,41 +496,41 @@ export default function App() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Tempo por etapa */}
-            <Card className="p-6 bg-white border-neutral-100 shadow-sm">
-              <h3 className="text-neutral-800 mb-4" style={{color: '#f097a5'}}>Tempo Médio por Etapa (dias)</h3>
+            <Card className="p-6 bg-white border-[#D8E2DC] shadow-sm">
+              <h3 className="text-[#6D6875] mb-4" style={{color: '#F4ACB7'}}>Tempo Médio por Etapa (dias)</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={etapasProcessoData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis type="number" stroke="#a3a3a3" />
-                  <YAxis dataKey="etapa" type="category" stroke="#a3a3a3" width={100} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D8E2DC" />
+                  <XAxis type="number" stroke="#6D6875" tick={{ fill: '#6D6875' }} />
+                  <YAxis dataKey="etapa" type="category" stroke="#6D6875" tick={{ fill: '#6D6875' }} width={100} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#fff',
-                      border: '1px solid #f0f0f0',
+                      border: '1px solid #D8E2DC',
                       borderRadius: '8px'
                     }}
                   />
-                  <Bar dataKey="dias" fill="#e67e96" name="Dias" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="dias" fill="#F4ACB7" name="Dias" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </Card>
 
             {/* Retrabalho */}
-            <Card className="p-6 bg-white border-neutral-100 shadow-sm">
-              <h3 className="text-neutral-800 mb-4" style={{color: '#f097a5'}}>Pedidos Refeitos por Mês</h3>
+            <Card className="p-6 bg-white border-[#D8E2DC] shadow-sm">
+              <h3 className="text-[#6D6875] mb-4" style={{color: '#F4ACB7'}}>Pedidos Refeitos por Mês</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={retrabalhoData}>
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis dataKey="mes" stroke="#a3a3a3" />
-                  <YAxis stroke="#a3a3a3" />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D8E2DC" />
+                  <XAxis dataKey="mes" stroke="#6D6875" tick={{ fill: '#6D6875' }} />
+                  <YAxis stroke="#6D6875" tick={{ fill: '#6D6875' }} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#fff',
-                      border: '1px solid #f0f0f0',
+                      border: '1px solid #D8E2DC',
                       borderRadius: '8px'
                     }}
                   />
-                  <Bar dataKey="quantidade" fill="#e67e96" name="Pedidos Refeitos" radius={[4, 4, 0, 0]} />
+                  <Bar dataKey="quantidade" fill="#9D8189" name="Pedidos Refeitos" radius={[4, 4, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </Card>
@@ -535,45 +539,45 @@ export default function App() {
 
         {/* Gráficos de Produtividade */}
         <div className="space-y-4">
-          <h2 className="text-neutral-800" style={{color: '#f097a5'}}>Produtividade da Equipe</h2>
+          <h2 className="text-[#6D6875]" style={{color: '#F4ACB7'}}>Produtividade da Equipe</h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Pedidos concluídos */}
-            <Card className="p-6 bg-white border-neutral-100 shadow-sm">
-              <h3 className="text-neutral-800 mb-4" style={{color: '#f097a5'}}>Pedidos Concluídos por Funcionário</h3>
+            <Card className="p-6 bg-white border-[#D8E2DC] shadow-sm">
+              <h3 className="text-[#6D6875] mb-4" style={{color: '#F4ACB7'}}>Pedidos Concluídos por Funcionário</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={pedidosConcluidosData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis type="number" stroke="#a3a3a3" />
-                  <YAxis dataKey="funcionario" type="category" stroke="#a3a3a3" width={120} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D8E2DC" />
+                  <XAxis type="number" stroke="#6D6875" tick={{ fill: '#6D6875' }} />
+                  <YAxis dataKey="funcionario" type="category" stroke="#6D6875" tick={{ fill: '#6D6875' }} width={120} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#fff',
-                      border: '1px solid #f0f0f0',
+                      border: '1px solid #D8E2DC',
                       borderRadius: '8px'
                     }}
                   />
-                  <Bar dataKey="pedidos" fill="#e67e96" name="Concluídos" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="pedidos" fill="#F4ACB7" name="Concluídos" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </Card>
 
             {/* Carga de trabalho */}
-            <Card className="p-6 bg-white border-neutral-100 shadow-sm">
-              <h3 className="text-neutral-800 mb-4" style={{color: '#f097a5'}}>Carga de Trabalho Atual</h3>
+            <Card className="p-6 bg-white border-[#D8E2DC] shadow-sm">
+              <h3 className="text-[#6D6875] mb-4" style={{color: '#F4ACB7'}}>Carga de Trabalho Atual</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={cargaTrabalhoData} layout="vertical">
-                  <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                  <XAxis type="number" stroke="#a3a3a3" />
-                  <YAxis dataKey="funcionario" type="category" stroke="#a3a3a3" width={120} />
+                  <CartesianGrid strokeDasharray="3 3" stroke="#D8E2DC" />
+                  <XAxis type="number" stroke="#6D6875" tick={{ fill: '#6D6875' }} />
+                  <YAxis dataKey="funcionario" type="category" stroke="#6D6875" tick={{ fill: '#6D6875' }} width={120} />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#fff',
-                      border: '1px solid #f0f0f0',
+                      border: '1px solid #D8E2DC',
                       borderRadius: '8px'
                     }}
                   />
-                  <Bar dataKey="emAndamento" fill="#f7b4c4" name="Em Andamento" radius={[0, 4, 4, 0]} />
+                  <Bar dataKey="emAndamento" fill="#9D8189" name="Em Andamento" radius={[0, 4, 4, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </Card>
@@ -582,38 +586,45 @@ export default function App() {
 
         {/* Tabela de Pedidos Sem Atualização */}
         <div className="space-y-4">
-          <h2 className="text-neutral-800">Pedidos Sem Atualização</h2>
-          <Card className="bg-white border-neutral-100 shadow-sm overflow-hidden">
+          <h2 className="text-[#6D6875]">Pedidos Sem Atualização</h2>
+          <Card className="bg-white border-[#D8E2DC] shadow-sm overflow-hidden">
             <Table>
               <TableHeader>
-                <TableRow className="bg-[#faf8f7] border-neutral-100">
-                  <TableHead className="text-neutral-800">ID</TableHead>
-                  <TableHead className="text-neutral-800">Cliente</TableHead>
-                  <TableHead className="text-neutral-800">Status Atual</TableHead>
-                  <TableHead className="text-neutral-800">Dias Parado</TableHead>
-                  <TableHead className="text-neutral-800">Responsável</TableHead>
+                <TableRow className="bg-[#FFE5D9] hover:bg-[#FFE5D9] border-[#D8E2DC]">
+                  <TableHead className="text-[#6D6875]">ID</TableHead>
+                  <TableHead className="text-[#6D6875]">Cliente</TableHead>
+                  <TableHead className="text-[#6D6875]">Status Atual</TableHead>
+                  <TableHead className="text-[#6D6875]">Dias Parado</TableHead>
+                  <TableHead className="text-[#6D6875]">Responsável</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
                 {pedidosSemAtualizacao.length > 0 ? (
-                  pedidosSemAtualizacaoPaginados.map((pedido) => (
-                    <TableRow key={pedido.id} className="border-neutral-100">
-                      <TableCell className="text-neutral-800">{pedido.id}</TableCell>
-                      <TableCell className="text-neutral-600">{pedido.cliente}</TableCell>
+                  pedidosSemAtualizacaoPaginados.map((pedido, index) => (
+                    <TableRow
+                      key={pedido.id}
+                      className={`border-[#D8E2DC] ${
+                        index % 2 === 0
+                          ? 'bg-[#F9F9F9] hover:bg-[#F9F9F9]'
+                          : 'bg-white hover:bg-white'
+                      }`}
+                    >
+                      <TableCell className="text-[#6D6875]">{pedido.id}</TableCell>
+                      <TableCell className="text-[#6D6875]">{pedido.cliente}</TableCell>
                       <TableCell>
-                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-[#fce4e8] text-[#dc6b84] border border-[#f7b4c4]">
+                        <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-sm bg-[#FFE5D9] text-[#6D6875] border border-[#D8E2DC]">
                           {pedido.status}
                         </span>
                       </TableCell>
                       <TableCell>
-                        <span className="text-[#dc6b84]">{pedido.diasParado} dias</span>
+                        <span className="text-[#6D6875]">{pedido.diasParado} dias</span>
                       </TableCell>
-                      <TableCell className="text-neutral-600">{pedido.responsavel}</TableCell>
+                      <TableCell className="text-[#6D6875]">{pedido.responsavel}</TableCell>
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={5} className="text-center text-neutral-400 py-8">
+                    <TableCell colSpan={5} className="text-center text-[#9D8189] py-8">
                       Nenhum pedido encontrado com os filtros selecionados
                     </TableCell>
                   </TableRow>
@@ -621,8 +632,8 @@ export default function App() {
               </TableBody>
             </Table>
             {pedidosSemAtualizacao.length > 0 && (
-              <div className="flex items-center justify-between gap-4 border-t border-neutral-100 px-4 py-3">
-                <span className="text-sm text-neutral-500">
+              <div className="flex items-center justify-between gap-4 border-t border-[#D8E2DC] px-4 py-3">
+                <span className="text-sm text-[#9D8189]">
                   {pedidosSemAtualizacao.length} pedidos sem atualização
                 </span>
                 {temPaginacaoPedidosSemAtualizacao && (
@@ -636,7 +647,7 @@ export default function App() {
                     >
                       Anterior
                     </Button>
-                    <span className="text-sm text-neutral-500">
+                    <span className="text-sm text-[#9D8189]">
                       Página {paginaPedidosSemAtualizacao} de {totalPaginasPedidosSemAtualizacao}
                     </span>
                     <Button
