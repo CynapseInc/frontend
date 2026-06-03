@@ -13,6 +13,7 @@ interface Theme {
   id: string;
   description: string;
   categoryId: string;
+  categoryDescription: string;
 }
 
 interface ThemeListModalProps {
@@ -53,11 +54,12 @@ export default function ThemeListModal({ isOpen, onClose, themes, categories, on
           setTotalPages(data.totalPages);
           
           // mapear os nomes da resposta para o formato esperado
-          console.log('Resposta da API:', data);
+          
           const mappedThemes = data.content.map((theme: any) => ({
             id: theme.id,
             description: theme.descricao,
-            categoryId: theme.categoriaTemaId
+            categoryId: theme.categoriaTemaId,
+            categoryDescription: theme.categoriaTema.titulo
           }));
           setTemasFiltrados(mappedThemes);
         } catch (error) {
@@ -212,7 +214,7 @@ export default function ThemeListModal({ isOpen, onClose, themes, categories, on
                             color: '#6D6875'
                           }}
                         >
-                          {getCategoryName(theme.categoryId)}
+                          {theme.categoryDescription}
                         </span>
                       </td>
                       <td className="px-6 py-4">

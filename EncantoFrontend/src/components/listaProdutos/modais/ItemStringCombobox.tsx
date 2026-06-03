@@ -1,50 +1,49 @@
 import { useState, useEffect, useRef } from 'react';
 import { Check, ChevronDown, X } from 'lucide-react';
-import { temaService } from '../../../services/TemaService';
+import { itemService } from '../../../services/ItemService';
 
-interface ProductTheme {
+interface Item {
   id: string;
   description: string;
-  categoriaDescricao: string;
+  salePrice: number;
+  productionCost: number;
+  productionDeadline: string;
+  width: string;
+  height: string;
+  weight: string;
+  length: string;
+  material: string;
+  descricaoPadrao?: string;
+  promotionalPrice: number;
+  unitPrice: number;
+  minimumQuantity: number;
 }
 
-interface ThemeComboboxProps {
+interface ItemComboboxProps {
   value: string;
-  onChange: (id: string, categoryDesc: string) => void;
-  themes: ProductTheme[];
+  onChange: (id: string, item?: Item | null) => void;
+  items: string[];
   isErr?: boolean;
-  themeSelected?: string | null;
 }
 
-export default function ThemeCombobox({ value, onChange, themes, isErr, themeSelected }: ThemeComboboxProps) {
+export default function ItemCombobox({ value, onChange, items, isErr }: ItemComboboxProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [selectedName, setSelectedName] = useState(themeSelected);
-  const [filteredThemes, setFilteredThemes] = useState<ProductTheme[]>(themes);
+  const [selectedName, setSelectedName] = useState('');
+  const [filteredItems, setFilteredItems] = useState<string[]>([]);
   const searchTimeoutRef = useRef<number | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-
   useEffect(() => {
-    if (themeSelected != undefined) {
-      setSelectedName(themeSelected);
-    }
-
-  }, [ themeSelected])
-
-  useEffect(() => {
-
     if (value) {
-      const selected = themes.find(theme => theme.id === value);
-      console.log(selectedName, ' ', themeSelected); // --- IGNORE ---
+      const selected = items.find(item => item === value);
       if (selected) {
-        console.log('Tema selecionado:', selectedName); // --- IGNORE ---
-        setSelectedName(selected.description);
+        setSelectedName(selected);
       }
     } else {
       setSelectedName('');
     }
-  }, [value, themes]);
+  }, [value, items]);
 
   // Fechar ao clicar fora
   useEffect(() => {
@@ -58,50 +57,46 @@ export default function ThemeCombobox({ value, onChange, themes, isErr, themeSel
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  useEffect(() => {
+   useEffect(() => {
+          
             
+            if(searchTimeoutRef.current) {
+              window.clearTimeout(searchTimeoutRef.current);
+            }
+      
+            searchTimeoutRef.current = window.setTimeout(async () => {
+      
+            try {
+              const data = await itemService.listarTodos({ search: search });
               
-              if(searchTimeoutRef.current) {
-                window.clearTimeout(searchTimeoutRef.current);
-              }
-        
-              searchTimeoutRef.current = window.setTimeout(async () => {
-        
-              try {
-                const data = await temaService.listarTodos({ search: search });
-                
-                
-                // mapear os nomes da resposta para o formato esperado
-                console.log('Resposta da API temas:', data); // --- IGNORE ---s
-                const mappedThemes = data.content.map((t: any) => ({
-                  id: t.id,
-                  description: t.descricao,
-                  categoriaDescricao: t.categoriaTema ? t.categoriaTema.titulo : 'Sem categoria'
-                }));
-                
-                setFilteredThemes(mappedThemes);
               
-               
-              } catch (error) {
-                console.error('Erro ao buscar temas:', error);
-              }
-            },
-            500)
-           
-            
-          }, [search])
+              // mapear os nomes da resposta para o formato esperado
+              
+              const mappedItems = data.content.map((item: any) => item.descricao);
+             
+              setFilteredItems(mappedItems);
+            } catch (error) {
+              console.error('Erro ao buscar itens:', error);
+            }
+          },
+          500)
+         
+          
+        }, [search])
+
   
 
-  const handleSelect = (theme: ProductTheme) => {
-    onChange(theme.id, theme.categoriaDescricao);
-    setSelectedName(theme.description);
+  const handleSelect = (item: string) => {
+
+    onChange(item);
+    setSelectedName(item);
     setOpen(false);
     setSearch('');
   };
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onChange('', '');
+    onChange('', null);
     setSelectedName('');
     setSearch('');
   };
@@ -118,7 +113,7 @@ export default function ThemeCombobox({ value, onChange, themes, isErr, themeSel
           color: selectedName ? '#6D6875' : '#9D8189'
         }}
       >
-        <span>{selectedName || 'Selecione um tema...'}</span>
+        <span>{selectedName || 'Selecione um item (opcional)...'}</span>
         <div className="flex items-center gap-2">
           {selectedName && (
             <button
@@ -144,7 +139,7 @@ export default function ThemeCombobox({ value, onChange, themes, isErr, themeSel
           <div className="p-2 border-b" style={{ borderColor: '#D8E2DC' }}>
             <input
               type="text"
-              placeholder="Pesquisar tema..."
+              placeholder="Pesquisar item..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full px-3 py-2 rounded-md border text-[14px] focus:outline-none focus:border-[#F4ACB7]"
@@ -158,26 +153,27 @@ export default function ThemeCombobox({ value, onChange, themes, isErr, themeSel
           </div>
 
           <div className="max-h-[300px] overflow-y-auto">
-            {filteredThemes.length === 0 ? (
+            {filteredItems.length === 0 ? (
               <div className="py-6 text-center text-[14px]" style={{ color: '#9D8189' }}>
-                Nenhum tema encontrado
+                Nenhum item encontrado
               </div>
             ) : (
-              filteredThemes.map((theme) => (
+              filteredItems.map((item) => (
                 <button
-                  key={theme.id}
+                  key={item}
                   type="button"
-                  onClick={() => handleSelect(theme)}
+                  onClick={() => handleSelect(item)}
                   className="w-full px-4 py-2.5 text-left text-[14px] flex items-center justify-between hover:bg-gray-100 transition-colors border-0"
                   style={{
                     color: '#6D6875',
-                    backgroundColor: value === theme.id ? '#F0F0F0' : 'transparent'
+                    backgroundColor: value === item ? '#F0F0F0' : 'transparent'
                   }}
                 >
                   <div className="flex-1">
-                    {theme.description}
+                    <div className="font-medium">{item}</div>
+                    
                   </div>
-                  {value === theme.id && (
+                  {value === item && (
                     <Check className="size-4 ml-2" style={{ color: '#F4ACB7' }} />
                   )}
                 </button>

@@ -1,7 +1,7 @@
 import api from '../provider/api';
 
 export const categoriaTemaService = {
-  listarTodos: async (params?:{
+    listarTodos: async (params?:{
         search?: string,
         page?:number
     }) => {

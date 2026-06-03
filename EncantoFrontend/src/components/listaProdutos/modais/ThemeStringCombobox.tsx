@@ -1,45 +1,32 @@
 import { useState, useEffect, useRef } from 'react';
 import { Check, ChevronDown, X } from 'lucide-react';
-import { temaService } from '../../../services/TemaService';
+import {temaService} from '../../../services/TemaService';
 
 interface ProductTheme {
   id: string;
   description: string;
-  categoriaDescricao: string;
 }
 
 interface ThemeComboboxProps {
   value: string;
-  onChange: (id: string, categoryDesc: string) => void;
-  themes: ProductTheme[];
+  onChange: (value: string) => void;
+  themes: string[];
   isErr?: boolean;
-  themeSelected?: string | null;
 }
 
-export default function ThemeCombobox({ value, onChange, themes, isErr, themeSelected }: ThemeComboboxProps) {
+export default function ThemeCombobox({ value, onChange, themes, isErr }: ThemeComboboxProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [selectedName, setSelectedName] = useState(themeSelected);
-  const [filteredThemes, setFilteredThemes] = useState<ProductTheme[]>(themes);
+  const [selectedName, setSelectedName] = useState('');
   const searchTimeoutRef = useRef<number | null>(null);
+  const [filteredThemes, setFilteredThemes] = useState<string[]>([]);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
-
   useEffect(() => {
-    if (themeSelected != undefined) {
-      setSelectedName(themeSelected);
-    }
-
-  }, [ themeSelected])
-
-  useEffect(() => {
-
     if (value) {
-      const selected = themes.find(theme => theme.id === value);
-      console.log(selectedName, ' ', themeSelected); // --- IGNORE ---
+      const selected = themes.find(theme => theme === value);
       if (selected) {
-        console.log('Tema selecionado:', selectedName); // --- IGNORE ---
-        setSelectedName(selected.description);
+        setSelectedName(selected);
       }
     } else {
       setSelectedName('');
@@ -59,49 +46,42 @@ export default function ThemeCombobox({ value, onChange, themes, isErr, themeSel
   }, []);
 
   useEffect(() => {
+        
+          
+          if(searchTimeoutRef.current) {
+            window.clearTimeout(searchTimeoutRef.current);
+          }
+    
+          searchTimeoutRef.current = window.setTimeout(async () => {
+    
+          try {
+            const data = await temaService.listarTodos({ search: search });
             
-              
-              if(searchTimeoutRef.current) {
-                window.clearTimeout(searchTimeoutRef.current);
-              }
-        
-              searchTimeoutRef.current = window.setTimeout(async () => {
-        
-              try {
-                const data = await temaService.listarTodos({ search: search });
-                
-                
-                // mapear os nomes da resposta para o formato esperado
-                console.log('Resposta da API temas:', data); // --- IGNORE ---s
-                const mappedThemes = data.content.map((t: any) => ({
-                  id: t.id,
-                  description: t.descricao,
-                  categoriaDescricao: t.categoriaTema ? t.categoriaTema.titulo : 'Sem categoria'
-                }));
-                
-                setFilteredThemes(mappedThemes);
-              
-               
-              } catch (error) {
-                console.error('Erro ao buscar temas:', error);
-              }
-            },
-            500)
+            
+            // mapear os nomes da resposta para o formato esperado
+            
+            const mappedThemes = data.content.map((item: any) => item.descricao);
            
-            
-          }, [search])
-  
+            setFilteredThemes(mappedThemes);
+          } catch (error) {
+            console.error('Erro ao buscar temas:', error);
+          }
+        },
+        500)
+       
+        
+      }, [search])
 
-  const handleSelect = (theme: ProductTheme) => {
-    onChange(theme.id, theme.categoriaDescricao);
-    setSelectedName(theme.description);
+  const handleSelect = (theme: string) => {
+    onChange(theme);
+    setSelectedName(theme);
     setOpen(false);
     setSearch('');
   };
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onChange('', '');
+    onChange('');
     setSelectedName('');
     setSearch('');
   };
@@ -165,19 +145,19 @@ export default function ThemeCombobox({ value, onChange, themes, isErr, themeSel
             ) : (
               filteredThemes.map((theme) => (
                 <button
-                  key={theme.id}
+                  key={theme}
                   type="button"
                   onClick={() => handleSelect(theme)}
                   className="w-full px-4 py-2.5 text-left text-[14px] flex items-center justify-between hover:bg-gray-100 transition-colors border-0"
                   style={{
                     color: '#6D6875',
-                    backgroundColor: value === theme.id ? '#F0F0F0' : 'transparent'
+                    backgroundColor: value === theme ? '#F0F0F0' : 'transparent'
                   }}
                 >
                   <div className="flex-1">
-                    {theme.description}
+                    {theme}
                   </div>
-                  {value === theme.id && (
+                  {value === theme && (
                     <Check className="size-4 ml-2" style={{ color: '#F4ACB7' }} />
                   )}
                 </button>

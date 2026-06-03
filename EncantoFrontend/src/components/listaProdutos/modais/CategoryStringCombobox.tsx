@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Check, ChevronDown, X } from 'lucide-react';
+import { categoriaTemaService } from '../../../services/CategoriaTemaService';
 
 interface CategoryComboboxProps {
   value: string;
@@ -8,11 +9,13 @@ interface CategoryComboboxProps {
   isErr?: boolean;
 }
 
-export default function CategoryCombobox({ value, onChange, categories, isErr }: CategoryComboboxProps) {
+export default function       CategoryStringCombobox({ value, onChange, categories, isErr }: CategoryComboboxProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
+  const searchTimeoutRef = useRef<number | null>(null);
   const [selectedName, setSelectedName] = useState('');
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const [filteredCategories, setFilteredCategories] = useState<string[]>([]);
 
   useEffect(() => {
     if (value) {
@@ -25,6 +28,8 @@ export default function CategoryCombobox({ value, onChange, categories, isErr }:
     }
   }, [value, categories]);
 
+
+
   // Fechar ao clicar fora
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
@@ -36,10 +41,32 @@ export default function CategoryCombobox({ value, onChange, categories, isErr }:
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
-
-  const filteredCategories = categories.filter(cat =>
-    cat.toLowerCase().includes(search.toLowerCase())
-  );
+   useEffect(() => {
+      
+        
+        if(searchTimeoutRef.current) {
+          window.clearTimeout(searchTimeoutRef.current);
+        }
+  
+        searchTimeoutRef.current = window.setTimeout(async () => {
+  
+        try {
+          const data = await categoriaTemaService.listarTodos({ search: search });
+          
+          
+          // mapear os nomes da resposta para o formato esperado
+          
+          const mappedThemes = data.content.map((item: any) => item.titulo);
+            
+          setFilteredCategories(mappedThemes);
+        } catch (error) {
+          console.error('Erro ao buscar temas:', error);
+        }
+      },
+      500)
+     
+      
+    }, [search])
 
   const handleSelect = (category: string) => {
     onChange(category);

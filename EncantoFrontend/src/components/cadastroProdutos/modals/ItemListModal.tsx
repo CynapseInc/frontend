@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../../ui/dialog';
 import { X, Pencil, Trash2, Search } from 'lucide-react';
 import { Input } from '../../ui/input';
+import { itemService } from '../../../services/ItemService';
 
 interface Item {
   id: string;
@@ -30,17 +31,56 @@ interface ItemListModalProps {
 export default function ItemListModal({ isOpen, onClose, items, onEdit, onDelete }: ItemListModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
-  const itemsPerPage = 8;
+  const [filteredItems, setFilteredItems] = useState<Item[]>(items);
+  const [totalPages, setTotalPages] = useState(1);
+  const searchTimeoutRef = useRef<number | null>(null);
 
-  const filteredItems = useMemo(() =>
-    items.filter(item =>
-      item.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      item.material.toLowerCase().includes(searchTerm.toLowerCase())
-    ),
-    [items, searchTerm]
-  );
+  const itemsPerPage = 10;
 
-  const totalPages = Math.ceil(filteredItems.length / itemsPerPage);
+    useEffect(() => {
+         
+           
+           if(searchTimeoutRef.current) {
+             window.clearTimeout(searchTimeoutRef.current);
+           }
+     
+           searchTimeoutRef.current = window.setTimeout(async () => {
+     
+           try {
+             const data = await itemService.listarTodos({ search: searchTerm, page: currentPage - 1 });
+             setTotalPages(data.totalPages);
+             
+             // mapear os nomes da resposta para o formato esperado
+              console.log('Resposta da API:', data);
+              const mappedItems = data.content.map((item: any) => ({
+                id: item.id,
+                description: item.descricao,
+                salePrice:  item.precoVenda || 0,
+                productionCost: item.custoProducao || 0,
+                productionDeadline: item.prazoProducao || '',
+                width: item.largura || '',
+                height: item.altura || '',
+                weight: item.peso || '',
+                length: item.comprimento || '',
+                material: item.material || '',
+                descricaoPadrao: item.descricaoPadrao || '',
+                promotionalPrice: item.precoPromocional || 0,
+                unitPrice: item.precoUnitario || 0,
+                minimumQuantity: item.quantidadeMinima || 0
+              }));
+             
+              setFilteredItems(mappedItems);
+           } catch (error) {
+             console.error('Erro ao buscar itens:', error);
+           }
+         },
+         500)
+        
+         
+       }, [searchTerm, currentPage])
+             
+           
+  
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedItems = filteredItems.slice(startIndex, endIndex);
@@ -138,7 +178,7 @@ export default function ItemListModal({ isOpen, onClose, items, onEdit, onDelete
 
         {/* Tabela */}
         <div className="px-8 pb-6 overflow-y-auto" style={{ maxHeight: '500px' }}>
-          {paginatedItems.length === 0 ? (
+          {filteredItems.length === 0 ? (
             <div className="text-center py-12" style={{ color: '#9D8189' }}>
               <p className="text-[15px]">Nenhum item encontrado</p>
             </div>
@@ -171,7 +211,7 @@ export default function ItemListModal({ isOpen, onClose, items, onEdit, onDelete
                   </tr>
                 </thead>
                 <tbody>
-                  {paginatedItems.map((item, index) => (
+                  {filteredItems.map((item, index) => (
                     <tr
                       key={item.id}
                       className="border-b transition-colors hover:bg-opacity-50"
