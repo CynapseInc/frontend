@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../../ui/dialog';
 import { X, Pencil, Trash2, Search, Tag } from 'lucide-react';
 import { Input } from '../../ui/input';
+import { categoriaTemaService } from '../../../services/CategoriaTemaService';
 
 interface ProductCategory {
   id: string;
@@ -20,19 +21,45 @@ interface ProductCategoryListModalProps {
 export default function ProductCategoryListModal({ isOpen, onClose, categories, onCreate, onEdit, onDelete }: ProductCategoryListModalProps) {
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [filteredCategories, setFilteredCategories] = useState<ProductCategory[]>(categories);
+  const searchTimeoutRef = useRef<number | null>(null);
+  const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
 
-  const filteredCategories = useMemo(() =>
-    categories.filter(cat =>
-      cat.description.toLowerCase().includes(searchTerm.toLowerCase())
-    ),
-    [categories, searchTerm]
-  );
+   useEffect(() => {
+        
+          
+          if(searchTimeoutRef.current) {
+            window.clearTimeout(searchTimeoutRef.current);
+          }
+    
+          searchTimeoutRef.current = window.setTimeout(async () => {
+    
+          try {
+            const data = await categoriaTemaService.listarTodos({ search: searchTerm, page: currentPage - 1 });
+            setTotalPages(data.totalPages);
+            
+            // mapear os nomes da resposta para o formato esperado
+            
+            const mappedCategories = data.content.map((category: any) => ({
+              id: category.id,
+              description: category.titulo
+            }));
+            
+            setFilteredCategories(mappedCategories);
+          } catch (error) {
+            console.error('Erro ao buscar categorias:', error);
+          }
+        },
+        500)
+       
+        
+      }, [searchTerm, currentPage])
 
-  const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
+  
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
-  const paginatedCategories = filteredCategories.slice(startIndex, endIndex);
+  // const paginatedCategories = filteredCategories.slice(startIndex, endIndex);
 
   const gerarPaginas = (currentPage: number, totalPages: number) => {
     const maxPages = 7;
@@ -136,7 +163,7 @@ export default function ProductCategoryListModal({ isOpen, onClose, categories, 
 
         {/* Tabela */}
         <div className="px-8 pb-6 overflow-y-auto" style={{ maxHeight: '400px' }}>
-          {paginatedCategories.length === 0 ? (
+          {filteredCategories.length === 0 ? (
             <div className="text-center py-12" style={{ color: '#9D8189' }}>
               <p className="text-[15px]">Nenhuma categoria encontrada</p>
             </div>
@@ -154,7 +181,7 @@ export default function ProductCategoryListModal({ isOpen, onClose, categories, 
                   </tr>
                 </thead>
                 <tbody>
-                  {paginatedCategories.map((category, index) => (
+                  {filteredCategories.map((category, index) => (
                     <tr
                       key={category.id}
                       className="border-b transition-colors hover:bg-opacity-50"

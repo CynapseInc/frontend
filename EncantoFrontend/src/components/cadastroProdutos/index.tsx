@@ -4,6 +4,8 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { useNavigate, useParams } from 'react-router-dom'; // Adicionado useParams
 import FeedbackModal from '../ui/FeedbackModal';
+import ThemeCombobox from './modals/ThemeCombobox';
+import ItemCombobox from './modals/ItemCombobox';
 // Importação dos Modais
 import ProductCategoryModal from './modals/ProductCategoryModal';
 import ProductCategoryListModal from './modals/ProductCategoryListModal';
@@ -44,7 +46,9 @@ export default function App() {
   const [productTitle, setProductTitle] = useState('');
   const [productDescription, setProductDescription] = useState('');
   const [selectedThemeId, setSelectedThemeId] = useState('');
+  const [themeNameEditing, setThemeNameEditing] = useState('');
   const [selectedItemId, setSelectedItemId] = useState('');
+  const [itemNameEditing, setItemNameEditing] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
   const [isItemLocked, setIsItemLocked] = useState(false);
   const [currentItem, setCurrentItem] = useState<Item | null>(null);
@@ -86,7 +90,7 @@ export default function App() {
         ]);
 
         const todosOsTemas: Theme[] = [];
-        const categoriasFormatadas = categoriasData.map((c: any) => {
+        const categoriasFormatadas = categoriasData.content.map((c: any) => {
           if (c.temas && Array.isArray(c.temas)) {
             c.temas.forEach((t: any) => {
               todosOsTemas.push({ id: t.id.toString(), description: t.descricao, categoryId: c.id.toString() });
@@ -95,7 +99,7 @@ export default function App() {
           return { id: c.id.toString(), description: c.titulo };
         });
 
-        const itensFormatados = itensData.map((i: any) => ({
+        const itensFormatados = itensData?.content?.map((i: any) => ({
           id: i.id.toString(),
           description: i.descricao,
           salePrice: i.precoVenda || 0,
@@ -137,9 +141,16 @@ export default function App() {
         setProductDescription(produto.descricao || '');
         
         // Seleciona os IDs nos dropdowns (garante que vêm como string para o value do select)
-        if (produto.tema?.id) setSelectedThemeId(produto.tema.id.toString());
-        if (produto.item?.id) setSelectedItemId(produto.item.id.toString());
-        
+        if (produto.tema?.id) {
+          setSelectedThemeId(produto.tema.id.toString());
+          setSelectedCategory(produto.tema.categoriaTema ? produto.tema.categoriaTema.titulo : '');
+          setThemeNameEditing(produto.tema.descricao);
+          
+        }
+        if (produto.item?.id) {
+          setSelectedItemId(produto.item.id.toString());
+          setItemNameEditing(produto.item.descricao);
+        }
       } catch (error) {
         console.error("Erro ao buscar produto para edição:", error);
         showFeedback("Não foi possível carregar o produto para edição. Tente novamente.", "error");
@@ -150,22 +161,22 @@ export default function App() {
   }, [id, isEditingProduct]);
 
   // Preenchimento automático (Categoria e Item)
-  useEffect(() => {
-    if (selectedThemeId) {
-      const theme = themes.find(t => t.id === selectedThemeId);
-      if (theme) {
-        const category = categories.find(c => c.id === theme.categoryId);
-        setSelectedCategory(category?.description || 'Desconhecida');
-      }
-    } else setSelectedCategory('');
-  }, [selectedThemeId, themes, categories]);
+  // useEffect(() => {
+  //   if (selectedThemeId) {
+  //     const theme = themes.find(t => t.id === selectedThemeId);
+  //     if (theme) {
+  //       const category = categories.find(c => c.id === theme.categoryId);
+  //       setSelectedCategory(category?.description || 'Desconhecida');
+  //     }
+  //   } else setSelectedCategory('');
+  // }, [selectedThemeId, themes, categories]);
 
-  useEffect(() => {
-    if (selectedItemId) {
-      const item = items.find(i => i.id === selectedItemId);
-      if (item) { setCurrentItem(item); setIsItemLocked(true); }
-    } else { setCurrentItem(null); setIsItemLocked(false); }
-  }, [selectedItemId, items]);
+  // useEffect(() => {
+  //   if (selectedItemId) {
+  //     const item = items.find(i => i.id === selectedItemId);
+  //     if (item) { setCurrentItem(item); setIsItemLocked(true); }
+  //   } else { setCurrentItem(null); setIsItemLocked(false); }
+  // }, [selectedItemId, items]);
 
   useEffect(() => {
     if (!isEditingProduct && selectedItemId && productDescription.trim() === '') {
@@ -381,10 +392,21 @@ export default function App() {
             {/* Tema */}
             <div>
               <label className="block text-[16px] mb-2" style={{ color: '#6D6875' }}><strong>Tema</strong> <span style={{ color: '#F4ACB7' }}>*</span></label>
-              <select value={selectedThemeId} onChange={(e) => setSelectedThemeId(e.target.value)} className="w-full h-11 px-4 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]" style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }} required>
-                <option value="">Selecione um tema</option>
-                {themes.map(theme => <option key={theme.id} value={theme.id}>{theme.description}</option>)}
-              </select>
+                {/* <select value={selectedThemeId} onChange={(e) => setSelectedThemeId(e.target.value)} className="w-full h-12 px-4 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]" style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }} required>
+                  <option value="">Selecione um tema</option>
+                  {themes.map(theme => <option key={theme.id} value={theme.id}>{theme.description}</option>)}
+                </select> */}
+                <ThemeCombobox
+                  value={selectedThemeId}
+                  onChange={(id, categoryDesc) => {
+                    setSelectedThemeId(id);
+                    setSelectedCategory(categoryDesc);
+
+                  }}
+                  themes={themes}
+                  themeSelected={themeNameEditing }
+                  
+                />
             </div>
 
             {/* Categoria */}
@@ -398,11 +420,21 @@ export default function App() {
             {/* Item */}
             <div>
               <label className="block text-[16px] mb-2" style={{ color: '#6D6875' }}><strong>Item</strong> <span style={{ color: '#F4ACB7' }}>*</span></label>
-              <select value={selectedItemId} onChange={(e) => setSelectedItemId(e.target.value)} className="w-full h-11 px-4 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]" style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }} required>
+              {/* <select value={selectedItemId} onChange={(e) => setSelectedItemId(e.target.value)} className="w-full h-12 px-4 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]" style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }} required>
                 <option value="">Selecione um item</option>
                 {items.map(item => <option key={item.id} value={item.id}>{item.description}</option>)}
-              </select>
-             
+              </select> */}
+
+              <ItemCombobox value={selectedItemId} onChange={(item) => {
+                setCurrentItem(item);
+                setProductDescription(item.description || '');
+                setSelectedItemId(item.id);
+
+                
+              }} items={items} 
+              itemSelected={itemNameEditing}
+              
+              />
             </div>
 
             {/* Informações do Item (Card) */}

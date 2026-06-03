@@ -1,13 +1,26 @@
 import api from '../provider/api';
 
 export const itemService = {
-  listarTodos: async (page = 0, ativo = true) => {
-    const { data } = await api.get(`/itens?page=${page}&ativo=${ativo}`);
-    
-    if (data && data.content && Array.isArray(data.content)) {
-      return data.content;
+  listarTodos: async (params?: 
+    {
+      search?: string,
+      page?: number,
+      ativo?: boolean
     }
-    return Array.isArray(data) ? data : [];
+  ) => {
+    const { data } = await api.get(`/itens`, { params });
+    
+    if(!data){
+            return {
+                content:[],
+                totalElements: 0, 
+                totalPages: 0,
+                number: 0,
+                size: 0
+            }
+        }
+
+    return data;
   },
   
   criar: async (payload: any) => {

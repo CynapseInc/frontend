@@ -12,6 +12,10 @@ import { temaService } from '../../services/TemaService';
 import { itemService } from '../../services/ItemService';
 import type { Produto } from '../../interfaces/Produto'; 
 import './index-lista-produtos.css';
+import CategoryStringCombobox from './modais/CategoryStringCombobox';
+import ThemeStringCombobox from './modais/ThemeStringCombobox';
+import ItemStringCombobox from './modais/ItemStringCombobox';
+
 
 export default function App() {
   const [products, setProducts] = useState<Produto[]>([]);
@@ -56,8 +60,8 @@ export default function App() {
         ]);
 
         // Mapeia os arrays de objetos para arrays de strings (usando os mesmos nomes de propriedades que usou na listagem)
-        const categoriasNomes = categoriasData.map((c: any) => c.titulo).filter(Boolean);
-        const temasNomes = temasData.map((t: any) => t.descricao).filter(Boolean);
+        const categoriasNomes = categoriasData.content.map((c: any) => c.titulo).filter(Boolean);
+        const temasNomes = temasData.content.map((t: any) => t.descricao).filter(Boolean);
         const itensNomes = itensData.map((i: any) => i.descricao).filter(Boolean); 
 
         // Atualiza os estados, garantindo que o 'Todos' fica sempre no início e removendo possíveis duplicados com o Set
@@ -177,38 +181,31 @@ export default function App() {
 
             <div className="flex items-center gap-2">
               <label className="text-[14px]" style={{ color: '#9D8189' }}>Categoria:</label>
-              <select
+              
+              <CategoryStringCombobox
                 value={selectedCategory}
-                onChange={(e) => { setSelectedCategory(e.target.value); setCurrentPage(1); }}
-                className="px-4 py-2 rounded-md text-[14px] border focus:outline-none focus:border-[#F4ACB7]"
-                style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }}
-              >
-                {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
-              </select>
+                onChange={(cat) => { setSelectedCategory(cat); setCurrentPage(1); }}
+                categories={categories}
+              />
             </div>
 
             <div className="flex items-center gap-2">
               <label className="text-[14px]" style={{ color: '#9D8189' }}>Tema:</label>
-              <select
+             
+              <ThemeStringCombobox
                 value={selectedTheme}
-                onChange={(e) => { setSelectedTheme(e.target.value); setCurrentPage(1); }}
-                className="px-4 py-2 rounded-md text-[14px] border focus:outline-none focus:border-[#F4ACB7]"
-                style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }}
-              >
-                {themes.map(theme => <option key={theme} value={theme}>{theme}</option>)}
-              </select>
+                onChange={(tema) => { setSelectedTheme(tema); setCurrentPage(1); }}
+                themes={themes}
+              />
             </div>
 
             <div className="flex items-center gap-2">
               <label className="text-[14px]" style={{ color: '#9D8189' }}>Item:</label>
-              <select
+              <ItemStringCombobox
                 value={selectedItem}
-                onChange={(e) => { setSelectedItem(e.target.value); setCurrentPage(1); }}
-                className="px-4 py-2 rounded-md text-[14px] border focus:outline-none focus:border-[#F4ACB7]"
-                style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }}
-              >
-                {items.map(item => <option key={item} value={item}>{item}</option>)}
-              </select>
+                onChange={(item) => { setSelectedItem(item); setCurrentPage(1); }}
+                items={items}
+                />
             </div>
           </div>
         </div>

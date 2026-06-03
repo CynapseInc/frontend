@@ -1,67 +1,37 @@
 import { useState, useEffect, useRef } from 'react';
 import { Check, ChevronDown, X } from 'lucide-react';
-import {categoriaTemaService} from '../../../services/CategoriaTemaService';
+import {temaService} from '../../../services/TemaService';
 
-interface ProductCategory {
+interface ProductTheme {
   id: string;
   description: string;
 }
 
-interface CategoryComboboxProps {
+interface ThemeComboboxProps {
   value: string;
-  onChange: (id: string) => void;
-  categories: ProductCategory[];
+  onChange: (value: string) => void;
+  themes: string[];
   isErr?: boolean;
 }
 
-export default function CategoryCombobox({ value, onChange, categories, isErr }: CategoryComboboxProps) {
+export default function ThemeCombobox({ value, onChange, themes, isErr }: ThemeComboboxProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const searchTimeoutRef = useRef<number | null>(null);
   const [selectedName, setSelectedName] = useState('');
-  const [categoriasFiltradas, setCategoriasFiltradas] = useState<ProductCategory[]>(categories);
+  const searchTimeoutRef = useRef<number | null>(null);
+  const [filteredThemes, setFilteredThemes] = useState<string[]>([]);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (value) {
-      const selected = categories.find(cat => cat.id === value);
+      const selected = themes.find(theme => theme === value);
       if (selected) {
-        setSelectedName(selected.description);
+        setSelectedName(selected);
       }
     } else {
       setSelectedName('');
     }
-  }, [value, categories]);
-
-
-  useEffect(() => {
-    
-      
-      if(searchTimeoutRef.current) {
-        window.clearTimeout(searchTimeoutRef.current);
-      }
-
-      searchTimeoutRef.current = window.setTimeout(async () => {
-
-      try {
-        const data = await categoriaTemaService.listarTodos({ search });
-        
-        
-        // mapear os nomes da resposta para o formato esperado
-        const mappedCategories = data.content.map((cat: any) => ({
-          id: cat.id,
-          description: cat.titulo
-        }));
-        setCategoriasFiltradas(mappedCategories);
-      } catch (error) {
-        console.error('Erro ao buscar categorias:', error);
-      }
-    },
-    500)
-   
-    
-  }, [search])
-
+  }, [value, themes]);
 
   // Fechar ao clicar fora
   useEffect(() => {
@@ -75,13 +45,36 @@ export default function CategoryCombobox({ value, onChange, categories, isErr }:
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const filteredCategories = categories.filter(cat =>
-    cat.description.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+        
+          
+          if(searchTimeoutRef.current) {
+            window.clearTimeout(searchTimeoutRef.current);
+          }
+    
+          searchTimeoutRef.current = window.setTimeout(async () => {
+    
+          try {
+            const data = await temaService.listarTodos({ search: search });
+            
+            
+            // mapear os nomes da resposta para o formato esperado
+            
+            const mappedThemes = data.content.map((item: any) => item.descricao);
+           
+            setFilteredThemes(mappedThemes);
+          } catch (error) {
+            console.error('Erro ao buscar temas:', error);
+          }
+        },
+        500)
+       
+        
+      }, [search])
 
-  const handleSelect = (category: ProductCategory) => {
-    onChange(category.id);
-    setSelectedName(category.description);
+  const handleSelect = (theme: string) => {
+    onChange(theme);
+    setSelectedName(theme);
     setOpen(false);
     setSearch('');
   };
@@ -105,7 +98,7 @@ export default function CategoryCombobox({ value, onChange, categories, isErr }:
           color: selectedName ? '#6D6875' : '#9D8189'
         }}
       >
-        <span>{selectedName || 'Selecione uma categoria...'}</span>
+        <span>{selectedName || 'Selecione um tema...'}</span>
         <div className="flex items-center gap-2">
           {selectedName && (
             <button
@@ -131,7 +124,7 @@ export default function CategoryCombobox({ value, onChange, categories, isErr }:
           <div className="p-2 border-b" style={{ borderColor: '#D8E2DC' }}>
             <input
               type="text"
-              placeholder="Pesquisar categoria..."
+              placeholder="Pesquisar tema..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full px-3 py-2 rounded-md border text-[14px] focus:outline-none focus:border-[#F4ACB7]"
@@ -145,26 +138,26 @@ export default function CategoryCombobox({ value, onChange, categories, isErr }:
           </div>
 
           <div className="max-h-[300px] overflow-y-auto">
-            {categoriasFiltradas.length === 0 ? (
+            {filteredThemes.length === 0 ? (
               <div className="py-6 text-center text-[14px]" style={{ color: '#9D8189' }}>
-                Nenhuma categoria encontrada
+                Nenhum tema encontrado
               </div>
             ) : (
-              categoriasFiltradas.map((category) => (
+              filteredThemes.map((theme) => (
                 <button
-                  key={category.id}
+                  key={theme}
                   type="button"
-                  onClick={() => handleSelect(category)}
+                  onClick={() => handleSelect(theme)}
                   className="w-full px-4 py-2.5 text-left text-[14px] flex items-center justify-between hover:bg-gray-100 transition-colors border-0"
                   style={{
                     color: '#6D6875',
-                    backgroundColor: value === category.id ? '#F0F0F0' : 'transparent'
+                    backgroundColor: value === theme ? '#F0F0F0' : 'transparent'
                   }}
                 >
                   <div className="flex-1">
-                    {category.description}
+                    {theme}
                   </div>
-                  {value === category.id && (
+                  {value === theme && (
                     <Check className="size-4 ml-2" style={{ color: '#F4ACB7' }} />
                   )}
                 </button>

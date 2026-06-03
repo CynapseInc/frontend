@@ -1,7 +1,8 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../../ui/dialog';
 import { X, Pencil, Trash2, Search, Tag } from 'lucide-react';
 import { Input } from '../../ui/input';
+import { temaService } from '../../../services/TemaService';
 
 interface ProductCategory {
   id: string;
@@ -12,6 +13,7 @@ interface Theme {
   id: string;
   description: string;
   categoryId: string;
+  categoryDescription: string;
 }
 
 interface ThemeListModalProps {
@@ -24,9 +26,12 @@ interface ThemeListModalProps {
   onDelete: (theme: Theme) => void;
 }
 
-export default function ThemeListModal({ isOpen, onClose, themes, categories, onCreate, onEdit, onDelete }: ThemeListModalProps) {
-  const [searchTerm, setSearchTerm] = useState('');
+export default function ThemeListModal({ isOpen, onClose, themes, categories, onEdit, onDelete }: ThemeListModalProps) {
+  const [searchTerm, setSearchTerm] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
+  const [temasFiltrados, setTemasFiltrados] = useState<Theme[]>(themes);
+  const [totalPages, setTotalPages] = useState(1);
+  const searchTimeoutRef = useRef<number | null>(null);
   const itemsPerPage = 10;
 
   const filteredThemes = useMemo(() =>
@@ -36,7 +41,38 @@ export default function ThemeListModal({ isOpen, onClose, themes, categories, on
     [themes, searchTerm]
   );
 
-  const totalPages = Math.ceil(filteredThemes.length / itemsPerPage);
+   useEffect(() => {
+      
+        
+        if(searchTimeoutRef.current) {
+          window.clearTimeout(searchTimeoutRef.current);
+        }
+  
+        searchTimeoutRef.current = window.setTimeout(async () => {
+  
+        try {
+          const data = await temaService.listarTodos({ search: searchTerm, page: currentPage - 1 });
+          setTotalPages(data.totalPages);
+          
+          // mapear os nomes da resposta para o formato esperado
+          
+          const mappedThemes = data.content.map((theme: any) => ({
+            id: theme.id,
+            description: theme.descricao,
+            categoryId: theme.categoriaTemaId,
+            categoryDescription: theme.categoriaTema.titulo
+          }));
+          setTemasFiltrados(mappedThemes);
+        } catch (error) {
+          console.error('Erro ao buscar temas:', error);
+        }
+      },
+      500)
+     
+      
+    }, [searchTerm, currentPage])
+
+  // const totalPages = Math.ceil(filteredThemes.length / itemsPerPage);
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedThemes = filteredThemes.slice(startIndex, endIndex);
@@ -168,7 +204,7 @@ export default function ThemeListModal({ isOpen, onClose, themes, categories, on
                   </tr>
                 </thead>
                 <tbody>
-                  {paginatedThemes.map((theme, index) => (
+                  {temasFiltrados.map((theme, index) => (
                     <tr
                       key={theme.id}
                       className="border-b transition-colors hover:bg-opacity-50"
@@ -190,7 +226,7 @@ export default function ThemeListModal({ isOpen, onClose, themes, categories, on
                             color: '#6D6875'
                           }}
                         >
-                          {getCategoryName(theme.categoryId)}
+                          {theme.categoryDescription}
                         </span>
                       </td>
                       <td className="px-6 py-4">

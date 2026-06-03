@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { Check, ChevronDown, X } from 'lucide-react';
+import { itemService } from '../../../services/ItemService';
 
 interface Item {
   id: string;
@@ -20,16 +21,27 @@ interface Item {
 
 interface ItemComboboxProps {
   value: string;
-  onChange: (id: string, item?: Item | null) => void;
+  onChange: (item: Item) => void;
   items: Item[];
   isErr?: boolean;
+  itemSelected?: string | null;
 }
 
-export default function ItemCombobox({ value, onChange, items, isErr }: ItemComboboxProps) {
+export default function ItemCombobox({ value, onChange, items, isErr, itemSelected }: ItemComboboxProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
-  const [selectedName, setSelectedName] = useState('');
+  const [selectedName, setSelectedName] = useState(itemSelected);
+  const searchTimeoutRef = useRef<number | null>(null);
   const wrapperRef = useRef<HTMLDivElement>(null);
+  const [filteredItems, setFilteredItems] = useState<Item[]>([]);
+
+
+  useEffect(() => {
+    if (itemSelected != undefined) {
+      setSelectedName(itemSelected);
+    }
+
+  }, [ itemSelected])
 
   useEffect(() => {
     if (value) {
@@ -54,12 +66,51 @@ export default function ItemCombobox({ value, onChange, items, isErr }: ItemComb
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
-  const filteredItems = items.filter(item =>
-    item.description.toLowerCase().includes(search.toLowerCase())
-  );
+  useEffect(() => {
+            
+              
+              if(searchTimeoutRef.current) {
+                window.clearTimeout(searchTimeoutRef.current);
+              }
+        
+              searchTimeoutRef.current = window.setTimeout(async () => {
+        
+              try {
+                const data = await itemService.listarTodos({ search: search });
+                
+                
+                // mapear os nomes da resposta para o formato esperado
+                
+                const mappedItems = data.content.map((item: any) => ({
+                  id: item.id,
+                  description: item.descricao,
+                  salePrice:  item.precoVenda || 0,
+                  productionCost: item.custoProducao || 0,
+                  productionDeadline: item.prazoProducao || '',
+                  width: item.largura || '',
+                  height: item.altura || '',
+                  weight: item.peso || '',
+                  length: item.comprimento || '',
+                  material: item.material || '',
+                  descricaoPadrao: item.descricaoPadrao || '',
+                  promotionalPrice: item.precoPromocional || 0,
+                  unitPrice: item.precoUnitario || 0,
+                  minimumQuantity: item.quantidadeMinima || 0
+                }));
+               
+                setFilteredItems(mappedItems);
+              } catch (error) {
+                console.error('Erro ao buscar itens:', error);
+              }
+            },
+            500)
+           
+            
+          }, [search])
+  
 
   const handleSelect = (item: Item) => {
-    onChange(item.id, item);
+    onChange(item);
     setSelectedName(item.description);
     setOpen(false);
     setSearch('');
@@ -67,7 +118,7 @@ export default function ItemCombobox({ value, onChange, items, isErr }: ItemComb
 
   const handleClear = (e: React.MouseEvent) => {
     e.stopPropagation();
-    onChange('', null);
+    onChange(null);
     setSelectedName('');
     setSearch('');
   };
@@ -143,7 +194,7 @@ export default function ItemCombobox({ value, onChange, items, isErr }: ItemComb
                   <div className="flex-1">
                     <div className="font-medium">{item.description}</div>
                     <div className="text-[12px]" style={{ color: '#9D8189' }}>
-                      R$ {item.unitPrice.toFixed(2)} | {item.material}
+                      R$ {item.salePrice.toFixed(2)} | {item.material}
                     </div>
                   </div>
                   {value === item.id && (
