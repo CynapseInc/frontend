@@ -83,8 +83,10 @@ export default function Pedidos() {
   const [sortDirection, setSortDirection] = useState('asc');
   const [currentPage, setCurrentPage] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
+  const [mostrarInativos, setMostrarInativos] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<PedidoResponse | null>(null);
   const [orderToDelete, setOrderToDelete] = useState<PedidoResponse | null>(null);
+  const [orderToReactivate, setOrderToReactivate] = useState<PedidoResponse | null>(null);
   const [isOrderDetailOpen, setIsOrderDetailOpen] = useState(false);
   const [feedback, setFeedback] = useState<{
     isOpen: boolean;
@@ -129,7 +131,7 @@ export default function Pedidos() {
       const data = await pedidoService.listarPaginado({
         page: currentPage - 1,
         size: ITEMS_PER_PAGE,
-        ativa: true,
+        ativa: !mostrarInativos,
         search: debouncedSearch.trim(),
         origem: origem.trim(),
         statusId,
@@ -190,6 +192,7 @@ export default function Pedidos() {
     dataLimiteFim,
     sortBy,
     sortDirection,
+    mostrarInativos,
   ]);
 
   const limparFiltros = () => {
@@ -203,6 +206,7 @@ export default function Pedidos() {
     setDataLimiteFim('');
     setSortBy('');
     setSortDirection('asc');
+    setMostrarInativos(false);
     setCurrentPage(1);
   };
 
@@ -256,6 +260,19 @@ export default function Pedidos() {
       carregarPedidos();
     } catch (error) {
       showFeedback('Não foi possível remover o pedido.', 'error');
+    }
+  };
+
+  const handleReactivateOrder = async () => {
+    if (!orderToReactivate) return;
+
+    try {
+      await pedidoService.mudarEstado(orderToReactivate.id);
+      showFeedback('Pedido reativado com sucesso.', 'success');
+      setOrderToReactivate(null);
+      carregarPedidos();
+    } catch (error) {
+      showFeedback('Não foi possível reativar o pedido.', 'error');
     }
   };
 
@@ -394,6 +411,18 @@ export default function Pedidos() {
           </div>
 
           <div className="flex justify-end gap-2 mt-4">
+             <button
+              onClick={() => {
+                setMostrarInativos(true);
+                setCurrentPage(1);
+              }}
+              className="h-11 px-4 rounded-md text-[14px] transition-all flex items-center gap-2"
+              style={{ backgroundColor: '#D8E2DC', color: '#6D6875', border: '1px solid #D8E2DC' }}
+              title="Ver pedidos removidos"
+            >
+              Visualizar Pedidos Removidos
+            </button>
+
             <button
               onClick={limparFiltros}
               className="h-11 px-4 rounded-md text-[14px] transition-all flex items-center gap-2"
@@ -491,22 +520,35 @@ export default function Pedidos() {
                       </td>
                       <td className="px-6 py-4">
                         <div className="flex gap-2 justify-end">
-                          <button
-                            onClick={() => handleSeeDetails(pedido.id)}
-                            className="p-2 rounded-md transition-all hover:bg-opacity-80"
-                            style={{ backgroundColor: '#D8E2DC' }}
-                            title="Editar pedido"
-                          >
-                            <Edit2 className="size-4" style={{ color: '#6D6875' }} />
-                          </button>
-                          <button
-                            onClick={() => setOrderToDelete(pedido)}
-                            className="p-2 rounded-md transition-all hover:bg-opacity-80"
-                            style={{ backgroundColor: '#FFE5D9' }}
-                            title="Remover pedido"
-                          >
-                            <Trash2 className="size-4" style={{ color: '#9D8189' }} />
-                          </button>
+                          {mostrarInativos ? (
+                            <button
+                              onClick={() => setOrderToReactivate(pedido)}
+                              className="px-3 py-2 rounded-md text-[14px] transition-all hover:bg-opacity-80"
+                              style={{backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7'}}
+                              title="Reativar pedido"
+                            >
+                              Reativar
+                            </button>
+                          ) : (
+                            <>
+                              <button
+                                onClick={() => handleSeeDetails(pedido.id)}
+                                className="p-2 rounded-md transition-all hover:bg-opacity-80"
+                                style={{ backgroundColor: '#D8E2DC' }}
+                                title="Editar pedido"
+                              >
+                                <Edit2 className="size-4" style={{ color: '#6D6875' }} />
+                              </button>
+                              <button
+                                onClick={() => setOrderToDelete(pedido)}
+                                className="p-2 rounded-md transition-all hover:bg-opacity-80"
+                                style={{ backgroundColor: '#FFE5D9' }}
+                                title="Remover pedido"
+                              >
+                                <Trash2 className="size-4" style={{ color: '#9D8189' }} />
+                              </button>
+                            </>
+                          )}
                         </div>
                       </td>
                     </tr>
@@ -594,6 +636,16 @@ export default function Pedidos() {
         title="Remover pedido?"
         message={`O pedido ${orderToDelete ? formatarCodigoPedido(orderToDelete.id) : ''} será inativado e sairá do histórico.`}
         confirmText="Remover"
+        cancelText="Cancelar"
+      />
+
+      <ConfirmModal
+        isOpen={!!orderToReactivate}
+        onClose={() => setOrderToReactivate(null)}
+        onConfirm={handleReactivateOrder}
+        title="Reativar pedido?"
+        message={`O pedido ${orderToReactivate ? formatarCodigoPedido(orderToReactivate.id) : ''} voltará para o histórico de pedidos ativos.`}
+        confirmText="Reativar"
         cancelText="Cancelar"
       />
     </div>
