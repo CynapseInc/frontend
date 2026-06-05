@@ -156,7 +156,7 @@ export default function EmployeeModal({ isOpen, onClose, onSave, employee }: Emp
               />
             </div>
 
-            <div className="grid grid-cols-2 gap-x-6 gap-y-5">
+            <div className="grid grid-cols-2 gap-x-6 gap-y-5 modal-grid">
               <div className="col-span-2">
                 <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
                   Nome completo

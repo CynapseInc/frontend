@@ -103,8 +103,8 @@ export default function App() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [ produtosResponse, statusData] = await Promise.all([
-          
+        const [produtosResponse, statusData] = await Promise.all([
+
           produtoService.listarTodos(0, 500), // 1. Pedimos um limite alto de produtos
           statusPedidoService.listarTodos()
         ]);
@@ -144,7 +144,7 @@ export default function App() {
     };
     fetchData();
   }, []);
-  
+
   // const selectedClient = clients.find(c => c.id?.toString() === selectedClientId);
   const selectedAddress = client?.enderecos?.find(a => a.id?.toString() === selectedAddressId);
 
@@ -209,14 +209,14 @@ export default function App() {
         setDeliveryDate('');
         return;
       }
-      
+
       const totalDays = selectedProducts.reduce((sum, sp) => {
         return sum + (sp.product.productionDays * sp.quantity);
       }, 0);
 
       const date = new Date();
       date.setDate(date.getDate() + totalDays);
-      setDeliveryDate(date.toISOString().split('T')[0]); 
+      setDeliveryDate(date.toISOString().split('T')[0]);
     }
   }, [selectedProducts, isDateEdited]);
 
@@ -274,7 +274,7 @@ export default function App() {
 
       const clientesAtualizados = await clienteService.listarTodos({ page: 0 });
       const listaAtualizada = clientesAtualizados?.content || [];
-      
+
       if (!clientData.id && listaAtualizada.length > 0) {
         const novoId = listaAtualizada[listaAtualizada.length - 1].id;
         setSelectedClientId(novoId.toString());
@@ -294,19 +294,19 @@ export default function App() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
-      <div className="max-w-[1400px] mx-auto px-8 py-12">
+      <div className="max-w-[1400px] mx-auto px-4 lg:px-8 py-6 lg:py-12">
         <div className="mb-10">
           <button className="no-button-feedback flex items-center gap-2 mb-4 text-[15px]" style={{ color: '#9D8189' }} onClick={() => navigate('/kanban')}>
             <ArrowLeft className="size-5" /> Voltar para Pedidos
           </button>
-          <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Novo Pedido</h1>
+          <h1 className="text-[48px] mb-2 titulo-page" style={{ color: '#F4ACB7' }}>Novo Pedido</h1>
           <p className="text-[17px]" style={{ color: '#9D8189' }}>Preencha as informações abaixo para cadastrar um novo pedido</p>
         </div>
 
         {/* 1. Informações do Cliente */}
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
           <h2 className="text-[22px] mb-5" style={{ color: '#F4ACB7' }}><strong>Informações do Cliente</strong></h2>
-          <div className="grid grid-cols-[1fr_auto_auto] gap-3 mb-5">
+          <div className="grid grid-cols-[1fr_auto_auto] gap-3 mb-5 cliente-grid">
             <div>
               <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}><strong>Cliente</strong> <span style={{ color: '#F4ACB7' }}>*</span></label>
               {/* <select
@@ -320,11 +320,11 @@ export default function App() {
                   <option key={client.id} value={client.id}>{client.nome} - {client.telefone}</option>
                 ))}
               </select> */}
-                <ClienteCombobox 
-                  value={selectedClientId || ''}
-                  onChange={(id, name, enderecos) => { setSelectedClientId(id); setEnderecosClient(enderecos);  }}
-                  isErr={!selectedClientId}
-                />
+              <ClienteCombobox
+                value={selectedClientId || ''}
+                onChange={(id, name, enderecos) => { setSelectedClientId(id); setEnderecosClient(enderecos); }}
+                isErr={!selectedClientId}
+              />
             </div>
             <div className="flex items-end">
               <Button onClick={() => setIsClientListOpen(true)} className="no-button-feedback h-11 px-5 gap-2 text-[15px]" style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}>
@@ -349,7 +349,7 @@ export default function App() {
             </div>
           )}
 
-          <div className="grid grid-cols-2 gap-5">
+          <div className="grid grid-cols-2 gap-5 form-grid-2">
             <div>
               <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}><strong>Observações do Pedido</strong></label>
               <textarea
@@ -392,7 +392,7 @@ export default function App() {
             />
           </div>
 
-          <div className="grid grid-cols-4 gap-4 mb-6">
+          <div className="grid grid-cols-4 gap-4 mb-6 produtos-grid">
             {paginatedProducts.map(product => {
               const temDesconto = product.promotionalPrice > 0 && product.promotionalPrice < product.unitPrice;
 
@@ -430,18 +430,18 @@ export default function App() {
                     </div>
 
                     <div>
-                      <div className="flex items-center gap-1.5 mb-2">
+                      <div className="flex flex-wrap items-center gap-1.5 mb-2">
                         {temDesconto ? (
                           <>
-                            <span className="text-[#9D8189] line-through text-[9px]">
+                            <span className="text-[#9D8189] line-through text-[9px] whitespace-nowrap">
                               R$ {product.unitPrice.toFixed(2)}
                             </span>
-                            <span className="text-[#F4ACB7] font-bold text-[9px]">
+                            <span className="text-[#F4ACB7] font-bold text-[9px] whitespace-nowrap">
                               R$ {product.promotionalPrice.toFixed(2)}
                             </span>
                           </>
                         ) : (
-                          <span className="text-[11px] font-bold" style={{ color: '#F4ACB7' }}>
+                          <span className="text-[11px] font-bold whitespace-nowrap" style={{ color: '#F4ACB7' }}>
                             R$ {product.unitPrice.toFixed(2)}
                           </span>
                         )}
@@ -469,7 +469,7 @@ export default function App() {
           </div>
 
           {totalPages > 1 && (
-            <div className="flex items-center justify-between gap-4 border-t pt-4" style={{ borderColor: '#D8E2DC' }}>
+            <div className="flex items-center justify-between gap-4 border-t pt-4 paginacao-produtos" style={{ borderColor: '#D8E2DC' }}>
               <p className="text-sm" style={{ color: '#9D8189' }}>
                 Mostrando <strong>{startIndex + 1}</strong> a <strong>{Math.min(startIndex + itemsPerPage, filteredProducts.length)}</strong> de <strong>{filteredProducts.length}</strong> produtos
               </p>
@@ -560,7 +560,7 @@ export default function App() {
                     </div>
                     <Button onClick={() => handleRemoveProduct(sp.product.id)} className="h-9 px-4 text-[14px] border" style={{ backgroundColor: 'white', color: '#F4ACB7', borderColor: '#F4ACB7' }}>Remover</Button>
                   </div>
-                  <div className="grid grid-cols-5 gap-4">
+                  <div className="grid grid-cols-5 gap-4 selecionados-grid">
                     <div>
                       <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}><strong>Quantidade</strong></label>
                       <input type="number" min="1" value={sp.quantity} onChange={(e) => handleUpdateQuantity(sp.product.id, parseInt(e.target.value) || 1)} className="w-full h-11 px-3 rounded-md border focus:outline-none focus:border-[#F4ACB7]" style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }} />
@@ -592,7 +592,7 @@ export default function App() {
         {selectedProducts.length > 0 && selectedClientId && (
           <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
             <h2 className="text-[22px] mb-5" style={{ color: '#F4ACB7' }}><strong>Resumo do Pedido</strong></h2>
-            <div className="grid grid-cols-3 gap-4 mb-6">
+            <div className="grid grid-cols-3 gap-4 mb-6 resumo-grid">
               <div className="p-4 rounded-lg flex flex-col justify-center" style={{ backgroundColor: '#FFCAD4' }}>
                 <label className="text-[14px] mb-1 cursor-pointer" style={{ color: '#6D6875' }}>Previsão de Entrega</label>
                 <input
@@ -619,7 +619,7 @@ export default function App() {
               <Button
                 onClick={handleConfirmOrder}
                 disabled={!selectedClientId || selectedProducts.length === 0}
-                className="px-12 py-4 h-14 text-[17px] gap-3 disabled:opacity-40"
+                className="px-12 py-4 h-14 text-[17px] gap-3 disabled:opacity-40 btn-confirmar"
                 style={{ backgroundColor: '#F4ACB7', color: 'white' }}
               >
                 <Package className="size-5" /> Confirmar Pedido
@@ -629,10 +629,10 @@ export default function App() {
         )}
       </div>
 
-      <ClientListModal 
-        isOpen={isClientListOpen} 
-        onClose={() => setIsClientListOpen(false)} 
-        onEdit={handleEditClient} 
+      <ClientListModal
+        isOpen={isClientListOpen}
+        onClose={() => setIsClientListOpen(false)}
+        onEdit={handleEditClient}
       />
       <ClientFormModal
         isOpen={isClientFormOpen}

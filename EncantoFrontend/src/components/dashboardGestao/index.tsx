@@ -80,7 +80,7 @@ export default function App() {
 
   useEffect(() => {
     produtoService.listarTodos(0, 1000).then((data) => setProdutos(data?.content ?? (Array.isArray(data) ? data : []))).catch(() => { });
-    temaService.listarTodos().then((data) => setTemas(data)).catch(() => { });
+    temaService.listarTodos().then((data) => setTemas(data?.content ?? (Array.isArray(data) ? data : []))).catch(() => { });
   }, []);
 
   const fetchDash = useCallback(() => {
@@ -295,7 +295,7 @@ export default function App() {
                 className="w-full h-11 rounded-md border border-[#D8E2DC] bg-white px-3 text-sm text-[#6D6875] focus:outline-none focus:ring-1 focus:ring-[#F4ACB7]/30"
               >
                 <option value="">Todos</option>
-                {temas.map((t) => (
+                {temas?.map((t) => (
                   <option key={t.id} value={t.id}>{t.descricao}</option>
                 ))}
               </select>

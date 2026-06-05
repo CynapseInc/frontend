@@ -270,7 +270,7 @@ export default function App() {
         
         {/* Cabeçalho */}
         <div className="mb-10">
-          <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Financeiro</h1>
+          <h1 className="text-[48px] mb-2 titulo-movimentacoes" style={{ color: '#F4ACB7' }}>Movimentações</h1>
           <p className="text-[17px]" style={{ color: '#9D8189' }}>Gerencie todas as receitas e despesas do seu negócio</p>
         </div>
 
@@ -278,7 +278,7 @@ export default function App() {
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm flex flex-col gap-5" style={{ border: '1px solid #D8E2DC' }}>
           
           {/* Linha 1: Pesquisa e Botões de Ação */}
-          <div className="flex items-center justify-between gap-6">
+          <div className="flex items-center justify-between gap-6 mb-6 header-actions">
             <div className="flex-1 max-w-md relative">
               <Search 
                 className="absolute top-1/2 -translate-y-1/2" 
@@ -310,7 +310,7 @@ export default function App() {
           </div>
 
           {/* Linha 2: Área de Filtros */}
-          <div className="flex flex-wrap items-center gap-8 pt-5 border-t" style={{ borderColor: '#D8E2DC' }}>
+          <div className="flex flex-wrap items-center gap-8 pt-5 border-t filtros-container" style={{ borderColor: '#D8E2DC' }}>
             
             {/* Filtro por Tipo */}
             <div className="flex items-center gap-3">
@@ -360,18 +360,18 @@ export default function App() {
         </div>
 
         {/* Tabela */}
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden" style={{ border: '1px solid #D8E2DC' }}>
-          <table className="w-full">
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden tabela-container" style={{ border: '1px solid #D8E2DC' }}>
+          <table className="w-full min-w-[1000px]">
             <thead>
               <tr style={{ backgroundColor: '#FFE5D9', borderBottom: '1px solid #D8E2DC' }}>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Nome</th>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Descrição</th>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Tipo de Contrato</th>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Categoria</th>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Valor</th>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Status</th>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Data</th>
-                <th className="text-right px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Ações</th>
+                <th className="text-left px-6 py-4 text-[16px] whitespace-nowrap" style={{ color: '#6D6875' }}>Nome</th>
+                <th className="text-left px-6 py-4 text-[16px] whitespace-nowrap" style={{ color: '#6D6875' }}>Descrição</th>
+                <th className="text-left px-6 py-4 text-[16px] whitespace-nowrap" style={{ color: '#6D6875' }}>Tipo de Contrato</th>
+                <th className="text-left px-6 py-4 text-[16px] whitespace-nowrap" style={{ color: '#6D6875' }}>Categoria</th>
+                <th className="text-left px-6 py-4 text-[16px] whitespace-nowrap" style={{ color: '#6D6875' }}>Valor</th>
+                <th className="text-left px-6 py-4 text-[16px] whitespace-nowrap" style={{ color: '#6D6875' }}>Status</th>
+                <th className="text-left px-6 py-4 text-[16px] whitespace-nowrap" style={{ color: '#6D6875' }}>Data</th>
+                <th className="text-right px-6 py-4 text-[16px] whitespace-nowrap" style={{ color: '#6D6875' }}>Ações</th>
               </tr>
             </thead>
             <tbody>
@@ -424,7 +424,7 @@ export default function App() {
         </div>
 
         {/* Informação de paginação e controles */}
-        <div className="flex items-center justify-between mt-6">
+        <div className="flex items-center justify-between mt-6 paginacao-container">
           <div className="flex items-center gap-8">
             <p className="text-[15px]" style={{ color: '#9D8189' }}>
               Mostrando {startIndex + 1} a {Math.min(endIndex, totalElements)} de {totalElements} movimentações
@@ -435,7 +435,7 @@ export default function App() {
           </div>
 
           {totalPages > 1 && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 paginacao-botoes">
               <button
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}

@@ -1420,6 +1420,59 @@ html {
   font-size: var(--font-size);
 }
 
+/* =========================================
+   ESTILOS DE RESPONSIVIDADE (DETALHES DO PEDIDO)
+========================================= */
+
+@media (max-width: 1024px) {
+  /* Ajusta a linha de cálculos do produto selecionado no tablet */
+  .selecionados-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Reduz o título principal */
+  .titulo-page { font-size: 36px !important; }
+
+  /* Empilha o Título/Código e o bloco de "Status Atual" no topo */
+  .header-info {
+    flex-direction: column;
+    align-items: flex-start !important;
+    gap: 16px;
+  }
+  .header-info > div { width: 100%; }
+
+  /* Empilha a seleção de cliente e faz os botões ocuparem 100% da tela */
+  .cliente-grid { grid-template-columns: 1fr !important; }
+  .cliente-grid button { width: 100%; justify-content: center; }
+
+  /* Empilha Observações/Status e Datas de Criação/Atualização */
+  .form-grid-2, .datas-grid { grid-template-columns: 1fr !important; }
+
+  /* Evita que os botões "Ver Produto" e "Remover" amassem o texto da imagem */
+  .selecionado-header { flex-wrap: wrap; }
+  .selecionado-header .btn-acoes-produto { 
+    width: 100%; 
+    display: flex;
+  }
+  .selecionado-header .btn-acoes-produto button {
+    flex: 1; /* Faz os dois botões dividirem o espaço 50/50 na linha de baixo */
+    justify-content: center;
+  }
+
+  /* Ajusta os valores dos produtos para 2 colunas */
+  .selecionados-grid { grid-template-columns: 1fr 1fr !important; }
+  .selecionados-grid > div:last-child { grid-column: span 2 / span 2; }
+
+  /* Empilha os 3 blocos de resumo (Data, Peso e Valor) */
+  .resumo-grid { grid-template-columns: 1fr !important; }
+
+  /* Faz os botões finais de Voltar e Salvar ocuparem a tela toda */
+  .action-buttons { flex-direction: column-reverse; }
+  .action-buttons button { width: 100%; }
+}
+
 @property --tw-translate-x {
   syntax: "*";
   inherits: false;

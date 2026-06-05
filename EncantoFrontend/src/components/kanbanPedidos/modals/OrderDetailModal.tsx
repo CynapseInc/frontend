@@ -241,7 +241,7 @@ const currentStatus = statusTypes.find(st => st.id === order.statusAtual?.idStat
 
         </div>
 
-        <div className="flex justify-end gap-3 p-6 border-t" style={{ borderColor: '#D8E2DC' }}>
+        <div className="flex justify-end gap-3 p-6 border-t modal-action-buttons" style={{ borderColor: '#D8E2DC' }}>
           <Button
             onClick={handleViewOrderDetails}
             className="px-6 py-2 h-11 text-[15px]"

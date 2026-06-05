@@ -86,3 +86,16 @@
     color: #9D8189;
     font-size: 0.8vw;
 }
+
+/* =========================================
+   MEDIA QUERIES PARA RESPONSIVIDADE
+========================================= */
+@media (max-width: 1024px) {
+    /* Substitui os 'vw' por tamanhos fixos em píxeis (px) */
+    .headerTxt {
+        font-size: 14px !important;
+    }
+    .porcentagem {
+        font-size: 12px !important;
+    }
+}

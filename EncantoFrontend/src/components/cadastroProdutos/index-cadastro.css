@@ -1498,6 +1498,88 @@ html {
   font-size: var(--font-size);
 }
 
+/* =========================================
+   ESTILOS DE RESPONSIVIDADE (CADASTRO PRODUTO)
+========================================= */
+
+@media (max-width: 768px) {
+  /* Ajusta o tamanho do título principal */
+  .titulo-page { font-size: 36px !important; }
+
+  /* Ajusta os 3 botões do topo para quebrarem linha e se adaptarem */
+  .acoes-auxiliares {
+    flex-wrap: wrap;
+  }
+  .acoes-auxiliares button {
+    flex: 1 1 100%; /* Faz ocuparem a largura toda no celular */
+    justify-content: center;
+  }
+
+  /* Reduz o padding interno gigante (p-8) da caixa do formulário no celular */
+  .form-container {
+    padding: 20px !important;
+  }
+
+  /* Transforma o Card de "Detalhes do Item" (Preços) em 1 coluna */
+  .detalhes-item-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Remove a regra de ocupar 2 colunas do preço promocional para ele não estourar no celular */
+  .detalhes-item-grid > div {
+    grid-column: span 1 / span 1 !important;
+  }
+
+  /* Faz os botões finais de Voltar e Salvar ocuparem a tela toda (Salvar fica em cima) */
+  .action-buttons { flex-direction: column-reverse; }
+  .action-buttons button { width: 100%; }
+}
+
+/* =========================================
+   ESTILOS DE RESPONSIVIDADE (MODAIS)
+========================================= */
+
+/* Garante que a tabela dentro do modal tenha scroll horizontal */
+.modal-tabela-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 1024px) {
+  /* Remove a largura mínima forçada (ex: minWidth: 1180px) nos tablets e telemóveis */
+  .modal-lista-larga {
+    min-width: 0 !important;
+    width: calc(100vw - 32px) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Transforma qualquer grid (de 2 ou 4 colunas) num grid de 1 coluna */
+  .modal-grid {
+    grid-template-columns: 1fr !important;
+  }
+  
+  /* Garante que elementos que ocupavam várias colunas passem a ocupar apenas 1 */
+  .modal-grid > div {
+    grid-column: span 1 / span 1 !important;
+  }
+
+  /* Ajusta o título dos modais */
+  .modal-titulo {
+    font-size: 22px !important;
+  }
+
+  /* Permite que os botões do cabeçalho do modal (ex: "Novo Item") quebrem de linha */
+  .modal-header-actions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    margin-top: 10px;
+    width: 100%;
+  }
+  .modal-header-actions button {
+    flex: 1 1 auto;
+  }
+}
 @property --tw-translate-x {
   syntax: "*";
   inherits: false;

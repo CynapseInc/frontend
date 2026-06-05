@@ -100,7 +100,7 @@ export default function CounterpartyListModal({ isOpen, onClose, onCreate, onEdi
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="!max-w-none p-0 gap-0 [&>button]:hidden overflow-hidden flex flex-col"
+        className="!max-w-none p-0 gap-0 [&>button]:hidden overflow-hidden flex flex-col modal-lista-contraparte"
         style={{ 
           backgroundColor: 'white', 
           border: '1px solid #D8E2DC',
@@ -119,11 +119,11 @@ export default function CounterpartyListModal({ isOpen, onClose, onCreate, onEdi
         
         {/* Header */}
         <div className="px-8 py-6 border-b" style={{ borderColor: '#D8E2DC' }}>
-          <div className="flex items-center justify-between gap-4">
-            <h2 className="text-[28px] leading-tight flex-1 min-w-0" style={{ color: '#6D6875' }}>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <h2 className="text-[28px] leading-tight flex-1 min-w-0 modal-titulo" style={{ color: '#6D6875' }}>
               Contrapartes
             </h2>
-            <div className="flex items-center gap-3 shrink-0">
+            <div className="flex items-center gap-3 shrink-0 modal-header-actions">
               <button
                 type="button"
                 onClick={onCreate}
@@ -170,8 +170,8 @@ export default function CounterpartyListModal({ isOpen, onClose, onCreate, onEdi
               <p className="text-[16px]">Nenhuma contraparte encontrada</p>
             </div>
           ) : (
-            <div className="border rounded-lg overflow-hidden" style={{ borderColor: '#D8E2DC' }}>
-              <table className="w-full table-fixed">
+            <div className="border rounded-lg overflow-hidden tabela-container" style={{ borderColor: '#D8E2DC' }}>
+              <table className="w-full table-fixed min-w-[800px]">
                 <thead>
                   <tr style={{ backgroundColor: '#FFE5D9', borderBottom: '1px solid #D8E2DC' }}>
                     <th className="text-left px-4 py-4 text-[15px]" style={{ color: '#6D6875', width: '22%' }}>

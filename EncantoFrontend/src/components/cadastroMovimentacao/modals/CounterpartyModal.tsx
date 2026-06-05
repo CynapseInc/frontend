@@ -83,7 +83,7 @@ export default function CounterpartyModal({ isOpen, onClose, onSave, counterpart
 
         <form onSubmit={handleSubmit}>
           <div className="px-8 py-6">
-            <div className="grid grid-cols-2 gap-x-6 gap-y-5">
+            <div className="grid grid-cols-2 gap-x-6 gap-y-5 modal-grid">
               {/* Nome */}
               <div className="col-span-2">
                 <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>

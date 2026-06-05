@@ -8,6 +8,8 @@ import DeleteClientDialog from './modals/DeleteClientDialog';
 import { clienteService } from '../../services/ClienteService';
 import type { Cliente, ClienteFormPayload, EnderecoCliente } from '../../interfaces/Cliente';
 
+import './clientes.css';
+
 const onlyDigits = (value: string) => value.replace(/\D/g, '');
 
 const formatPhone = (value: string) => {
@@ -211,12 +213,12 @@ export default function Clientes() {
     <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
       <div className="w-full max-w-[1600px] mx-auto px-8 py-10 box-border">
         <div className="mb-10">
-          <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Clientes</h1>
+          <h1 className="text-[48px] mb-2 titulo-clientes" style={{ color: '#F4ACB7' }}>Clientes</h1>
           <p className="text-[17px]" style={{ color: '#9D8189' }}>Gerencie todos os clientes num só lugar</p>
         </div>
 
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
-          <div className="flex items-center justify-between gap-6">
+          <div className="flex items-center justify-between gap-6 header-actions">
             <div className="flex-1 max-w-md relative">
               <Search
                 className="absolute top-1/2 -translate-y-1/2"
@@ -245,8 +247,8 @@ export default function Clientes() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden" style={{ border: '1px solid #D8E2DC' }}>
-          <table className="w-full">
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden tabela-container" style={{ border: '1px solid #D8E2DC' }}>
+          <table className="w-full min-w-[800px]">
             <thead>
               <tr style={{ backgroundColor: '#FFE5D9', borderBottom: '1px solid #D8E2DC' }}>
                 <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Nome</th>
@@ -327,7 +329,7 @@ export default function Clientes() {
         </div>
 
         <div
-          className="flex items-center justify-between mt-6 bg-white rounded-lg p-4 shadow-sm"
+          className="flex items-center justify-between mt-6 bg-white rounded-lg p-4 shadow-sm paginacao-container"
           style={{ border: '1px solid #D8E2DC' }}
         >
           <p className="text-[14px]" style={{ color: '#9D8189' }}>
@@ -335,7 +337,7 @@ export default function Clientes() {
           </p>
 
           {totalPages > 1 && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 paginacao-botoes">
               <button
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1 || loading}

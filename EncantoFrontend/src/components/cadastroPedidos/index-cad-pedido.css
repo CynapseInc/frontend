@@ -1436,6 +1436,66 @@ html {
   font-size: var(--font-size);
 }
 
+/* =========================================
+   ESTILOS DE RESPONSIVIDADE (NOVO PEDIDO)
+========================================= */
+
+@media (max-width: 1024px) {
+  /* Reduz os 4 produtos para 2 por linha no tablet */
+  .produtos-grid {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
+  
+  /* Ajusta a linha de cálculos do produto selecionado */
+  .selecionados-grid {
+    grid-template-columns: repeat(3, 1fr) !important;
+  }
+}
+
+@media (max-width: 768px) {
+  /* Ajustes gerais já feitos */
+  .titulo-page { font-size: 36px !important; }
+  .cliente-grid { grid-template-columns: 1fr !important; }
+  .cliente-grid button { width: 100%; justify-content: center; }
+  .form-grid-2 { grid-template-columns: 1fr !important; }
+  .produtos-grid { grid-template-columns: repeat(2, 1fr) !important; }
+  .selecionados-grid { grid-template-columns: 1fr 1fr !important; }
+  .selecionados-grid > div:last-child { grid-column: span 2 / span 2; }
+  .resumo-grid { grid-template-columns: 1fr !important; }
+  .btn-confirmar { width: 100%; padding-left: 0; padding-right: 0; }
+
+  /* =======================================
+     NOVAS CORREÇÕES PARA CELULAR
+  ======================================= */
+
+  /* 1. Resolve o sumiço das imagens: Remove a proporção quadrada e garante altura mínima para a foto */
+  .produtos-grid > div {
+    aspect-ratio: auto !important;
+  }
+  .produtos-grid > div > div:first-child {
+    min-height: 120px; 
+    flex: none; /* Impede que a foto seja esmagada pelos textos abaixo */
+  }
+
+  /* 2. Permite que a paginação quebre linha para não estourar a tela na horizontal */
+  .paginacao-produtos {
+    flex-direction: column;
+    gap: 16px;
+  }
+  .paginacao-produtos > div {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  /* 3. Evita que o botão 'Remover' empurre o título do produto selecionado para fora */
+  .selecionado-header {
+    flex-wrap: wrap;
+  }
+  .selecionado-header button {
+    width: 100%; /* O botão desce e ocupa a linha toda */
+  }
+}
+
 @property --tw-translate-x {
   syntax: "*";
   inherits: false;
