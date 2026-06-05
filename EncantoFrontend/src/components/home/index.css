@@ -954,6 +954,40 @@
     outline-style: none;
   }
 
+/* =========================================
+   MEDIA QUERIES PARA RESPONSIVIDADE
+========================================= */
+
+/* =========================================
+   MEDIA QUERIES PARA RESPONSIVIDADE
+========================================= */
+
+@media (max-width: 1024px) {
+  /* Transforma o grid de 3 colunas em 1 coluna */
+  .grid-cols-\[280px_1fr_320px\] {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Aplica scroll interno nas colunas (Meses e Pendências) */
+  .responsive-col {
+    height: auto !important;
+    max-height: 400px !important; /* Altura limite antes de rolar */
+    overflow-y: auto !important; /* Cria a barra de rolagem interna */
+  }
+
+  /* Empilha os botões do modal apenas no celular e tablet */
+  .modal-action-buttons {
+    flex-direction: column !important;
+  }
+
+  /* Aumenta levemente os textos menores no celular/tablet para melhor leitura */
+  .text-\[11px\] { font-size: 13px !important; }
+  .text-\[12px\] { font-size: 14px !important; }
+  .text-\[13px\] { font-size: 15px !important; }
+  .text-\[14px\] { font-size: 16px !important; }
+  .text-\[15px\] { font-size: 17px !important; }
+}
+
   @media (hover: hover) {
     .hover\:scale-110:hover {
       --tw-scale-x: 110%;

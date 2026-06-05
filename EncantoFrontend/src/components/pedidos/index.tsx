@@ -9,6 +9,8 @@ import { pedidoService } from '../../services/PedidoService';
 import { statusPedidoService } from '../../services/StatusPedidoService';
 import type { PedidoPageResponse, PedidoResponse, StatusPedidoResponse } from '../../interfaces/Pedido';
 
+import './pedidos.css';
+
 const ITEMS_PER_PAGE = 8;
 
 const emptyPage: PedidoPageResponse = {
@@ -271,7 +273,7 @@ export default function Pedidos() {
     <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
       <div className="w-full max-w-[1600px] mx-auto px-8 py-10 box-border">
         <div className="mb-10">
-          <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Histórico de Pedidos</h1>
+          <h1 className="text-[48px] mb-2 titulo-pedidos" style={{ color: '#F4ACB7' }}>Histórico de Pedidos</h1>
           <p className="text-[17px]" style={{ color: '#9D8189' }}>Consulte os pedidos registrados no sistema</p>
         </div>
 
@@ -301,10 +303,7 @@ export default function Pedidos() {
             <span className="text-[15px]" style={{ color: '#9D8189' }}>Filtrar por:</span>
           </div>
 
-          <div
-            className="grid items-end gap-3"
-            style={{ gridTemplateColumns: '1.1fr 1fr 1.1fr 2.25fr 2.25fr' }}
-          >
+          <div className="grid items-end gap-3 filtros-grid">
             <div>
               <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}>Origem</label>
               <Input
@@ -395,20 +394,20 @@ export default function Pedidos() {
           </div>
 
           <div className="flex justify-end gap-2 mt-4">
-              <button
-                onClick={limparFiltros}
-                className="h-11 px-4 rounded-md text-[14px] transition-all flex items-center gap-2"
-                style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
-                title="Limpar filtros"
-              >
-                <X className="size-4" />
-                Limpar
-              </button>
+            <button
+              onClick={limparFiltros}
+              className="h-11 px-4 rounded-md text-[14px] transition-all flex items-center gap-2"
+              style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
+              title="Limpar filtros"
+            >
+              <X className="size-4" />
+              Limpar
+            </button>
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden" style={{ border: '1px solid #D8E2DC' }}>
-          <table className="w-full">
+        <div className="bg-white rounded-lg shadow-sm tabela-container" style={{ border: '1px solid #D8E2DC' }}>
+          <table className="w-full min-w-[1000px]"> {/* O min-w forçará o scroll no mobile sem esmagar as colunas */}
             <thead>
               <tr style={{ backgroundColor: '#FFE5D9', borderBottom: '1px solid #D8E2DC' }}>
                 <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Pedido</th>
@@ -519,7 +518,7 @@ export default function Pedidos() {
         </div>
 
         <div
-          className="flex items-center justify-between mt-6 bg-white rounded-lg p-4 shadow-sm"
+          className="flex items-center justify-between mt-6 bg-white rounded-lg p-4 shadow-sm paginacao-container"
           style={{ border: '1px solid #D8E2DC' }}
         >
           <p className="text-[14px]" style={{ color: '#9D8189' }}>
@@ -527,7 +526,7 @@ export default function Pedidos() {
           </p>
 
           {totalPages > 1 && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 paginacao-botoes">
               <button
                 onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                 disabled={currentPage === 1 || isLoading}

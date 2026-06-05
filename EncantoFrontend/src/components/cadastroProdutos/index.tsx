@@ -349,14 +349,14 @@ export default function App() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
-      <div className="max-w-[1200px] mx-auto px-8 py-12">
+      <div className="max-w-[1200px] mx-auto px-4 lg:px-8 py-6 lg:py-12">
         {/* Cabeçalho */}
         <div className="mb-10">
           <button type="button" className="no-button-feedback flex items-center gap-2 mb-4 text-[15px]" style={{ color: '#9D8189' }} onClick={() => navigate('/lista-produtos')}>
             <ArrowLeft className="size-5" /> Voltar para Produtos
           </button>
           
-          <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>
+          <h1 className="text-[48px] mb-2 titulo-page" style={{ color: '#F4ACB7' }}>
             {isEditingProduct ? 'Editar Produto' : 'Cadastro de Produto'}
           </h1>
           <p className="text-[17px]" style={{ color: '#9D8189' }}>
@@ -367,7 +367,7 @@ export default function App() {
         </div>
 
         {/* Botões de gerenciamento */}
-        <div className="flex gap-3 mb-6">
+        <div className="flex gap-3 mb-6 acoes-auxiliares">
           <Button type="button" onClick={() => setIsCategoryListModalOpen(true)} className="no-button-feedback gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#FFE5D9', color: '#6D6875' }}><List className="size-4" /> Categorias</Button>
           <Button type="button" onClick={() => setIsThemeListModalOpen(true)} className="no-button-feedback gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#FFCAD4', color: '#6D6875' }}><List className="size-4" /> Temas</Button>
           <Button type="button" onClick={() => setIsItemListModalOpen(true)} className="no-button-feedback gap-2 h-11 px-5 text-[15px]" style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}><List className="size-4" /> Itens</Button>
@@ -375,7 +375,7 @@ export default function App() {
 
         {/* Formulário */}
         <form onSubmit={handleSubmit}>
-          <div className="bg-white rounded-lg p-8 shadow-sm space-y-6" style={{ border: '1px solid #D8E2DC' }}>
+          <div className="bg-white rounded-lg p-8 shadow-sm space-y-6 form-container" style={{ border: '1px solid #D8E2DC' }}>
             
             {/* Título do Produto */}
             <div>
@@ -446,7 +446,7 @@ export default function App() {
                     <Button type="button" onClick={() => setIsItemLocked(false)} className="px-4 py-2 h-9 text-[14px]" style={{ backgroundColor: '#F4ACB7', color: 'white' }}>Alterar Item</Button>
                   )}
                 </div>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-3 gap-4 detalhes-item-grid">
                   <div><span className="text-[14px]" style={{ color: '#9D8189' }}>Preço de Venda</span><p className="text-[16px]" style={{ color: '#4CAF50' }}><strong>R$ {currentItem.salePrice.toFixed(2)}</strong></p></div>
                   {currentItem.promotionalPrice > 0 && (
                     <div className="p-3 rounded-lg" style={{ backgroundColor: '#FFCAD4', gridColumn: 'span 2' }}>
@@ -458,7 +458,7 @@ export default function App() {
             )}
           </div>
 
-          <div className="flex justify-end gap-3 mt-6">
+          <div className="flex justify-end gap-3 mt-6 action-buttons">
             <Button type="button" onClick={() => navigate('/lista-produtos')} className="px-8 py-3 h-11 text-[16px]" style={{ backgroundColor: 'white', color: '#9D8189', border: '1px solid #D8E2DC' }}>Cancelar</Button>
             <Button type="submit" className="px-8 py-3 h-11 text-[16px]" style={{ backgroundColor: '#F4ACB7', color: 'white' }}>
               {isEditingProduct ? 'Salvar Alterações' : 'Cadastrar Produto'}

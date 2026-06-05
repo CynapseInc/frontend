@@ -32,7 +32,7 @@ const daysOfWeek = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
 export function HomeCalendar() {
   const navigate = useNavigate();
   const calendarCardRef = useRef<HTMLDivElement>(null);
-  
+
   // Data real de hoje
   const todayObj = new Date();
   const todayStr = `${todayObj.getFullYear()}-${String(todayObj.getMonth() + 1).padStart(2, '0')}-${String(todayObj.getDate()).padStart(2, '0')}`;
@@ -42,12 +42,12 @@ export function HomeCalendar() {
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [itemFilter, setItemFilter] = useState('');
-  
+
   // Estado para guardar os pedidos reais da API
   const [orders, setOrders] = useState<Order[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [calendarCardHeight, setCalendarCardHeight] = useState<number | null>(null);
-  
+
   // Estados para os Modais de Feedback e Confirmação
   const [feedback, setFeedback] = useState<{
     isOpen: boolean;
@@ -84,8 +84,8 @@ export function HomeCalendar() {
         ]);
 
         // CORREÇÃO AQUI: Extrair o array .content caso a API retorne um objeto paginado
-        const produtosData = Array.isArray(produtosResponse) 
-          ? produtosResponse 
+        const produtosData = Array.isArray(produtosResponse)
+          ? produtosResponse
           : (produtosResponse?.content || []);
 
         const mappedOrders: Order[] = pedidosData.map((p: any) => {
@@ -96,10 +96,10 @@ export function HomeCalendar() {
           }) || [];
 
           // 2. Pegar a categoria e tema baseados no primeiro produto (ou definir como Diversos)
-          const primeiroProdCatalogo = p.produtos && p.produtos.length > 0 
-            ? produtosData.find((cat: any) => cat.id === p.produtos[0].idProduto) 
+          const primeiroProdCatalogo = p.produtos && p.produtos.length > 0
+            ? produtosData.find((cat: any) => cat.id === p.produtos[0].idProduto)
             : null;
-            
+
           const category = primeiroProdCatalogo?.tema?.categoriaTema?.titulo || 'Diversos';
           const theme = primeiroProdCatalogo?.tema?.descricao || 'Diversos';
 
@@ -171,7 +171,7 @@ export function HomeCalendar() {
 
   const getOrdersForMonth = (year: number, month: number) => {
     const monthStr = String(month + 1).padStart(2, '0');
-    return orders.filter(order => 
+    return orders.filter(order =>
       order.deliveryDate.startsWith(`${year}-${monthStr}`)
     ).length;
   };
@@ -204,9 +204,8 @@ export function HomeCalendar() {
               setIsModalOpen(true);
             }
           }}
-          className={`aspect-square rounded-lg transition-all relative ${
-            hasOrders ? 'cursor-pointer hover:shadow-lg hover:-translate-y-1' : ''
-          }`}
+          className={`aspect-square rounded-lg transition-all relative ${hasOrders ? 'cursor-pointer hover:shadow-lg hover:-translate-y-1' : ''
+            }`}
           style={{
             backgroundColor: hasOrders ? '#FFE5D9' : 'white',
             border: isToday ? '2px solid #F4ACB7' : '1px solid #D8E2DC',
@@ -214,9 +213,9 @@ export function HomeCalendar() {
           }}
         >
           <div className="flex flex-col items-center justify-center h-full p-2">
-            <span 
+            <span
               className="text-[16px] mb-1"
-              style={{ 
+              style={{
                 color: isToday ? '#F4ACB7' : '#6D6875',
                 fontWeight: hasOrders || isToday ? 'bold' : 'normal'
               }}
@@ -224,7 +223,7 @@ export function HomeCalendar() {
               {day}
             </span>
             {hasOrders && (
-              <div 
+              <div
                 className="size-6 rounded-full flex items-center justify-center text-[11px] text-white shadow-sm"
                 style={{ backgroundColor: '#F4ACB7' }}
               >
@@ -263,7 +262,7 @@ export function HomeCalendar() {
       await pedidoService.mudarEstado(orderToDelete);
       setOrders(orders.filter(order => order.id !== orderToDelete));
       showFeedback('Pedido arquivado com sucesso!', 'success');
-      
+
       if (selectedOrders.length <= 1) {
         setIsModalOpen(false);
       }
@@ -278,7 +277,7 @@ export function HomeCalendar() {
   const filteredOrders = orders.filter(order => {
     const statusNormalizado = order.status.toLowerCase();
     if (statusNormalizado === 'finalizado' || statusNormalizado === 'concluído' || statusNormalizado === 'concluido' || statusNormalizado === 'entregue') {
-      return false; 
+      return false;
     }
 
     if (!itemFilter) return true;
@@ -307,7 +306,7 @@ export function HomeCalendar() {
     const daysUntil = getDaysUntilDelivery(date);
     // Adiciona "T00:00:00" para evitar problemas de fuso horário no JS
     const formattedDate = new Date(date + 'T00:00:00').toLocaleDateString('pt-BR');
-    
+
     if (daysUntil < 0) {
       return { text: `Atrasado há ${Math.abs(daysUntil)} dias`, color: '#F44336', bg: '#FFEBEE' };
     } else if (daysUntil === 0) {
@@ -335,7 +334,7 @@ export function HomeCalendar() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
       <div className="w-full max-w-[1600px] mx-auto px-8 py-10 box-border">
-        
+
         {/* Cabeçalho */}
         <div className="mb-8">
           <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Envios</h1>
@@ -345,15 +344,15 @@ export function HomeCalendar() {
         </div>
 
         <div className="grid grid-cols-[280px_1fr_320px] gap-6">
-          
+
           {/* COLUNA ESQUERDA - Seletor de Ano e Meses */}
           <div
-            className="flex flex-col gap-5"
+            className="flex flex-col gap-5 responsive-col"
             style={{
               height: calendarCardHeight ? `${calendarCardHeight}px` : undefined
             }}
           >
-            
+
             {/* Seletor de Ano */}
             <div className="bg-white rounded-lg p-5 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
               <div className="flex items-center justify-between mb-2">
@@ -384,7 +383,7 @@ export function HomeCalendar() {
                 {monthNames.map((month, index) => {
                   const ordersCount = getOrdersForMonth(currentYear, index);
                   const isSelected = index === currentMonth;
-                  
+
                   return (
                     <button
                       key={index}
@@ -395,9 +394,9 @@ export function HomeCalendar() {
                         border: isSelected ? '1px solid #F4ACB7' : '1px solid transparent',
                       }}
                     >
-                      <span 
+                      <span
                         className="text-[15px]"
-                        style={{ 
+                        style={{
                           color: isSelected ? '#F4ACB7' : '#6D6875',
                           fontWeight: isSelected ? 'bold' : 'normal'
                         }}
@@ -405,7 +404,7 @@ export function HomeCalendar() {
                         {month}
                       </span>
                       {ordersCount > 0 && (
-                        <span 
+                        <span
                           className="size-6 rounded-full flex items-center justify-center text-[12px] text-white"
                           style={{ backgroundColor: isSelected ? '#F4ACB7' : '#FFCAD4' }}
                         >
@@ -438,7 +437,7 @@ export function HomeCalendar() {
               <div className="mb-3">
                 <div className="grid grid-cols-7 gap-2 mb-2">
                   {daysOfWeek.map(day => (
-                    <div 
+                    <div
                       key={day}
                       className="text-center text-[14px] py-2"
                       style={{ color: '#9D8189' }}
@@ -473,7 +472,7 @@ export function HomeCalendar() {
           {/* COLUNA DIREITA - Pendências */}
           <div>
             <div
-              className="bg-white rounded-lg p-5 shadow-sm flex flex-col"
+              className="bg-white rounded-lg p-5 shadow-sm flex flex-col responsive-col"
               style={{
                 border: '1px solid #D8E2DC',
                 height: calendarCardHeight ? `${calendarCardHeight}px` : undefined,
@@ -510,12 +509,12 @@ export function HomeCalendar() {
               <div className="space-y-3 flex-1 min-h-0 overflow-y-auto pr-2">
                 {sortedPendingOrders.map(order => {
                   const dateInfo = formatDeliveryDate(order.deliveryDate);
-                  
+
                   return (
                     <div
                       key={order.id}
                       className="p-3 rounded-lg"
-                      style={{ 
+                      style={{
                         backgroundColor: dateInfo.bg,
                         border: `1px solid ${dateInfo.color === '#F44336' ? '#F44336' : '#D8E2DC'}`
                       }}
@@ -539,7 +538,7 @@ export function HomeCalendar() {
                         </span>
                       </div>
 
-                      <div 
+                      <div
                         className="px-2 py-1 rounded mb-3 inline-block"
                         style={{ backgroundColor: dateInfo.color === '#F44336' ? '#FFCDD2' : dateInfo.color === '#FF9800' ? '#FFE0B2' : '#E0E0E0' }}
                       >
@@ -580,16 +579,16 @@ export function HomeCalendar() {
       </div>
 
       {isModalOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
           style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
           onClick={() => setIsModalOpen(false)}
         >
-          <div 
+          <div
             className="bg-white rounded-lg shadow-xl w-full max-w-[700px] max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
-            <div 
+            <div
               className="flex items-center justify-between p-6 border-b sticky top-0 bg-white z-10"
               style={{ borderColor: '#D8E2DC' }}
             >
@@ -598,15 +597,15 @@ export function HomeCalendar() {
                   <strong>Pedidos do Dia</strong>
                 </h2>
                 <p className="text-[14px] mt-1" style={{ color: '#9D8189' }}>
-                  {selectedDate && new Date(selectedDate + 'T00:00:00').toLocaleDateString('pt-BR', { 
-                    weekday: 'long', 
-                    year: 'numeric', 
-                    month: 'long', 
-                    day: 'numeric' 
+                  {selectedDate && new Date(selectedDate + 'T00:00:00').toLocaleDateString('pt-BR', {
+                    weekday: 'long',
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
                   })}
                 </p>
               </div>
-              <button 
+              <button
                 onClick={() => setIsModalOpen(false)}
                 className="p-2 rounded-md hover:bg-gray-100 transition-colors"
               >
@@ -623,7 +622,7 @@ export function HomeCalendar() {
                     className="p-4 rounded-lg"
                     style={{ backgroundColor: '#F9F9F9', border: '1px solid #D8E2DC' }}
                   >
-                    <div className="flex items-start justify-between mb-3">
+                    <div className="flex items-start justify-between gap-2 flex-wrap mb-3">
                       <div className="flex-1">
                         <p className="text-[17px] mb-1" style={{ color: '#6D6875' }}>
                           <strong>{order.clientName}</strong>
@@ -632,7 +631,7 @@ export function HomeCalendar() {
                           {order.products.join(', ')}
                         </p>
                       </div>
-                      <div 
+                      <div
                         className="px-3 py-1 rounded-full text-[13px] text-center"
                         style={{ backgroundColor: '#FFE5D9', color: '#F4ACB7' }}
                       >
@@ -640,7 +639,7 @@ export function HomeCalendar() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-4 mb-3 text-[14px]" style={{ color: '#9D8189' }}>
+                    <div className="flex items-center gap-4 mb-3 text-[14px] flex-wrap" style={{ color: '#9D8189' }}>
                       <div className="flex items-center gap-2">
                         <Package className="size-4" style={{ color: '#F4ACB7' }} />
                         <span>{order.quantity} {order.quantity === 1 ? 'unidade' : 'unidades'}</span>
@@ -651,7 +650,7 @@ export function HomeCalendar() {
                       </div>
                     </div>
 
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 modal-action-buttons">
                       <Button
                         onClick={() => handleMarkAsSent(order.id)}
                         className="flex-1 h-10 gap-2 text-[14px]"
@@ -682,7 +681,7 @@ export function HomeCalendar() {
               </div>
             </div>
 
-            <div 
+            <div
               className="flex justify-end p-6 border-t"
               style={{ borderColor: '#D8E2DC' }}
             >

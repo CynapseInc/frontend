@@ -26,7 +26,7 @@ interface ThemeListModalProps {
   onDelete: (theme: Theme) => void;
 }
 
-export default function ThemeListModal({ isOpen, onClose, themes, categories, onEdit, onDelete }: ThemeListModalProps) {
+export default function ThemeListModal({ isOpen, onClose, themes, categories, onCreate, onEdit, onDelete }: ThemeListModalProps) {
   const [searchTerm, setSearchTerm] = useState<string>('');
   const [currentPage, setCurrentPage] = useState(1);
   const [temasFiltrados, setTemasFiltrados] = useState<Theme[]>(themes);
@@ -121,7 +121,7 @@ export default function ThemeListModal({ isOpen, onClose, themes, categories, on
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
       <DialogContent 
-        className="p-0 gap-0 [&>button]:hidden"
+        className="p-0 gap-0 [&>button]:hidden modal-lista-larga"
         style={{ 
           backgroundColor: 'white', 
           border: '1px solid #D8E2DC',
@@ -137,11 +137,11 @@ export default function ThemeListModal({ isOpen, onClose, themes, categories, on
         
         {/* Header */}
         <div className="px-8 py-6 border-b" style={{ borderColor: '#D8E2DC' }}>
-          <div className="flex items-center justify-between">
-            <h2 className="text-[28px]" style={{ color: '#F4ACB7' }}>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <h2 className="text-[28px] flex-1 min-w-0 modal-titulo" style={{ color: '#F4ACB7' }}>
               Temas
             </h2>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-3 shrink-0 modal-header-actions">
               <button
                 type="button"
                 onClick={onCreate}
@@ -188,8 +188,8 @@ export default function ThemeListModal({ isOpen, onClose, themes, categories, on
               <p className="text-[15px]">Nenhum tema encontrado</p>
             </div>
           ) : (
-            <div className="border rounded-lg overflow-hidden" style={{ borderColor: '#D8E2DC' }}>
-              <table className="w-full">
+            <div className="border rounded-lg overflow-hidden modal-tabela-container" style={{ borderColor: '#D8E2DC' }}>
+              <table className="w-full min-w-[600px] whitespace-nowrap">
                 <thead>
                   <tr style={{ backgroundColor: '#FFE5D9', borderBottom: '1px solid #D8E2DC' }}>
                     <th className="text-left px-6 py-4 text-[15px]" style={{ color: '#6D6875' }}>

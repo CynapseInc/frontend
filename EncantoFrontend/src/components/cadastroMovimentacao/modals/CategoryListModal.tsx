@@ -105,11 +105,11 @@ export default function CategoryListModal({ isOpen, onClose, onCreate, onEdit, o
         
         {/* Header */}
         <div className="px-8 py-6 border-b" style={{ borderColor: '#D8E2DC' }}>
-          <div className="flex items-start justify-between gap-4">
-            <h2 className="text-[28px] leading-tight flex-1 min-w-0" style={{ color: '#6D6875' }}>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <h2 className="text-[28px] leading-tight flex-1 min-w-0 modal-titulo" style={{ color: '#6D6875' }}>
               Categorias de Movimentação
             </h2>
-            <div className="flex items-center gap-3 shrink-0">
+            <div className="flex items-center gap-3 shrink-0 modal-header-actions">
               <button
                 type="button"
                 onClick={onCreate}

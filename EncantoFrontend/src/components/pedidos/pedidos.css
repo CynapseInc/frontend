@@ -1,0 +1,47 @@
+/* =========================================
+   ESTILOS PADRÃO (PC)
+========================================= */
+/* Movemos o grid do inline-style para cá, para podermos modificá-lo no celular */
+.filtros-grid {
+  grid-template-columns: 1.1fr 1fr 1.1fr 2.25fr 2.25fr;
+}
+
+/* Garante que a tabela tenha scroll horizontal em telas menores */
+.tabela-container {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch; /* Scroll suave no iOS */
+}
+
+/* =========================================
+   MEDIA QUERIES PARA TABLET E CELULAR
+========================================= */
+@media (max-width: 1024px) {
+  /* Em tablets, quebra os filtros para 2 colunas */
+  .filtros-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  /* Ajusta a paginação para não quebrar a tela */
+  .paginacao-container {
+    flex-direction: column !important;
+    gap: 15px;
+    align-items: center !important;
+  }
+
+  .paginacao-botoes {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 768px) {
+  /* No celular, empilha todos os filtros (1 coluna) */
+  .filtros-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Reduz um pouco o tamanho do título no celular */
+  .titulo-pedidos {
+    font-size: 36px !important;
+  }
+}

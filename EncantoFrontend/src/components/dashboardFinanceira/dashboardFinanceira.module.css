@@ -183,3 +183,67 @@
     width: 100%;
     height: 100%;
 }
+
+/* =========================================
+   MEDIA QUERIES PARA RESPONSIVIDADE
+========================================= */
+
+@media (max-width: 1024px) {
+  /* Restaura as fontes de 'vw' para tamanhos legíveis (px) no tablet */
+  .titulo { font-size: 38px !important; }
+  .textoSecundario { font-size: 16px !important; }
+  .tituloFiltro { font-size: 14px !important; }
+  .inputFiltro, .botaoFiltro { font-size: 15px !important; }
+
+  /* Filtros: Ajusta para os inputs dividirem o espaço e o botão cair para a linha de baixo */
+  .cardConteudoFiltros {
+      flex-wrap: wrap;
+  }
+  .containerFiltro {
+      flex: 1;
+      min-width: 200px;
+  }
+  .inputFiltro {
+      width: 100% !important;
+  }
+  .botaoFiltro {
+      width: 100%;
+      margin-top: 5px;
+  }
+
+  /* Cards KPI: Muda de 4 colunas para 2 colunas (2x2) */
+  .containerCards {
+      grid-template-columns: repeat(2, 1fr) !important;
+  }
+
+  /* Gráficos: Empilha todos (1 coluna) */
+  .containerCardGraficos {
+      grid-template-columns: 1fr !important;
+      grid-auto-rows: 400px !important; /* Altura fixa para manter o gráfico legível */
+  }
+}
+
+@media (max-width: 768px) {
+  /* Celular: Ajustes finos na fonte */
+  .titulo { font-size: 32px !important; }
+  .textoSecundario { font-size: 14px !important; }
+
+  /* Filtros: Empilha tudo (1 por linha) */
+  .cardConteudoFiltros {
+      flex-direction: column;
+      align-items: stretch !important;
+  }
+  .containerFiltro {
+      width: 100%;
+  }
+
+  /* Cards KPI: 1 por linha no celular */
+  .containerCards {
+      grid-template-columns: 1fr !important;
+  }
+
+  /* Gráficos: Reduz um pouquinho a altura no celular para caber melhor na tela */
+  .containerCardGraficos {
+      grid-auto-rows: 350px !important;
+  }
+}

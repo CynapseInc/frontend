@@ -213,7 +213,7 @@ export default function ClientModal({ isOpen, onClose, onSave, client }: ClientM
 
         <form onSubmit={handleSubmit}>
           <div className="px-8 py-6">
-            <div className="grid grid-cols-2 gap-x-6 gap-y-5">
+            <div className="grid grid-cols-2 gap-x-6 gap-y-5 modal-grid">
               <div className="col-span-2">
                 <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>
                   Nome completo
@@ -327,7 +327,7 @@ export default function ClientModal({ isOpen, onClose, onSave, client }: ClientM
                     <h3 className="text-[18px] mb-4" style={{ color: '#6D6875' }}>
                       {editingAddressIndex !== null ? 'Editar Endereço' : 'Adicionar Endereço'}
                     </h3>
-                    <div className="grid grid-cols-2 gap-x-6 gap-y-5">
+                    <div className="grid grid-cols-2 gap-x-6 gap-y-5 modal-grid">
                       <div>
                         <label className="block mb-2 text-[15px]" style={{ color: '#6D6875' }}>CEP</label>
                         <input

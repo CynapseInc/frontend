@@ -27,19 +27,19 @@ export default function App() {
   const [editingEmployee, setEditingEmployee] = useState<Funcionario | null>(null);
   const [deleteEmployee, setDeleteEmployee] = useState<Funcionario | null>(null);
   const [feedback, setFeedback] = useState<{
-        isOpen: boolean;
-        message: string;
-        type: 'success' | 'error';
-      }>({
-        isOpen: false,
-        message: '',
-        type: 'success'
-      });
-    
+    isOpen: boolean;
+    message: string;
+    type: 'success' | 'error';
+  }>({
+    isOpen: false,
+    message: '',
+    type: 'success'
+  });
+
   const showFeedback = (message: string, type: 'success' | 'error') => {
     setFeedback({ isOpen: true, message, type });
   };
-  
+
   const itemsPerPage = 8;
   const filters = ['Todos', 'Administrador', 'Social Media', 'Manufatura'];
 
@@ -51,13 +51,13 @@ export default function App() {
 
         const funcionariosFormatados: Funcionario[] = funcionarios.map((usuario: any) => ({
           id: usuario.id,
-          name: usuario.name, 
+          name: usuario.name,
           email: usuario.email,
           cpf: usuario.cpf,
-          dataNasc: usuario.dataNasc, 
+          dataNasc: usuario.dataNasc,
           cargo: usuario.cargo || 'Não definido',
           foto: usuario.foto,
-          status: 'Ativo' 
+          status: 'Ativo'
         }));
 
         setEmployees(funcionariosFormatados);
@@ -71,7 +71,7 @@ export default function App() {
 
   const filteredEmployees = employees.filter(emp => {
     const matchesSearch = emp.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         emp.email.toLowerCase().includes(searchTerm.toLowerCase());
+      emp.email.toLowerCase().includes(searchTerm.toLowerCase());
     const matchesFilter = selectedFilter === 'Todos' || emp.cargo === selectedFilter;
     return matchesSearch && matchesFilter;
   });
@@ -88,10 +88,10 @@ export default function App() {
         cpf: employee.cpf,
         email: employee.email,
         password: employee.senha,
-        dataNasc: employee.dataNasc,
+        dataNasc: employee.dataNasc ? employee.dataNasc : null,
         cargo: employee.cargo
       };
-      
+
       let novoUsuario = await funcionarioService.criar(dadosBackend);
 
       if (file) {
@@ -108,11 +108,11 @@ export default function App() {
   const handleEditEmployee = async (employee: Funcionario, file?: File) => {
     try {
       const dadosBackend = {
-        name: employee.name, 
+        name: employee.name,
         cpf: employee.cpf,
         email: employee.email,
-        senha: employee.senha, 
-        dataNasc: employee.dataNasc,
+        password: employee.senha,
+        dataNasc: employee.dataNasc ? employee.dataNasc : null,
         cargo: employee.cargo
       };
 
@@ -157,18 +157,18 @@ export default function App() {
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
       <div className="w-full max-w-[1600px] mx-auto px-8 py-10 box-border">
-        
+
         <div className="mb-10">
-          <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Funcionários</h1>
+          <h1 className="text-[48px] mb-2 titulo-funcionarios" style={{ color: '#F4ACB7' }}>Funcionários</h1>
           <p className="text-[17px]" style={{ color: '#9D8189' }}>Gerencie toda a sua equipe em um só lugar</p>
         </div>
 
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
-          <div className="flex items-center justify-between gap-6 mb-5">
+          <div className="flex items-center justify-between gap-6 mb-5 header-actions">
             <div className="flex-1 max-w-md relative">
-              <Search 
-                className="absolute top-1/2 -translate-y-1/2" 
-                style={{ color: '#9D8189', left: '1vw', width: '1.2vw', height: '1.2vw', pointerEvents: 'none' }} 
+              <Search
+                className="absolute top-1/2 -translate-y-1/2"
+                style={{ color: '#9D8189', left: '1vw', width: '1.2vw', height: '1.2vw', pointerEvents: 'none' }}
               />
               <Input
                 placeholder="Procurar por nome ou e-mail..."
@@ -181,8 +181,8 @@ export default function App() {
                 style={{ paddingLeft: '3.5vw', borderColor: '#D8E2DC', backgroundColor: '#F9F9F9', color: '#6D6875' }}
               />
             </div>
-            
-            <Button 
+
+            <Button
               onClick={openAddModal}
               className="gap-2 h-11 px-6 text-[15px]"
               style={{ backgroundColor: '#F4ACB7', color: 'white' }}
@@ -192,7 +192,7 @@ export default function App() {
             </Button>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-3 filtros-container">
             <Filter className="size-4" style={{ color: '#9D8189' }} />
             <span className="text-[15px]" style={{ color: '#9D8189' }}>Filtrar por cargo:</span>
             <div className="flex gap-2">
@@ -217,19 +217,19 @@ export default function App() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg shadow-sm overflow-hidden" style={{ border: '1px solid #D8E2DC' }}>
-          <table className="w-full">
+        <div className="bg-white rounded-lg shadow-sm overflow-hidden tabela-container" style={{ border: '1px solid #D8E2DC' }}>
+          <table className="w-full min-w-[800px]">
             <thead>
               <tr style={{ backgroundColor: '#FFE5D9', borderBottom: '1px solid #D8E2DC' }}>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Nome</th>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Cargo</th>
-                <th className="text-left px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Situação</th>
-                <th className="text-right px-6 py-4 text-[16px]" style={{ color: '#6D6875' }}>Ações</th>
+                <th className="text-left px-6 py-4 text-[16px] whitespace-nowrap" style={{ color: '#6D6875' }}>Nome</th>
+                <th className="text-left px-6 py-4 text-[16px] whitespace-nowrap" style={{ color: '#6D6875' }}>Cargo</th>
+                <th className="text-left px-6 py-4 text-[16px] whitespace-nowrap" style={{ color: '#6D6875' }}>Situação</th>
+                <th className="text-right px-6 py-4 text-[16px] whitespace-nowrap" style={{ color: '#6D6875' }}>Ações</th>
               </tr>
             </thead>
             <tbody>
               {currentEmployees.map((employee, index) => (
-                <tr 
+                <tr
                   key={employee.id}
                   className="border-b transition-colors hover:bg-opacity-50"
                   style={{ borderColor: '#D8E2DC', backgroundColor: index % 2 === 0 ? 'white' : '#F9F9F9' }}
@@ -238,8 +238,8 @@ export default function App() {
                     <div className="flex items-center gap-3">
                       <div className="size-10 rounded-full flex items-center justify-center shrink-0 overflow-hidden" style={{ backgroundColor: '#FFE5D9' }}>
                         {employee.foto ? (
-                          <ImageWithFallback 
-                            src={getFotoUrl(employee.foto)} 
+                          <ImageWithFallback
+                            src={getFotoUrl(employee.foto)}
                             alt={employee.name}
                             className="size-full object-cover"
                           />
@@ -260,7 +260,7 @@ export default function App() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span 
+                    <span
                       className="inline-flex items-center px-3 py-1 rounded-full text-[14px]"
                       style={{
                         backgroundColor: employee.status === 'Ativo' ? '#D8E2DC' : '#FFE5D9',
@@ -296,13 +296,13 @@ export default function App() {
           </table>
         </div>
 
-        <div className="flex items-center justify-between mt-6">
+        <div className="flex items-center justify-between mt-6 paginacao-container">
           <p className="text-[15px]" style={{ color: '#9D8189' }}>
             Mostrando {startIndex + 1} a {Math.min(endIndex, filteredEmployees.length)} de {filteredEmployees.length} funcionários
           </p>
-          
+
           {totalPages > 1 && (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 paginacao-botoes">
               <button
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
@@ -311,7 +311,7 @@ export default function App() {
               >
                 Anterior
               </button>
-              
+
               {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
                 <button
                   key={page}
@@ -326,7 +326,7 @@ export default function App() {
                   {page}
                 </button>
               ))}
-              
+
               <button
                 onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
                 disabled={currentPage === totalPages}

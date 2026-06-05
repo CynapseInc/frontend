@@ -385,7 +385,7 @@ export default function App() {
 
   return (
     <div className="min-h-screen" style={{ backgroundColor: '#F9F9F9' }}>
-      <div className="max-w-[1400px] mx-auto px-8 py-12">
+      <div className="max-w-[1400px] mx-auto px-4 lg:px-8 py-6 lg:py-12">
         
         {/* Cabeçalho */}
         <div className="mb-10">
@@ -397,9 +397,9 @@ export default function App() {
             <ArrowLeft className="size-5" />
             Voltar
           </button>
-          <div className="flex items-center justify-between">
+          <div className="flex items-center justify-between header-info">
             <div>
-              <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Detalhes do Pedido</h1>
+              <h1 className="text-[48px] mb-2 titulo-page" style={{ color: '#F4ACB7' }}>Detalhes do Pedido</h1>
               <p className="text-[17px]" style={{ color: '#9D8189' }}>
                 Código: <strong style={{ color: '#6D6875' }}>PED-{orderId.padStart(3, '0')}</strong>
               </p>
@@ -415,11 +415,10 @@ export default function App() {
         </div>
 
         {/* 1. Informações do Cliente */}
-        {/* 1. Informações do Cliente */}
         <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
           <h2 className="text-[22px] mb-5" style={{ color: '#F4ACB7' }}><strong>Informações do Cliente</strong></h2>
 
-          <div className="grid grid-cols-[1fr_auto_auto] gap-3 mb-5">
+          <div className="grid grid-cols-[1fr_auto_auto] gap-3 mb-5 cliente-grid">
             <div>
               <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}><strong>Cliente</strong></label>
               <div 
@@ -469,7 +468,7 @@ export default function App() {
             </div>
           )}
           
-          <div className="grid grid-cols-2 gap-5 mb-5">
+          <div className="grid grid-cols-2 gap-5 mb-5 form-grid-2">
             <div>
               <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}><strong>Observações do Pedido</strong></label>
               <textarea
@@ -497,7 +496,7 @@ export default function App() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-5">
+          <div className="grid grid-cols-2 gap-5 datas-grid">
             <div className="p-4 rounded-lg" style={{ backgroundColor: '#F9F9F9', border: '1px solid #D8E2DC' }}>
               <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}>Data de Criação</label>
               <p className="text-[15px]" style={{ color: '#6D6875' }}><strong>{createdAt}</strong></p>
@@ -526,7 +525,7 @@ export default function App() {
             <div className="space-y-4">
               {selectedProducts.map(sp => (
                 <div key={sp.product.id} className="border rounded-lg p-5" style={{ borderColor: '#D8E2DC', backgroundColor: '#F9F9F9' }}>
-                  <div className="flex items-start gap-4 mb-4">
+                  <div className="flex items-start gap-4 mb-4 selecionado-header">
                     <div className="size-20 rounded-lg overflow-hidden flex-shrink-0 bg-white flex items-center justify-center border" style={{ borderColor: '#D8E2DC' }}>
                       {sp.product.imageUrl ? <ImageWithFallback src={sp.product.imageUrl} alt={sp.product.title} className="w-full h-full object-cover" /> : <span className="text-xs text-gray-400">Sem Foto</span>}
                     </div>
@@ -534,7 +533,7 @@ export default function App() {
                       <h3 className="text-[17px] mb-1" style={{ color: '#6D6875' }}><strong>{sp.product.title}</strong></h3>
                       <p className="text-[14px]" style={{ color: '#9D8189' }}>{sp.product.category} • {sp.product.theme}</p>
                     </div>
-                    <div className="flex gap-2">
+                    <div className="flex gap-2 btn-acoes-produto">
                       <Button onClick={() => navigate(`/detalhe-produto/${sp.product.id}`)} className="h-9 px-4 gap-2 text-[14px]" style={{ backgroundColor: 'white', color: '#6D6875', border: '1px solid #D8E2DC' }}>
                         <Edit2 className="size-3" /> Ver Produto
                       </Button>
@@ -544,7 +543,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="grid grid-cols-5 gap-4">
+                  <div className="grid grid-cols-5 gap-4 selecionados-grid">
                     <div>
                       <label className="block text-[13px] mb-1" style={{ color: '#9D8189' }}><strong>Quantidade</strong></label>
                       <input type="number" min="1" value={sp.quantity} onChange={(e) => handleUpdateQuantity(sp.idRelacionamento, parseInt(e.target.value) || 1, sp.product.id)} className="w-full h-10 px-3 rounded-md text-[15px] border transition-all focus:outline-none focus:border-[#F4ACB7]" style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#6D6875' }} />
@@ -576,7 +575,7 @@ export default function App() {
         {selectedProducts.length > 0 && selectedClient && (
           <div className="bg-white rounded-lg p-6 mb-6 shadow-sm" style={{ border: '1px solid #D8E2DC' }}>
             <h2 className="text-[22px] mb-5" style={{ color: '#F4ACB7' }}><strong>Resumo Geral do Pedido</strong></h2>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-3 gap-4 resumo-grid">
               <div className="p-4 rounded-lg" style={{ backgroundColor: '#FFCAD4' }}>
                 <p className="text-[14px] mb-1" style={{ color: '#6D6875' }}>Previsão de Entrega</p>
                 <p className="text-[18px]" style={{ color: '#6D6875' }}><strong>{calculateDeliveryDate()}</strong></p>
@@ -594,7 +593,7 @@ export default function App() {
         )}
 
         {/* Botões de Ação */}
-        <div className="flex justify-end gap-3">
+        <div className="flex justify-end gap-3 action-buttons">
           <Button onClick={() => navigate(-1)} className="px-8 py-3 h-12 text-[16px]" style={{ backgroundColor: 'white', color: '#9D8189', border: '1px solid #D8E2DC' }}>
             Voltar
           </Button>

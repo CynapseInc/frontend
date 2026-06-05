@@ -149,9 +149,23 @@ button.no-button-feedback:active {
   font-size: 15px;
 }
 
-/* Garante que o menu hambúrguer desaparece 100% em ecrãs de computador */
+/* Garante que o menu hambúrguer desaparece 100% em ecrãs de computador na área do cliente */
 @media (min-width: 768px) {
   .esconder-no-pc {
+    display: none !important;
+  }
+}
+
+/* Nova classe exclusiva para a navbar administrativa (limite de 1024px para acomodar mais links) */
+@media (min-width: 1025px) {
+  .esconder-no-pc-admin {
+    display: none !important;
+  }
+}
+
+/* Esconde a barra de navegação comum (PC) em telas de celular e tablet (abaixo de 1024px) */
+@media (max-width: 1025px) {
+  .mostrar-no-pc-admin {
     display: none !important;
   }
 }

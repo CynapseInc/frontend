@@ -11,7 +11,7 @@ export default function FeedbackModal({ isOpen, onClose, message, type }: Feedba
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
+    <div className="fixed inset-0 z-[100] pointer-events-auto flex items-center justify-center bg-black/40 backdrop-blur-sm animate-in fade-in duration-200"
     style={{ zIndex: 9999 }}>
       
       <div className="bg-white rounded-2xl shadow-xl w-[90%] max-w-sm p-6 relative animate-in zoom-in-95 duration-200 border border-[#D8E2DC]">

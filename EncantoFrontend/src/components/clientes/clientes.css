@@ -5,7 +5,7 @@
 /* Garante que a tabela tenha scroll horizontal em telas menores */
 .tabela-container {
   overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  -webkit-overflow-scrolling: touch; /* Scroll suave no iOS */
 }
 
 /* =========================================
@@ -23,20 +23,15 @@
     flex-wrap: wrap;
     justify-content: center;
   }
-
-  /* Permite que os filtros quebrem linha no tablet se faltar espaço */
-  .filtros-container {
-    flex-wrap: wrap;
-  }
 }
 
 @media (max-width: 768px) {
   /* Reduz o tamanho do título no celular */
-  .titulo-produtos {
+  .titulo-clientes {
     font-size: 36px !important;
   }
 
-  /* Empilha a barra de pesquisa e o botão de Cadastrar Produto */
+  /* Empilha a barra de pesquisa e o botão "Adicionar Cliente" */
   .header-actions {
     flex-direction: column;
     align-items: stretch !important;
@@ -47,18 +42,13 @@
     max-width: 100% !important;
   }
 
-  /* Empilha os combos de filtros (Categoria, Tema, Item) no celular */
-  .filtros-container {
-    flex-direction: column;
-    align-items: stretch !important;
-    gap: 16px !important;
+  /* Transforma os grids de 2 colunas do Modal em 1 coluna */
+  .modal-grid {
+    grid-template-columns: 1fr !important;
   }
 
-  .filtros-container > div {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start !important;
-    gap: 6px;
-    width: 100%;
+  /* Faz os itens que ocupavam 2 colunas ocuparem apenas 1 */
+  .modal-grid .col-span-2 {
+    grid-column: span 1 / span 1 !important;
   }
 }

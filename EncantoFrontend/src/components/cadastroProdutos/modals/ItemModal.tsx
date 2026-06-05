@@ -134,10 +134,10 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
 
   return (
     <Dialog open={isOpen} onOpenChange={handleClose}>
-      <DialogContent 
+      <DialogContent
         className="p-0 gap-0 [&>button]:hidden overflow-y-auto"
-        style={{ 
-          backgroundColor: 'white', 
+        style={{
+          backgroundColor: 'white',
           border: '1px solid #D8E2DC',
           maxWidth: '800px',
           maxHeight: '90vh'
@@ -156,8 +156,8 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
             <h2 className="text-[28px]" style={{ color: '#F4ACB7' }}>
               {item ? 'Editar Item' : 'Novo Item'}
             </h2>
-            <button 
-              onClick={handleClose} 
+            <button
+              onClick={handleClose}
               className="p-1.5 rounded-md transition-colors hover:bg-gray-100"
               style={{ color: '#9D8189' }}
             >
@@ -169,7 +169,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
         {/* Form */}
         <form onSubmit={handleSubmit}>
           <div className="px-8 py-6 space-y-5">
-            
+
             {/* Basear em item existente */}
             {!item && (
               <div className="p-4 rounded-lg" style={{ backgroundColor: '#FFE5D9' }}>
@@ -197,7 +197,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Ex: Caneca, Caderno..."
                 className="h-11 text-[15px]"
-                style={{ 
+                style={{
                   borderColor: '#D8E2DC',
                   color: '#6D6875'
                 }}
@@ -206,24 +206,24 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
             </div>
 
             <div className="mt-4">
-            <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}>
-              Descrição Padrão
-            </label>
-            <textarea
-              value={descricaoPadrao}
-              onChange={(e) => setDescricaoPadrao(e.target.value)}
-              placeholder="Ex: Caneca de cerâmica 325ml. Pode ir ao micro-ondas..."
-              className="w-full min-h-[100px] px-4 py-3 rounded-md text-[15px] border transition-all focus:outline-none"
-              style={{ borderColor: '#D8E2DC', color: '#6D6875' }}
-            />
-            <p className="text-[13px] mt-1" style={{ color: '#9D8189' }}>
-              Este texto será carregado automaticamente na tela de Produto quando este item for selecionado.
-            </p>
-          </div>
-            
+              <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}>
+                Descrição Padrão
+              </label>
+              <textarea
+                value={descricaoPadrao}
+                onChange={(e) => setDescricaoPadrao(e.target.value)}
+                placeholder="Ex: Caneca de cerâmica 325ml. Pode ir ao micro-ondas..."
+                className="w-full min-h-[100px] px-4 py-3 rounded-md text-[15px] border transition-all focus:outline-none"
+                style={{ borderColor: '#D8E2DC', color: '#6D6875' }}
+              />
+              <p className="text-[13px] mt-1" style={{ color: '#9D8189' }}>
+                Este texto será carregado automaticamente na tela de Produto quando este item for selecionado.
+              </p>
+            </div>
+
 
             {/* Linha 1: Preço e Custo */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 modal-grid">
               <div>
                 <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}>
                   Preço Unitário <span style={{ color: '#F4ACB7' }}>*</span>
@@ -235,7 +235,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
                   onChange={(e) => setUnitPrice(e.target.value)}
                   placeholder="0.00"
                   className="h-11 text-[15px]"
-                  style={{ 
+                  style={{
                     borderColor: '#D8E2DC',
                     color: '#6D6875'
                   }}
@@ -252,7 +252,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
                   onChange={(e) => setMinimumQuantity(e.target.value)}
                   placeholder="0"
                   className="h-11 text-[15px]"
-                  style={{ 
+                  style={{
                     borderColor: '#D8E2DC',
                     color: '#6D6875'
                   }}
@@ -275,7 +275,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
             </div>
 
             {/* Linha 2: Custo e Prazo */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-x-6 gap-y-5 modal-grid">
               <div>
                 <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}>
                   Custo de Produção
@@ -287,7 +287,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
                   onChange={(e) => setProductionCost(e.target.value)}
                   placeholder="0.00"
                   className="h-11 text-[15px]"
-                  style={{ 
+                  style={{
                     borderColor: '#D8E2DC',
                     color: '#6D6875'
                   }}
@@ -302,7 +302,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
                   onChange={(e) => setProductionDeadline(e.target.value)}
                   placeholder="Ex: 3 dias, 1 semana..."
                   className="h-11 text-[15px]"
-                  style={{ 
+                  style={{
                     borderColor: '#D8E2DC',
                     color: '#6D6875'
                   }}
@@ -311,7 +311,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
             </div>
 
             {/* Linha 3: Dimensões */}
-            <div className="grid grid-cols-4 gap-4">
+            <div className="grid grid-cols-4 gap-4 modal-grid">
               <div>
                 <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}>
                   Largura
@@ -321,7 +321,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
                   onChange={(e) => setWidth(e.target.value)}
                   placeholder="Ex: 10cm"
                   className="h-11 text-[15px]"
-                  style={{ 
+                  style={{
                     borderColor: '#D8E2DC',
                     color: '#6D6875'
                   }}
@@ -336,7 +336,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
                   onChange={(e) => setHeight(e.target.value)}
                   placeholder="Ex: 15cm"
                   className="h-11 text-[15px]"
-                  style={{ 
+                  style={{
                     borderColor: '#D8E2DC',
                     color: '#6D6875'
                   }}
@@ -351,7 +351,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
                   onChange={(e) => setWeight(e.target.value)}
                   placeholder="Ex: 200g"
                   className="h-11 text-[15px]"
-                  style={{ 
+                  style={{
                     borderColor: '#D8E2DC',
                     color: '#6D6875'
                   }}
@@ -366,7 +366,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
                   onChange={(e) => setLength(e.target.value)}
                   placeholder="Ex: 8cm"
                   className="h-11 text-[15px]"
-                  style={{ 
+                  style={{
                     borderColor: '#D8E2DC',
                     color: '#6D6875'
                   }}
@@ -375,7 +375,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
             </div>
 
             {/* Linha 4: Material e Preço Promocional */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4 modal-grid">
               <div>
                 <label className="block text-[15px] mb-2" style={{ color: '#6D6875' }}>
                   Material
@@ -385,7 +385,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
                   onChange={(e) => setMaterial(e.target.value)}
                   placeholder="Ex: Cerâmica, Papel..."
                   className="h-11 text-[15px]"
-                  style={{ 
+                  style={{
                     borderColor: '#D8E2DC',
                     color: '#6D6875'
                   }}
@@ -402,7 +402,7 @@ export default function ItemModal({ isOpen, onClose, onSave, item, items }: Item
                   onChange={(e) => setPromotionalPrice(e.target.value)}
                   placeholder="0.00"
                   className="h-11 text-[15px]"
-                  style={{ 
+                  style={{
                     borderColor: '#D8E2DC',
                     color: '#6D6875'
                   }}

@@ -1340,6 +1340,44 @@ html {
   font-size: var(--font-size);
 }
 
+/* =========================================
+   MEDIA QUERIES PARA RESPONSIVIDADE (KANBAN E MODAIS)
+========================================= */
+
+@media (max-width: 1024px) {
+  /* Transforma o grid de 2 colunas do modal em 1 coluna */
+  .grid-cols-2 {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* No celular, o span-2 (que ocupava 2 colunas) passa a ocupar 1 só */
+  .col-span-2 {
+    grid-column: span 1 / span 1 !important;
+  }
+
+  /* Empilha os botões do modal */
+  .modal-action-buttons {
+    flex-direction: column !important;
+  }
+
+  /* Faz os botões do cabeçalho (Novo Pedido, Novo Status) quebrarem a linha e se ajustarem */
+  .kanban-header-buttons {
+    flex-wrap: wrap !important;
+  }
+  
+  .kanban-header-buttons button {
+    flex: 1 1 auto !important; /* Faz os botões esticarem se sobrar espaço */
+    min-width: 150px;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
+  }
+
+  /* Aumenta levemente as fontes minúsculas para melhor leitura no celular */
+  .text-\[12px\] { font-size: 14px !important; }
+  .text-\[13px\] { font-size: 15px !important; }
+  .text-\[14px\] { font-size: 16px !important; }
+}
+
 @property --tw-space-y-reverse {
   syntax: "*";
   inherits: false;
