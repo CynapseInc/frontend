@@ -61,12 +61,29 @@ interface DashData {
 }
 
 export default function App() {
-  const [filtroDataInicio, setFiltroDataInicio] = useState(() => {
-    const d = new Date();
-    d.setMonth(d.getMonth() - 3);
-    return d.toISOString().split('T')[0];
-  });
-  const [filtroDataFim, setFiltroDataFim] = useState(() => new Date().toISOString().split('T')[0]);
+  // Funções auxiliares para lidar com os meses de forma exata
+  const obterMesAtual = (): string => {
+    const agora = new Date();
+    return agora.getFullYear() + '-' + String(agora.getMonth() + 1).padStart(2, '0');
+  };
+
+  const obterMesTresMesesAtras = (): string => {
+    const agora = new Date();
+    agora.setMonth(agora.getMonth() - 3);
+    return agora.getFullYear() + '-' + String(agora.getMonth() + 1).padStart(2, '0');
+  };
+
+  // Converters idênticos aos da Dashboard Financeira
+  const converterDataInicioParaAPI = (data: string): string => data + '-01';
+  const converterDataFimParaAPI = (data: string): string => {
+    const [ano, mes] = data.split('-');
+    const ultimoDia = new Date(Number(ano), Number(mes), 0).getDate();
+    return `${data}-${ultimoDia.toString().padStart(2, '0')}`;
+  };
+
+  // Estados padronizados para YYYY-MM
+  const [filtroDataInicio, setFiltroDataInicio] = useState(obterMesTresMesesAtras);
+  const [filtroDataFim, setFiltroDataFim] = useState(obterMesAtual);
   const [filtroTipo, setFiltroTipo] = useState('');
   const [filtroProdutoId, setFiltroProdutoId] = useState('');
   const [filtroTemaId, setFiltroTemaId] = useState('');
@@ -87,10 +104,14 @@ export default function App() {
     if (!filtroDataInicio || !filtroDataFim) return;
     setLoading(true);
     setError(null);
+
+    const dataInicioFormatada = converterDataInicioParaAPI(filtroDataInicio);
+    const dataFimFormatada = converterDataFimParaAPI(filtroDataFim);
+
     dashFinanceiraService
       .listarDashFinanceiros(
-        filtroDataInicio,
-        filtroDataFim,
+        dataInicioFormatada,
+        dataFimFormatada,
         filtroTipo || undefined,
         filtroProdutoId ? Number(filtroProdutoId) : undefined,
         filtroTemaId ? Number(filtroTemaId) : undefined
@@ -184,8 +205,9 @@ export default function App() {
 
   const periodoFiltrado = useMemo(() => {
     if (!filtroDataInicio || !filtroDataFim) return '';
-    const d1 = new Date(filtroDataInicio + 'T00:00:00');
-    const d2 = new Date(filtroDataFim + 'T00:00:00');
+    // Adicionamos '-01T00:00:00' para evitar o bug de fuso horário no fuso local
+    const d1 = new Date(filtroDataInicio + '-01T00:00:00');
+    const d2 = new Date(filtroDataFim + '-01T00:00:00');
     const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
     const fmtMesAno = (d: Date) =>
       capitalize(new Intl.DateTimeFormat('pt-BR', { month: 'long', year: 'numeric' }).format(d));
@@ -200,13 +222,13 @@ export default function App() {
 
   const periodoResumo = useMemo(() => {
     if (!filtroDataInicio || !filtroDataFim) return '';
-
-    const dataInicio = new Date(filtroDataInicio + 'T00:00:00');
-    const dataFim = new Date(filtroDataFim + 'T00:00:00');
+    // Usa as funções conversoras para calcular a quantidade exata de dias
+    const dataInicio = new Date(converterDataInicioParaAPI(filtroDataInicio) + 'T00:00:00');
+    const dataFim = new Date(converterDataFimParaAPI(filtroDataFim) + 'T00:00:00');
     const hojeIso = new Date().toISOString().split('T')[0];
     const umDiaEmMs = 24 * 60 * 60 * 1000;
     const quantidadeDias = Math.max(1, Math.floor((dataFim.getTime() - dataInicio.getTime()) / umDiaEmMs) + 1);
-    const dataFimEhHoje = filtroDataFim === hojeIso;
+    const dataFimEhHoje = converterDataFimParaAPI(filtroDataFim) === hojeIso;
 
     if (quantidadeDias === 1) return 'no dia selecionado';
     if (dataFimEhHoje) return `nos últimos ${quantidadeDias} dias`;
@@ -214,8 +236,10 @@ export default function App() {
     return `em um período de ${quantidadeDias} dias`;
   }, [filtroDataInicio, filtroDataFim]);
 
-  const formatarMes = (mesStr: string) => {
-    if (!mesStr) return '';
+  const formatarMes = (mesStr: any) => {
+    // Se vier nulo, indefinido ou não for string, retorna um fallback seguro
+    if (!mesStr || typeof mesStr !== 'string') return String(mesStr || '');
+
     const partes = mesStr.split('-');
     if (partes.length < 2) return mesStr;
 
@@ -223,6 +247,14 @@ export default function App() {
     const mesIndex = parseInt(partes[1], 10) - 1;
 
     return meses[mesIndex];
+  };
+
+  const formatarDecimal = (valor: any) => {
+    // Se for número e tiver casas decimais, formata para 1 casa. Se for inteiro, mantém como está.
+    if (typeof valor === 'number' && !Number.isInteger(valor)) {
+      return Number(valor).toFixed(1);
+    }
+    return valor;
   };
 
   const chartLegendFormatter = (value: unknown) => (
@@ -242,7 +274,7 @@ export default function App() {
           </h1>
           <p style={{ fontSize: '16px', color: '#9D8189', marginBottom: '2rem' }}>
             Visão geral operacional da sua equipe {periodoResumo}.
-            <span style={{color: '#F4ACB7', fontWeight: '700'}}>{periodoFiltrado && ` ${periodoFiltrado}`}</span>
+            <span style={{ color: '#F4ACB7', fontWeight: '700' }}>{periodoFiltrado && ` ${periodoFiltrado}`}</span>
           </p>
         </div>
 
@@ -303,9 +335,9 @@ export default function App() {
 
             {/* Data Início */}
             <div className="space-y-2">
-              <label className="text-sm text-[#6D6875]">Data Início</label>
+              <label className="text-sm text-[#6D6875]">Mês Início</label>
               <Input
-                type="date"
+                type="month"
                 value={filtroDataInicio}
                 onChange={(e) => setFiltroDataInicio(e.target.value)}
                 className="bg-white border-[#D8E2DC]"
@@ -314,9 +346,9 @@ export default function App() {
 
             {/* Data Fim */}
             <div className="space-y-2">
-              <label className="text-sm text-[#6D6875]">Data Fim</label>
+              <label className="text-sm text-[#6D6875]">Mês Fim</label>
               <Input
-                type="date"
+                type="month"
                 value={filtroDataFim}
                 onChange={(e) => setFiltroDataFim(e.target.value)}
                 className="bg-white border-[#D8E2DC]"
@@ -339,10 +371,8 @@ export default function App() {
             <Button
               variant="outline"
               onClick={() => {
-                const d = new Date();
-                d.setMonth(d.getMonth() - 3);
-                setFiltroDataInicio(d.toISOString().split('T')[0]);
-                setFiltroDataFim(new Date().toISOString().split('T')[0]);
+                setFiltroDataInicio(obterMesTresMesesAtras());
+                setFiltroDataFim(obterMesAtual());
                 setFiltroTipo('');
                 setFiltroProdutoId('');
                 setFiltroTemaId('');
@@ -399,8 +429,9 @@ export default function App() {
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
                 <p className="text-[#9D8189] text-sm leading-5 min-h-10">Tempo Médio de Entrega</p>
+                {/* Altere esta linha dentro do Card do Tempo Médio de Entrega */}
                 <p className="text-[#6D6875] mt-1 text-[18px] leading-6">
-                  {ultimoLeadTime !== null ? `${ultimoLeadTime} dias` : '—'}
+                  {ultimoLeadTime !== null ? `${formatarDecimal(ultimoLeadTime)} dias` : '—'}
                 </p>
               </div>
               <div className="bg-[#FFE5D9] p-2 rounded-lg shrink-0">
@@ -440,12 +471,12 @@ export default function App() {
 
         {/* Gráficos Operacionais */}
         <div className="space-y-4">
-          <h2 className="text-[#6D6875]" style={{color: '#F4ACB7'}}>Gráficos Operacionais</h2>
+          <h2 className="text-[#6D6875]" style={{ color: '#F4ACB7' }}>Gráficos Operacionais</h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Pedidos criados x entregues */}
             <Card className="p-6 bg-white border-[#D8E2DC] shadow-sm">
-              <h3 className="text-[#6D6875] mb-4" style={{color: '#F4ACB7'}}>Pedidos Criados vs Entregues</h3>
+              <h3 className="text-[#6D6875] mb-4" style={{ color: '#F4ACB7' }}>Pedidos Criados vs Entregues</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={pedidosMesData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#D8E2DC" />
@@ -457,6 +488,7 @@ export default function App() {
                       border: '1px solid #D8E2DC',
                       borderRadius: '8px'
                     }}
+                    labelFormatter={formatarMes}
                   />
                   <Legend iconType="square" iconSize={10} formatter={chartLegendFormatter} />
                   <Bar dataKey="criados" fill="#9D8189" name="Criados" radius={[4, 4, 0, 0]} />
@@ -467,18 +499,24 @@ export default function App() {
 
             {/* Lead Time */}
             <Card className="p-6 bg-white border-[#D8E2DC] shadow-sm">
-              <h3 className="text-[#6D6875] mb-4" style={{color: '#F4ACB7'}}>Tempo Médio de Entrega (dias)</h3>
+              <h3 className="text-[#6D6875] mb-4" style={{ color: '#F4ACB7' }}>Tempo Médio de Entrega (dias)</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <LineChart data={leadTimeData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#D8E2DC" />
                   <XAxis dataKey="mes" stroke="#6D6875" tick={{ fill: '#6D6875' }} tickFormatter={formatarMes} />
-                  <YAxis stroke="#6D6875" tick={{ fill: '#6D6875' }} />
+                  <YAxis
+                    stroke="#6D6875"
+                    tick={{ fill: '#6D6875' }}
+                    tickFormatter={formatarDecimal}
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#fff',
                       border: '1px solid #D8E2DC',
                       borderRadius: '8px'
                     }}
+                    labelFormatter={formatarMes}
+                    formatter={formatarDecimal}
                   />
                   <Legend iconType="square" iconSize={10} formatter={chartLegendFormatter} />
                   <Line
@@ -497,18 +535,30 @@ export default function App() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Tempo por etapa */}
             <Card className="p-6 bg-white border-[#D8E2DC] shadow-sm">
-              <h3 className="text-[#6D6875] mb-4" style={{color: '#F4ACB7'}}>Tempo Médio por Etapa (dias)</h3>
+              <h3 className="text-[#6D6875] mb-4" style={{ color: '#F4ACB7' }}>Tempo Médio por Etapa (dias)</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={etapasProcessoData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="#D8E2DC" />
-                  <XAxis type="number" stroke="#6D6875" tick={{ fill: '#6D6875' }} />
-                  <YAxis dataKey="etapa" type="category" stroke="#6D6875" tick={{ fill: '#6D6875' }} width={100} />
+                  <XAxis
+                    type="number"
+                    stroke="#6D6875"
+                    tick={{ fill: '#6D6875' }}
+                    tickFormatter={formatarDecimal}
+                  />
+                  <YAxis
+                    dataKey="etapa"
+                    type="category"
+                    stroke="#6D6875"
+                    tick={{ fill: '#6D6875' }}
+                    width={100}
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: '#fff',
                       border: '1px solid #D8E2DC',
                       borderRadius: '8px'
                     }}
+                    formatter={formatarDecimal}
                   />
                   <Bar dataKey="dias" fill="#F4ACB7" name="Dias" radius={[0, 4, 4, 0]} />
                 </BarChart>
@@ -517,11 +567,16 @@ export default function App() {
 
             {/* Retrabalho */}
             <Card className="p-6 bg-white border-[#D8E2DC] shadow-sm">
-              <h3 className="text-[#6D6875] mb-4" style={{color: '#F4ACB7'}}>Pedidos Refeitos por Mês</h3>
+              <h3 className="text-[#6D6875] mb-4" style={{ color: '#F4ACB7' }}>Pedidos Refeitos por Mês</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={retrabalhoData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#D8E2DC" />
-                  <XAxis dataKey="mes" stroke="#6D6875" tick={{ fill: '#6D6875' }} />
+                  <XAxis
+                    dataKey="mes"
+                    stroke="#6D6875"
+                    tick={{ fill: '#6D6875' }}
+                    tickFormatter={formatarMes}
+                  />
                   <YAxis stroke="#6D6875" tick={{ fill: '#6D6875' }} />
                   <Tooltip
                     contentStyle={{
@@ -529,6 +584,7 @@ export default function App() {
                       border: '1px solid #D8E2DC',
                       borderRadius: '8px'
                     }}
+                    labelFormatter={formatarMes}
                   />
                   <Bar dataKey="quantidade" fill="#9D8189" name="Pedidos Refeitos" radius={[4, 4, 0, 0]} />
                 </BarChart>
@@ -539,12 +595,12 @@ export default function App() {
 
         {/* Gráficos de Produtividade */}
         <div className="space-y-4">
-          <h2 className="text-[#6D6875]" style={{color: '#F4ACB7'}}>Produtividade da Equipe</h2>
+          <h2 className="text-[#6D6875]" style={{ color: '#F4ACB7' }}>Produtividade da Equipe</h2>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
             {/* Pedidos concluídos */}
             <Card className="p-6 bg-white border-[#D8E2DC] shadow-sm">
-              <h3 className="text-[#6D6875] mb-4" style={{color: '#F4ACB7'}}>Pedidos Concluídos por Funcionário</h3>
+              <h3 className="text-[#6D6875] mb-4" style={{ color: '#F4ACB7' }}>Pedidos Concluídos por Funcionário</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={pedidosConcluidosData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="#D8E2DC" />
@@ -564,7 +620,7 @@ export default function App() {
 
             {/* Carga de trabalho */}
             <Card className="p-6 bg-white border-[#D8E2DC] shadow-sm">
-              <h3 className="text-[#6D6875] mb-4" style={{color: '#F4ACB7'}}>Carga de Trabalho Atual</h3>
+              <h3 className="text-[#6D6875] mb-4" style={{ color: '#F4ACB7' }}>Carga de Trabalho Atual</h3>
               <ResponsiveContainer width="100%" height={300}>
                 <BarChart data={cargaTrabalhoData} layout="vertical">
                   <CartesianGrid strokeDasharray="3 3" stroke="#D8E2DC" />
@@ -603,11 +659,10 @@ export default function App() {
                   pedidosSemAtualizacaoPaginados.map((pedido, index) => (
                     <TableRow
                       key={pedido.id}
-                      className={`border-[#D8E2DC] ${
-                        index % 2 === 0
-                          ? 'bg-[#F9F9F9] hover:bg-[#F9F9F9]'
-                          : 'bg-white hover:bg-white'
-                      }`}
+                      className={`border-[#D8E2DC] ${index % 2 === 0
+                        ? 'bg-[#F9F9F9] hover:bg-[#F9F9F9]'
+                        : 'bg-white hover:bg-white'
+                        }`}
                     >
                       <TableCell className="text-[#6D6875]">{pedido.id}</TableCell>
                       <TableCell className="text-[#6D6875]">{pedido.cliente}</TableCell>
