@@ -5,7 +5,8 @@ import type { Contraparte, PageResponse } from '../interfaces/ContraparteInterfa
 export const contraparteService = {
     listar: async (params?:{
         search?: string,
-        page?:number
+        page?:number,
+        status?: boolean
     }): Promise<PageResponse<Contraparte>> =>{
         const {data} = await api.get('/contrapartes', {params});
         if(!data){
