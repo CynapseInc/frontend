@@ -411,7 +411,7 @@ export default function Pedidos() {
           </div>
 
           <div className="flex justify-end gap-2 mt-4">
-             <button
+            <button
               onClick={() => {
                 setMostrarInativos(true);
                 setCurrentPage(1);
@@ -524,7 +524,7 @@ export default function Pedidos() {
                             <button
                               onClick={() => setOrderToReactivate(pedido)}
                               className="px-3 py-2 rounded-md text-[14px] transition-all hover:bg-opacity-80"
-                              style={{backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7'}}
+                              style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
                               title="Reativar pedido"
                             >
                               Reativar

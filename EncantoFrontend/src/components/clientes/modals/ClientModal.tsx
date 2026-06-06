@@ -60,6 +60,7 @@ export default function ClientModal({ isOpen, onClose, onSave, client }: ClientM
   const [editingAddressIndex, setEditingAddressIndex] = useState<number | null>(null);
   const [removedAddressIds, setRemovedAddressIds] = useState<number[]>([]);
   const [cepError, setCepError] = useState('');
+  const [mostrarInativos, setMostrarInativos] = useState(false);
 
   useEffect(() => {
     if (client) {
@@ -67,9 +68,7 @@ export default function ClientModal({ isOpen, onClose, onSave, client }: ClientM
         id: client.id,
         nome: client.nome || '',
         telefone: client.telefone || '',
-        enderecos: (client.enderecos || [])
-          .filter((address) => address.ativo !== false)
-          .map(normalizeAddress)
+        enderecos: (client.enderecos || []).map(normalizeAddress)
       });
     } else {
       setFormData({
@@ -83,6 +82,7 @@ export default function ClientModal({ isOpen, onClose, onSave, client }: ClientM
     setEditingAddressIndex(null);
     setRemovedAddressIds([]);
     setCepError('');
+    setMostrarInativos(false);
   }, [client, isOpen]);
 
   useEffect(() => {
@@ -161,10 +161,14 @@ export default function ClientModal({ isOpen, onClose, onSave, client }: ClientM
   const handleRemoveAddress = (index: number) => {
     const address = formData.enderecos[index];
     if (address.id) setRemovedAddressIds([...removedAddressIds, address.id]);
-    setFormData({
-      ...formData,
-      enderecos: formData.enderecos.filter((_, currentIndex) => currentIndex !== index)
-    });
+
+    const updated = [...formData.enderecos];
+    if (address.id) {
+      updated[index] = { ...address, ativo: false };
+    } else {
+      updated.splice(index, 1);
+    }
+    setFormData({ ...formData, enderecos: updated });
 
     if (editingAddressIndex === index) resetAddressForm();
   };
@@ -257,70 +261,112 @@ export default function ClientModal({ isOpen, onClose, onSave, client }: ClientM
                   <label className="block text-[15px]" style={{ color: '#6D6875' }}>
                     Endereços vinculados
                   </label>
-                  {!showAddressForm && (
-                    <button
-                      type="button"
-                      onClick={() => setShowAddressForm(true)}
-                      className="px-4 py-2 rounded-md text-[14px] text-white transition-all hover:opacity-90 inline-flex items-center gap-2"
-                      style={{ backgroundColor: '#F4ACB7' }}
-                    >
-                      <Plus className="size-4" />
-                      Adicionar endereço
-                    </button>
-                  )}
+                  <div className="flex gap-2">
+                    {(formData.enderecos || []).some((a) => a.ativo === false) && (
+                      <button
+                        type="button"
+                        onClick={() => setMostrarInativos((prev) => !prev)}
+                        className="px-4 py-2 rounded-md text-[14px] transition-all hover:opacity-90 inline-flex items-center gap-2"
+                        style={{ backgroundColor: '#D8E2DC', color: '#6D6875' }}
+                      >
+                        {mostrarInativos ? 'Ver ativos' : 'Ver removidos'}
+                      </button>
+                    )}
+                    {!showAddressForm && !mostrarInativos && (
+                      <button
+                        type="button"
+                        onClick={() => setShowAddressForm(true)}
+                        className="px-4 py-2 rounded-md text-[14px] text-white transition-all hover:opacity-90 inline-flex items-center gap-2"
+                        style={{ backgroundColor: '#F4ACB7' }}
+                      >
+                        <Plus className="size-4" />
+                        Adicionar endereço
+                      </button>
+                    )}
+                  </div>
                 </div>
 
-                {formData.enderecos.length > 0 ? (
-                  <div className="flex flex-col gap-3 mb-4">
-                    {formData.enderecos.map((address, index) => {
-                      const normalized = normalizeAddress(address);
-                      return (
-                        <div
-                          key={address.id ?? index}
-                          className="p-4 rounded-md border flex items-start justify-between gap-4"
-                          style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC' }}
-                        >
-                          <div>
-                            <p className="text-[15px] mb-1" style={{ color: '#6D6875' }}>
-                              {normalized.logradouro}, {normalized.numLogradouro}
-                              {normalized.complemento ? ` - ${normalized.complemento}` : ''}
-                            </p>
-                            <p className="text-[14px]" style={{ color: '#9D8189' }}>
-                              {normalized.bairro}, {normalized.cidade}/{normalized.uf || normalized.estado}
-                            </p>
-                            <p className="text-[13px]" style={{ color: '#9D8189' }}>
-                              CEP: {normalized.cep}
-                            </p>
+                {(() => {
+                  const enderecosFiltrados = (formData.enderecos || []).filter((a) =>
+                    mostrarInativos ? a.ativo === false : a.ativo !== false
+                  );
+
+                  return enderecosFiltrados.length > 0 ? (
+                    <div className="flex flex-col gap-3 mb-4">
+                      {enderecosFiltrados.map((address) => {
+                        const index = formData.enderecos.indexOf(address);
+                        const normalized = normalizeAddress(address);
+                        return (
+                          <div
+                            key={address.id ?? index}
+                            className="p-4 rounded-md border flex items-start justify-between gap-4"
+                            style={{
+                              backgroundColor: mostrarInativos ? '#FFF0F0' : '#F9F9F9',
+                              borderColor: '#D8E2DC',
+                              opacity: mostrarInativos ? 0.8 : 1
+                            }}
+                          >
+                            <div>
+                              <p className="text-[15px] mb-1" style={{ color: '#6D6875' }}>
+                                {normalized.logradouro}, {normalized.numLogradouro}
+                                {normalized.complemento ? ` - ${normalized.complemento}` : ''}
+                              </p>
+                              <p className="text-[14px]" style={{ color: '#9D8189' }}>
+                                {normalized.bairro}, {normalized.cidade}/{normalized.uf || normalized.estado}
+                              </p>
+                              <p className="text-[13px]" style={{ color: '#9D8189' }}>
+                                CEP: {normalized.cep}
+                              </p>
+                            </div>
+                            <div className="flex gap-2 shrink-0">
+                              {mostrarInativos ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const updated = [...formData.enderecos];
+                                    updated[index] = { ...updated[index], ativo: true };
+                                    setFormData({ ...formData, enderecos: updated });
+                                    setRemovedAddressIds(removedAddressIds.filter((id) => id !== address.id));
+                                  }}
+                                  className="px-3 py-2 rounded-md text-[14px] transition-all hover:opacity-80"
+                                  style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
+                                  title="Reativar endereço"
+                                >
+                                  Reativar
+                                </button>
+                              ) : (
+                                <>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleEditAddress(index)}
+                                    className="p-2 rounded-md transition-all hover:bg-opacity-80"
+                                    style={{ backgroundColor: '#D8E2DC' }}
+                                    title="Editar endereço"
+                                  >
+                                    <Edit2 className="size-4" style={{ color: '#6D6875' }} />
+                                  </button>
+                                  <button
+                                    type="button"
+                                    onClick={() => handleRemoveAddress(index)}
+                                    className="p-2 rounded-md transition-all hover:bg-opacity-80"
+                                    style={{ backgroundColor: '#FFCAD4' }}
+                                    title="Excluir endereço"
+                                  >
+                                    <Trash2 className="size-4" style={{ color: '#6D6875' }} />
+                                  </button>
+                                </>
+                              )}
+                            </div>
                           </div>
-                          <div className="flex gap-2 shrink-0">
-                            <button
-                              type="button"
-                              onClick={() => handleEditAddress(index)}
-                              className="p-2 rounded-md transition-all hover:bg-opacity-80"
-                              style={{ backgroundColor: '#D8E2DC' }}
-                              title="Editar endereço"
-                            >
-                              <Edit2 className="size-4" style={{ color: '#6D6875' }} />
-                            </button>
-                            <button
-                              type="button"
-                              onClick={() => handleRemoveAddress(index)}
-                              className="p-2 rounded-md transition-all hover:bg-opacity-80"
-                              style={{ backgroundColor: '#FFCAD4' }}
-                              title="Excluir endereço"
-                            >
-                              <Trash2 className="size-4" style={{ color: '#6D6875' }} />
-                            </button>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ) : (
-                  <p className="text-[14px] mb-4" style={{ color: '#9D8189' }}>
-                    Nenhum endereço cadastrado para este cliente.
-                  </p>
-                )}
+                        );
+                      })}
+                    </div>
+                  ) : (
+                    <p className="text-[14px] mb-4" style={{ color: '#9D8189' }}>
+                      {mostrarInativos ? 'Nenhum endereço removido.' : 'Nenhum endereço cadastrado para este cliente.'}
+                    </p>
+                  );
+                })()}
 
                 {showAddressForm && (
                   <div className="p-5 rounded-md border" style={{ borderColor: '#F4ACB7', backgroundColor: '#FFE5D9' }}>
