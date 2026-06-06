@@ -4,7 +4,7 @@ import { Button } from '../ui/button';
 import { DndProvider, useDrag, useDrop, useDragLayer } from 'react-dnd';
 import { HTML5Backend } from 'react-dnd-html5-backend';
 import { TouchBackend } from 'react-dnd-touch-backend';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import FeedbackModal from '../ui/FeedbackModal';
 // Modais
 import OrderDetailModal from './modals/OrderDetailModal';
@@ -362,6 +362,7 @@ export default function Kanban() {
 
   const scrollContainerRef = useRef<HTMLDivElement>(null);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const showFeedback = (message: string, type: 'success' | 'error') => {
     setFeedback({ isOpen: true, message, type });
@@ -442,9 +443,14 @@ export default function Kanban() {
         }
         return order;
       }));
-    } catch (error) {
+    } catch (error: any) {
       console.error("Erro ao mover pedido:", error);
-      showFeedback("Não foi possível mover o pedido. Tente novamente.", "error");
+      if(error?.status === 400){
+        showFeedback("Não é possível mover pedidos com status de Cancelado.", "error");
+      }else{
+
+        showFeedback("Não foi possível mover o pedido. Tente novamente.", "error");
+      }
     }
   }, []);
 
@@ -513,6 +519,17 @@ export default function Kanban() {
   const getOrdersByStatus = (statusId: number) => {
     return orders.filter(order => order.statusAtual?.idStatusPedido === statusId);
   };
+
+  useEffect(() => {
+    const openOrderId = (location.state as { openOrderId?: string | number } | null)?.openOrderId;
+    if (!openOrderId || orders.length === 0) return;
+
+    const matchedOrder = orders.find(order => order.id === Number(openOrderId) || order.id === openOrderId);
+    if (matchedOrder) {
+      handleOrderClick(matchedOrder);
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, orders, navigate]);
 
   // SCROLL SUAVE E SENSÍVEL
   const handleDragOverContainer = (e: React.DragEvent) => {

@@ -48,7 +48,7 @@ export default function App() {
   const [selectedThemeId, setSelectedThemeId] = useState('');
   const [themeNameEditing, setThemeNameEditing] = useState('');
   const [selectedItemId, setSelectedItemId] = useState('');
-  const [itemNameEditing, setItemNameEditing] = useState('');
+  const [itemNameEditing, setItemNameEditing] = useState(''); 
   const [selectedCategory, setSelectedCategory] = useState('');
   const [isItemLocked, setIsItemLocked] = useState(false);
   const [currentItem, setCurrentItem] = useState<Item | null>(null);
@@ -245,14 +245,15 @@ export default function App() {
     } catch (e) { console.error(e); showFeedback("Erro ao atualizar tema.", "error"); }
   };
 
-  const handleDeleteTheme = async () => {
-    if (deleteTheme) {
+  const handleDeleteTheme = async (theme: Theme) => {
+    
       try {
-        await temaService.deletar(deleteTheme.id);
-        setThemes(themes.filter(t => t.id !== deleteTheme.id));
+        console.log("Deletando tema com ID:", theme.id);
+        await temaService.deletar(theme.id);
+        setThemes(themes.filter(t => t.id !== theme.id));
         setDeleteTheme(null);
       } catch (e) { console.error(e); showFeedback("Erro ao excluir. Pode estar vinculado a um produto.", "error"); }
-    }
+    
   };
 
   const buildItemPayload = (item: Item) => ({
@@ -472,7 +473,7 @@ export default function App() {
       <ProductCategoryListModal isOpen={isCategoryListModalOpen} onClose={() => setIsCategoryListModalOpen(false)} categories={categories} onCreate={() => { setEditingCategory(null); setIsCategoryListModalOpen(false); setIsCategoryModalOpen(true); }} onEdit={(cat) => { setEditingCategory(cat); setIsCategoryModalOpen(true); setIsCategoryListModalOpen(false); }} onDelete={(cat) => setDeleteCategory(cat)} />
       
       <ThemeModal isOpen={isThemeModalOpen} onClose={() => { setIsThemeModalOpen(false); setEditingTheme(null); }} onSave={editingTheme ? handleEditTheme : handleAddTheme} theme={editingTheme} categories={categories} />
-      <ThemeListModal isOpen={isThemeListModalOpen} onClose={() => setIsThemeListModalOpen(false)} themes={themes} categories={categories} onCreate={() => { setEditingTheme(null); setIsThemeListModalOpen(false); setIsThemeModalOpen(true); }} onEdit={(t) => { setEditingTheme(t); setIsThemeModalOpen(true); setIsThemeListModalOpen(false); }} onDelete={(t) => setDeleteTheme(t)} />
+      <ThemeListModal isOpen={isThemeListModalOpen} onClose={() => setIsThemeListModalOpen(false)} themes={themes} categories={categories} onCreate={() => { setEditingTheme(null); setIsThemeListModalOpen(false); setIsThemeModalOpen(true); }} onEdit={(t) => { setEditingTheme(t); setIsThemeModalOpen(true); setIsThemeListModalOpen(false); }} onDelete={(t) => handleDeleteTheme(t)} />
       
       <ItemModal isOpen={isItemModalOpen} onClose={() => { setIsItemModalOpen(false); setEditingItem(null); }} onSave={editingItem ? handleEditItem : handleAddItem} item={editingItem} items={items} />
       <ItemListModal isOpen={isItemListModalOpen} onClose={() => setIsItemListModalOpen(false)} items={items} onCreate={() => { setEditingItem(null); setIsItemListModalOpen(false); setIsItemModalOpen(true); }} onEdit={(i) => { setEditingItem(i); setIsItemModalOpen(true); setIsItemListModalOpen(false); }} onDelete={(i) => setDeleteItem(i)} />

@@ -20,6 +20,7 @@ interface Order {
   status: string;
   category: string;
   theme: string;
+  createdAt?: string;
 }
 
 const monthNames = [
@@ -64,6 +65,18 @@ export function HomeCalendar() {
 
   const showFeedback = (message: string, type: 'success' | 'error') => {
     setFeedback({ isOpen: true, message, type });
+  };
+
+  const isOrderCreatedMoreThan30DaysAgo = (createdAt?: string) => {
+    if (!createdAt) return false;
+
+    const orderDate = new Date(createdAt);
+    if (Number.isNaN(orderDate.getTime())) return false;
+
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    return orderDate < thirtyDaysAgo;
   };
 
   // ==========================================
@@ -121,7 +134,8 @@ export function HomeCalendar() {
             deliveryDate: dataLimiteDate,
             status: statusName,
             category: category,
-            theme: theme
+            theme: theme,
+            createdAt: p.createdAt,
           };
         });
 
@@ -239,9 +253,17 @@ export function HomeCalendar() {
   };
 
   const handleMarkAsSent = (orderId: string) => {
+    const order = orders.find((o) => o.id === orderId);
+    const isOlder = order ? isOrderCreatedMoreThan30DaysAgo(order.createdAt) : false;
+
+    if (isOlder) {
+      navigate(`/pedidos/detalhes/${orderId}`);
+      return;
+    }
+
     showFeedback(`O pedido PED-${orderId.padStart(3, '0')} deve ser movido no Kanban!`, 'success');
     setTimeout(() => {
-      navigate('/kanban');
+      navigate('/kanban', { state: { openOrderId: orderId } });
     }, 1500);
   };
 
@@ -556,8 +578,17 @@ export function HomeCalendar() {
                             color: 'white'
                           }}
                         >
-                          <Send className="size-3" />
-                          <strong>Atualizar no Kanban</strong>
+                          {isOrderCreatedMoreThan30DaysAgo(order.createdAt) ? (
+                            <>
+                              <Eye className="size-3" />
+                              <strong>Ver pedido</strong>
+                            </>
+                          ) : (
+                            <>
+                              <Send className="size-3" />
+                              <strong>Mover no Kanban</strong>
+                            </>
+                          )}
                         </button>
                       </div>
                     </div>
@@ -656,8 +687,17 @@ export function HomeCalendar() {
                         className="flex-1 h-10 gap-2 text-[14px]"
                         style={{ backgroundColor: '#F4ACB7', color: 'white' }}
                       >
-                        <Send className="size-4" />
-                        <strong>Mover no Kanban</strong>
+                        {isOrderCreatedMoreThan30DaysAgo(order.createdAt) ? (
+                          <>
+                            <Eye className="size-4" />
+                            <strong>Ver pedido</strong>
+                          </>
+                        ) : (
+                          <>
+                            <Send className="size-4" />
+                            <strong>Mover no Kanban</strong>
+                          </>
+                        )}
                       </Button>
                       <Button
                         onClick={() => handleViewDetails(order.id)}

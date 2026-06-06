@@ -28,6 +28,6 @@ export const categoriaTemaService = {
     return data;
   },
   deletar: async (id: string) => {
-    await api.delete(`/categoria-temas/${id}`);
+    await api.patch(`/categoria-temas/mudar-estado/${id}`);
   }
 };

@@ -238,15 +238,26 @@ export default function App() {
   };
 
   const handleEditTransaction = (transaction: Transaction) => {
-    setTransactions(transactions.map(t => t.id === transaction.id ? transaction : t));
+     movimentacaoService.atualizar(Number(transaction.id), {
+      descricao: transaction.description,
+      valor: transaction.value,
+      tipo: transaction.type,
+      statusPagamento: transaction.paymentStatus,
+      dataVencimento: transaction.dueDate,
+      dataPagamento: transaction.date,
+      idContraparte: Number(transaction.counterpartyId),
+      idCategoriaMovimentacao: Number(transaction.categoryId)
+    }).then(() => carregarMovimentacoes());
     setIsTransactionModalOpen(false);
     setEditingTransaction(null);
   };
 
   const handleDeleteTransaction = () => {
     if (deleteTransaction) {
-      setTransactions(transactions.filter(t => t.id !== deleteTransaction.id));
-      setDeleteTransaction(null);
+      movimentacaoService.deletar(Number(deleteTransaction.id)).then(() => {
+        setTransactions(transactions.filter(t => t.id !== deleteTransaction.id));
+        setDeleteTransaction(null);
+      });
     }
   };
 

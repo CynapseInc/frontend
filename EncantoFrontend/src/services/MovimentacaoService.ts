@@ -46,5 +46,15 @@ export const movimentacaoService = {
     console.log("mandando:" , data)
     const response = await api.post('/movimentacoes', data);
     return response.data;
+  },
+
+  atualizar: async (id: number, data: any) => {
+    const response = await api.put(`/movimentacoes/${id}`, data);
+    return response.data;
+  },
+  deletar: async (id: number) => {
+    await api.delete(`/movimentacoes/${id}`);
   }
+
+  
 };
