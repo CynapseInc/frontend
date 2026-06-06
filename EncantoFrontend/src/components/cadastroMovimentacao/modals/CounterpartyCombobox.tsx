@@ -12,17 +12,18 @@ interface Contraparte {
 
 interface CounterpartyComboboxProps {
   value: string;
+  defaultName?: string;
   onChange: (id: string, name: string) => void;
   isErr?: boolean;
 }
 
-export default function CounterpartyCombobox({ value, onChange, isErr }: CounterpartyComboboxProps) {
+export default function CounterpartyCombobox({ value, defaultName = '', onChange, isErr }: CounterpartyComboboxProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [options, setOptions] = useState<Contraparte[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedName, setSelectedName] = useState('');
-  const debounceTimer = useRef<ReturnType<typeof setTimeout>>();
+  const debounceTimer = useRef<number | undefined>(undefined);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const fetchCounterparties = useCallback(async (query: string) => {
@@ -44,12 +45,19 @@ export default function CounterpartyCombobox({ value, onChange, isErr }: Counter
   }, []);
 
   useEffect(() => {
-    clearTimeout(debounceTimer.current);
-    debounceTimer.current = setTimeout(() => {
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+
+    debounceTimer.current = window.setTimeout(() => {
       fetchCounterparties(search);
     }, 300);
 
-    return () => clearTimeout(debounceTimer.current);
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
   }, [search, fetchCounterparties]);
 
   useEffect(() => {
@@ -57,6 +65,23 @@ export default function CounterpartyCombobox({ value, onChange, isErr }: Counter
       fetchCounterparties('');
     }
   }, [open, options.length, search, fetchCounterparties]);
+
+  useEffect(() => {
+    if (!value) {
+      setSelectedName('');
+      return;
+    }
+
+    if (defaultName) {
+      setSelectedName(defaultName);
+      return;
+    }
+
+    const selectedOption = options.find(option => String(option.id) === value);
+    if (selectedOption) {
+      setSelectedName(selectedOption.nome);
+    }
+  }, [value, defaultName, options]);
 
   // Fechar ao clicar fora
   useEffect(() => {

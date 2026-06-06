@@ -77,6 +77,12 @@ export default function ThemeListModal({ isOpen, onClose, themes, categories, on
   const endIndex = startIndex + itemsPerPage;
   const paginatedThemes = filteredThemes.slice(startIndex, endIndex);
 
+
+  const handleDeleteTheme = async (theme: Theme) => {
+    onDelete(theme);
+    setSearchTerm('');
+  }
+
   const gerarPaginas = (currentPage: number, totalPages: number) => {
     const maxPages = 7;
     const pages: (number | string)[] = [];
@@ -240,7 +246,7 @@ export default function ThemeListModal({ isOpen, onClose, themes, categories, on
                             <Pencil className="size-4" style={{ color: '#6D6875' }} />
                           </button>
                           <button
-                            onClick={() => onDelete(theme)}
+                            onClick={() => handleDeleteTheme(theme)}
                             className="p-2 rounded-md transition-all hover:bg-opacity-80"
                             style={{ backgroundColor: '#FFCAD4' }}
                             title="Excluir"

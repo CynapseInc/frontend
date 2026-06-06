@@ -54,6 +54,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
     paymentStatus: 'pago',
     dueDate: '',
   });
+  
 
   useEffect(() => {
     // Pegar a data local correta no formato YYYY-MM-DD
@@ -154,6 +155,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
                 </label>
                 <CounterpartyCombobox 
                   value={formData.counterpartyId || ''}
+                  defaultName={formData.counterpartyName || ''}
                   onChange={(id, name) => setFormData({ 
                     ...formData, 
                     counterpartyId: id,
@@ -263,6 +265,7 @@ export default function TransactionModal({ isOpen, onClose, onSave, transaction,
                 </label>
                 <CategoryCombobox 
                   value={formData.categoryId || ''}
+                  defaultName={formData.category || ''}
                   onChange={(id, name) => setFormData({ 
                     ...formData, 
                     categoryId: id,

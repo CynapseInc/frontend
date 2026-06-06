@@ -9,17 +9,18 @@ interface CategoriaMov {
 
 interface CategoryComboboxProps {
   value: string;
+  defaultName?: string;
   onChange: (id: string, descricao: string) => void;
   isErr?: boolean;
 }
 
-export default function CategoryCombobox({ value, onChange, isErr }: CategoryComboboxProps) {
+export default function CategoryCombobox({ value, defaultName = '', onChange, isErr }: CategoryComboboxProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState('');
   const [options, setOptions] = useState<CategoriaMov[]>([]);
   const [loading, setLoading] = useState(false);
   const [selectedName, setSelectedName] = useState('');
-  const debounceTimer = useRef<ReturnType<typeof setTimeout>>();
+  const debounceTimer = useRef<number | undefined>(undefined);
   const wrapperRef = useRef<HTMLDivElement>(null);
 
   const fetchCategories = useCallback(async (query: string) => {
@@ -41,12 +42,19 @@ export default function CategoryCombobox({ value, onChange, isErr }: CategoryCom
   }, []);
 
   useEffect(() => {
-    clearTimeout(debounceTimer.current);
-    debounceTimer.current = setTimeout(() => {
+    if (debounceTimer.current) {
+      clearTimeout(debounceTimer.current);
+    }
+
+    debounceTimer.current = window.setTimeout(() => {
       fetchCategories(search);
     }, 300);
 
-    return () => clearTimeout(debounceTimer.current);
+    return () => {
+      if (debounceTimer.current) {
+        clearTimeout(debounceTimer.current);
+      }
+    };
   }, [search, fetchCategories]);
 
   useEffect(() => {
@@ -54,6 +62,23 @@ export default function CategoryCombobox({ value, onChange, isErr }: CategoryCom
       fetchCategories('');
     }
   }, [open, options.length, search, fetchCategories]);
+
+  useEffect(() => {
+    if (!value) {
+      setSelectedName('');
+      return;
+    }
+
+    if (defaultName) {
+      setSelectedName(defaultName);
+      return;
+    }
+
+    const selectedOption = options.find(option => String(option.id) === value);
+    if (selectedOption) {
+      setSelectedName(selectedOption.descricao);
+    }
+  }, [value, defaultName, options]);
 
   // Fechar ao clicar fora
   useEffect(() => {

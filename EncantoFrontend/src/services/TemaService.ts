@@ -32,6 +32,6 @@ export const temaService = {
     return data;
   },
   deletar: async (id: string) => {
-    await api.delete(`/temas/${id}`);
+    await api.patch(`/temas/mudar-estado/${id}`);
   }
 };
