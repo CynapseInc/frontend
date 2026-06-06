@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Dialog, DialogContent, DialogTitle, DialogDescription } from '../../ui/dialog';
 import { Edit2, Plus, Trash2, X } from 'lucide-react';
 import type { Cliente, ClienteFormPayload, EnderecoCliente } from '../../../interfaces/Cliente';
+import { clienteService } from '../../../services/ClienteService';
 
 interface ClientModalProps {
   isOpen: boolean;
@@ -61,6 +62,7 @@ export default function ClientModal({ isOpen, onClose, onSave, client }: ClientM
   const [removedAddressIds, setRemovedAddressIds] = useState<number[]>([]);
   const [cepError, setCepError] = useState('');
   const [mostrarInativos, setMostrarInativos] = useState(false);
+  const [enderecoParaReativar, setEnderecoParaReativar] = useState<{ index: number; address: EnderecoCliente } | null>(null);
 
   useEffect(() => {
     if (client) {
@@ -83,6 +85,7 @@ export default function ClientModal({ isOpen, onClose, onSave, client }: ClientM
     setRemovedAddressIds([]);
     setCepError('');
     setMostrarInativos(false);
+    setEnderecoParaReativar(null);
   }, [client, isOpen]);
 
   useEffect(() => {
@@ -171,6 +174,38 @@ export default function ClientModal({ isOpen, onClose, onSave, client }: ClientM
     setFormData({ ...formData, enderecos: updated });
 
     if (editingAddressIndex === index) resetAddressForm();
+  };
+
+  const handleReativarEndereco = async () => {
+    if (!enderecoParaReativar) return;
+    const { index, address } = enderecoParaReativar;
+
+    try {
+      // Inativa o endereço atualmente ativo, se existir
+      const ativoAtual = formData.enderecos.find((a, i) => a.ativo !== false && i !== index);
+      if (ativoAtual?.id) {
+        await clienteService.excluirEndereco(ativoAtual.id);
+      }
+
+      // Reativa o endereço selecionado
+      if (address.id) {
+        await clienteService.excluirEndereco(address.id);
+      }
+
+      // Atualiza o estado local
+      const updated = formData.enderecos.map((a, i) => {
+        if (a.ativo !== false && i !== index) return { ...a, ativo: false };
+        if (i === index) return { ...a, ativo: true };
+        return a;
+      });
+
+      setFormData({ ...formData, enderecos: updated });
+      setRemovedAddressIds(removedAddressIds.filter((id) => id !== address.id));
+    } catch (error) {
+      console.error('Erro ao reativar endereço:', error);
+    } finally {
+      setEnderecoParaReativar(null);
+    }
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -322,12 +357,7 @@ export default function ClientModal({ isOpen, onClose, onSave, client }: ClientM
                               {mostrarInativos ? (
                                 <button
                                   type="button"
-                                  onClick={() => {
-                                    const updated = [...formData.enderecos];
-                                    updated[index] = { ...updated[index], ativo: true };
-                                    setFormData({ ...formData, enderecos: updated });
-                                    setRemovedAddressIds(removedAddressIds.filter((id) => id !== address.id));
-                                  }}
+                                  onClick={() => setEnderecoParaReativar({ index, address })}
                                   className="px-3 py-2 rounded-md text-[14px] transition-all hover:opacity-80"
                                   style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
                                   title="Reativar endereço"
@@ -508,6 +538,78 @@ export default function ClientModal({ isOpen, onClose, onSave, client }: ClientM
           </div>
         </form>
       </DialogContent>
+
+      {/* Modal de confirmação de reativação */}
+      {enderecoParaReativar && (() => {
+        const normalized = enderecoParaReativar.address;
+        const ativoAtual = formData.enderecos.find((a) => a.ativo !== false && a !== enderecoParaReativar.address);
+        return (
+          <Dialog open={true} onOpenChange={() => setEnderecoParaReativar(null)}>
+            <DialogContent
+              className="max-w-[440px] p-0 gap-0 [&>button]:hidden"
+              style={{ backgroundColor: 'white', border: '1px solid #D8E2DC' }}
+            >
+              <DialogTitle className="sr-only">Confirmar reativação</DialogTitle>
+              <DialogDescription className="sr-only">Confirmar reativação de endereço</DialogDescription>
+              <div className="px-7 py-6 border-b" style={{ borderColor: '#D8E2DC' }}>
+                <h2 className="text-[22px]" style={{ color: '#6D6875' }}>Reativar endereço?</h2>
+              </div>
+              <div className="px-7 py-5">
+                {ativoAtual ? (
+                  <>
+                    <p className="text-[15px] mb-3" style={{ color: '#6D6875' }}>
+                      O endereço atual será substituído:
+                    </p>
+                    <div className="p-3 rounded-md mb-4" style={{ backgroundColor: '#FFE5D9', borderColor: '#D8E2DC', border: '1px solid #D8E2DC' }}>
+                      <p className="text-[14px]" style={{ color: '#6D6875' }}>
+                        {ativoAtual.logradouro}, {ativoAtual.numLogradouro ?? ativoAtual.numero}
+                        {ativoAtual.complemento ? ` - ${ativoAtual.complemento}` : ''}
+                      </p>
+                      <p className="text-[13px]" style={{ color: '#9D8189' }}>
+                        {ativoAtual.bairro}, {ativoAtual.cidade}/{ativoAtual.uf || ativoAtual.estado}
+                      </p>
+                    </div>
+                    <p className="text-[15px]" style={{ color: '#6D6875' }}>
+                      Novo endereço ativo:
+                    </p>
+                    <div className="p-3 rounded-md mt-2" style={{ backgroundColor: '#F9F9F9', border: '1px solid #D8E2DC' }}>
+                      <p className="text-[14px]" style={{ color: '#6D6875' }}>
+                        {normalized.logradouro}, {normalized.numLogradouro ?? normalized.numero}
+                        {normalized.complemento ? ` - ${normalized.complemento}` : ''}
+                      </p>
+                      <p className="text-[13px]" style={{ color: '#9D8189' }}>
+                        {normalized.bairro}, {normalized.cidade}/{normalized.uf || normalized.estado}
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-[15px]" style={{ color: '#6D6875' }}>
+                    Deseja reativar este endereço?
+                  </p>
+                )}
+              </div>
+              <div className="px-7 py-5 border-t flex justify-end gap-3" style={{ borderColor: '#D8E2DC', backgroundColor: '#F9F9F9' }}>
+                <button
+                  type="button"
+                  onClick={() => setEnderecoParaReativar(null)}
+                  className="px-5 py-2.5 rounded-md text-[15px] border transition-all hover:bg-white"
+                  style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#9D8189' }}
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="button"
+                  onClick={handleReativarEndereco}
+                  className="px-5 py-2.5 rounded-md text-[15px] text-white transition-all hover:opacity-90"
+                  style={{ backgroundColor: '#F4ACB7' }}
+                >
+                  Confirmar
+                </button>
+              </div>
+            </DialogContent>
+          </Dialog>
+        );
+      })()}
     </Dialog>
   );
 }
