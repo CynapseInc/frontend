@@ -36,52 +36,64 @@ export default function ItemListModal({ isOpen, onClose, items, onCreate, onEdit
   const [totalPages, setTotalPages] = useState(1);
   const searchTimeoutRef = useRef<number | null>(null);
 
+  // --- NOVOS ESTADOS ADICIONADOS PARA O HISTÓRICO ---
+  const [mostrarInativos, setMostrarInativos] = useState(false);
+  const [itemToReactivate, setItemToReactivate] = useState<Item | null>(null);
+
   const itemsPerPage = 10;
 
-    useEffect(() => {
-         
-           
-           if(searchTimeoutRef.current) {
-             window.clearTimeout(searchTimeoutRef.current);
-           }
-     
-           searchTimeoutRef.current = window.setTimeout(async () => {
-     
-           try {
-             const data = await itemService.listarTodos({ search: searchTerm, page: currentPage - 1 });
-             setTotalPages(data.totalPages);
-             
-             // mapear os nomes da resposta para o formato esperado
-              console.log('Resposta da API:', data);
-              const mappedItems = data.content.map((item: any) => ({
-                id: item.id,
-                description: item.descricao,
-                salePrice:  item.precoVenda || 0,
-                productionCost: item.custoProducao || 0,
-                productionDeadline: item.prazoProducao || '',
-                width: item.largura || '',
-                height: item.altura || '',
-                weight: item.peso || '',
-                length: item.comprimento || '',
-                material: item.material || '',
-                descricaoPadrao: item.descricaoPadrao || '',
-                promotionalPrice: item.precoPromocional || 0,
-                unitPrice: item.precoUnitario || 0,
-                minimumQuantity: item.quantidadeMinima || 0
-              }));
-             
-              setFilteredItems(mappedItems);
-           } catch (error) {
-             console.error('Erro ao buscar itens:', error);
-           }
-         },
-         500)
-        
-         
-       }, [searchTerm, currentPage])
-             
-           
-  
+  // --- RESETAR ESTADOS AO FECHAR O MODAL ---
+  useEffect(() => {
+    if (!isOpen) {
+      setMostrarInativos(false);
+      setItemToReactivate(null);
+    }
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (searchTimeoutRef.current) {
+      window.clearTimeout(searchTimeoutRef.current);
+    }
+
+    searchTimeoutRef.current = window.setTimeout(async () => {
+      try {
+        // --- PARÂMETRO 'ativo' ADICIONADO AQUI ---
+        const data = await itemService.listarTodos({
+          search: searchTerm,
+          page: currentPage - 1,
+          ativo: mostrarInativos ? false : true
+        });
+        setTotalPages(data.totalPages);
+
+        // mapear os nomes da resposta para o formato esperado
+        console.log('Resposta da API:', data);
+        const mappedItems = data.content.map((item: any) => ({
+          id: item.id,
+          description: item.descricao,
+          salePrice: item.precoVenda || 0,
+          productionCost: item.custoProducao || 0,
+          productionDeadline: item.prazoProducao || '',
+          width: item.largura || '',
+          height: item.altura || '',
+          weight: item.peso || '',
+          length: item.comprimento || '',
+          material: item.material || '',
+          descricaoPadrao: item.descricaoPadrao || '',
+          promotionalPrice: item.precoPromocional || 0,
+          unitPrice: item.precoUnitario || 0,
+          minimumQuantity: item.quantidadeMinima || 0
+        }));
+
+        setFilteredItems(mappedItems);
+      } catch (error) {
+        console.error('Erro ao buscar itens:', error);
+      }
+    },
+      500)
+
+    // --- mostrarInativos ADICIONADO NAS DEPENDÊNCIAS ---
+  }, [searchTerm, currentPage, mostrarInativos, items])
+
   const startIndex = (currentPage - 1) * itemsPerPage;
   const endIndex = startIndex + itemsPerPage;
   const paginatedItems = filteredItems.slice(startIndex, endIndex);
@@ -124,236 +136,315 @@ export default function ItemListModal({ isOpen, onClose, items, onCreate, onEdit
   };
 
   return (
-    <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent 
-        className="p-0 gap-0 [&>button]:hidden modal-lista-larga"
-        style={{ 
-          backgroundColor: 'white', 
-          border: '1px solid #D8E2DC',
-          width: '90vw',
-          maxWidth: '1400px',
-          maxHeight: '90vh'
-        }}
-      >
-        <DialogTitle className="sr-only">
-          Gerenciar itens
-        </DialogTitle>
-        <DialogDescription className="sr-only">
-          Lista de todos os itens cadastrados
-        </DialogDescription>
-        
-        {/* Header */}
-        <div className="px-8 py-6 border-b" style={{ borderColor: '#D8E2DC' }}>
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <h2 className="text-[28px] flex-1 min-w-0 modal-titulo" style={{ color: '#F4ACB7' }}>
-              Itens
-            </h2>
-            <div className="flex items-center gap-3 shrink-0 modal-header-actions">
+    <>
+      <Dialog open={isOpen} onOpenChange={onClose}>
+        <DialogContent
+          className="p-0 gap-0 [&>button]:hidden modal-lista-larga"
+          style={{
+            backgroundColor: 'white',
+            border: '1px solid #D8E2DC',
+            width: '90vw',
+            maxWidth: '1400px',
+            maxHeight: '90vh'
+          }}
+        >
+          <DialogTitle className="sr-only">
+            Gerenciar itens
+          </DialogTitle>
+          <DialogDescription className="sr-only">
+            Lista de todos os itens cadastrados
+          </DialogDescription>
+
+          {/* Header */}
+          <div className="px-8 py-6 border-b" style={{ borderColor: '#D8E2DC' }}>
+            <div className="flex flex-wrap items-center justify-between gap-4">
+              <h2 className="text-[28px] flex-1 min-w-0 modal-titulo" style={{ color: '#F4ACB7' }}>
+                Itens
+              </h2>
+              <div className="flex items-center gap-3 shrink-0 modal-header-actions">
+                {/* --- BOTÃO DE ALTERNAR ADICIONADO AQUI --- */}
+                <button
+                  type="button"
+                  onClick={() => { setMostrarInativos(prev => !prev); setCurrentPage(1); }}
+                  className="h-10 px-4 rounded-md text-[15px] transition-all inline-flex items-center gap-2"
+                  style={{ backgroundColor: '#D8E2DC', color: '#6D6875', border: '1px solid #D8E2DC' }}
+                >
+                  {mostrarInativos ? 'Ver ativos' : 'Ver removidos'}
+                </button>
+
+                {/* --- BOTÃO 'NOVO' ESCONDIDO QUANDO VENDO INATIVOS --- */}
+                {!mostrarInativos && (
+                  <button
+                    type="button"
+                    onClick={onCreate}
+                    className="h-10 px-4 rounded-md text-[15px] transition-all inline-flex items-center gap-2"
+                    style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
+                  >
+                    <Box className="size-4" />
+                    Novo Item
+                  </button>
+                )}
+
+                <button
+                  onClick={onClose}
+                  className="p-1.5 rounded-md transition-colors hover:bg-gray-100"
+                  style={{ color: '#9D8189' }}
+                >
+                  <X className="size-5" />
+                </button>
+              </div>
+            </div>
+          </div>
+
+          {/* Pesquisa */}
+          <div className="px-8 pt-6 pb-5">
+            <div className="relative">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-5" style={{ color: '#9D8189' }} />
+              <Input
+                placeholder="Buscar item..."
+                value={searchTerm}
+                onChange={(e) => handleSearchChange(e.target.value)}
+                className="pl-10 h-11 text-[15px]"
+                style={{
+                  borderColor: '#D8E2DC',
+                  backgroundColor: '#F9F9F9',
+                  color: '#6D6875',
+                  paddingLeft: '40px'
+                }}
+              />
+            </div>
+          </div>
+
+          {/* Tabela */}
+          <div className="px-8 pb-6 overflow-y-auto" style={{ maxHeight: '500px' }}>
+            {filteredItems.length === 0 ? (
+              <div className="text-center py-12" style={{ color: '#9D8189' }}>
+                <p className="text-[15px]">
+                  {mostrarInativos ? 'Nenhum item removido' : 'Nenhum item encontrado'}
+                </p>
+              </div>
+            ) : (
+              <div className="border rounded-lg overflow-hidden modal-tabela-container" style={{ borderColor: '#D8E2DC' }}>
+                <table className="w-full min-w-[900px] whitespace-nowrap">
+                  <thead>
+                    <tr style={{ backgroundColor: '#FFE5D9', borderBottom: '1px solid #D8E2DC' }}>
+                      <th className="text-left px-4 py-3 text-[14px]" style={{ color: '#6D6875' }}>
+                        Descrição
+                      </th>
+                      <th className="text-left px-4 py-3 text-[14px]" style={{ color: '#6D6875' }}>
+                        Preço Venda
+                      </th>
+                      <th className="text-left px-4 py-3 text-[14px]" style={{ color: '#6D6875' }}>
+                        Custo
+                      </th>
+                      <th className="text-left px-4 py-3 text-[14px]" style={{ color: '#6D6875' }}>
+                        Prazo
+                      </th>
+                      <th className="text-left px-4 py-3 text-[14px]" style={{ color: '#6D6875' }}>
+                        Material
+                      </th>
+                      <th className="text-left px-4 py-3 text-[14px]" style={{ color: '#6D6875' }}>
+                        Qtd. Mín.
+                      </th>
+                      <th className="text-right px-4 py-3 text-[14px]" style={{ color: '#6D6875' }}>
+                        Ações
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredItems.map((item, index) => (
+                      <tr
+                        key={item.id}
+                        className="border-b transition-colors hover:bg-opacity-50"
+                        // --- COR DE FUNDO ALTERADA PARA INATIVOS ---
+                        style={{
+                          borderColor: '#D8E2DC',
+                          backgroundColor: mostrarInativos ? '#FFF0F0' : (index % 2 === 0 ? 'white' : '#F9F9F9'),
+                          opacity: mostrarInativos ? 0.85 : 1
+                        }}
+                      >
+                        <td className="px-4 py-3">
+                          <span className="text-[15px]" style={{ color: '#6D6875' }}>
+                            {item.description}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="text-[15px]" style={{ color: '#4CAF50' }}>
+                            R$ {item.salePrice.toFixed(2)}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="text-[15px]" style={{ color: '#9D8189' }}>
+                            R$ {item.productionCost.toFixed(2)}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="text-[15px]" style={{ color: '#9D8189' }}>
+                            {item.productionDeadline ? `${item.productionDeadline} dias` : '-'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span
+                            className="inline-flex items-center px-2 py-1 rounded-full text-[13px]"
+                            style={{
+                              backgroundColor: '#D8E2DC',
+                              color: '#6D6875'
+                            }}
+                          >
+                            {item.material || '-'}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <span className="text-[15px]" style={{ color: '#9D8189' }}>
+                            {item.minimumQuantity}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          <div className="flex gap-2 justify-end">
+                            {/* --- BOTÃO DE REATIVAR ADICIONADO AQUI --- */}
+                            {mostrarInativos ? (
+                              <button
+                                onClick={() => setItemToReactivate(item)}
+                                className="px-3 py-2 rounded-md text-[14px] transition-all hover:opacity-80"
+                                style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
+                                title="Reativar"
+                              >
+                                Reativar
+                              </button>
+                            ) : (
+                              <>
+                                <button
+                                  onClick={() => onEdit(item)}
+                                  className="p-2 rounded-md transition-all hover:bg-opacity-80"
+                                  style={{ backgroundColor: '#D8E2DC' }}
+                                  title="Editar"
+                                >
+                                  <Pencil className="size-4" style={{ color: '#6D6875' }} />
+                                </button>
+                                <button
+                                  onClick={() => onDelete(item)}
+                                  className="p-2 rounded-md transition-all hover:bg-opacity-80"
+                                  style={{ backgroundColor: '#FFCAD4' }}
+                                  title="Excluir"
+                                >
+                                  <Trash2 className="size-4" style={{ color: '#6D6875' }} />
+                                </button>
+                              </>
+                            )}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            )}
+          </div>
+
+          {/* Paginação */}
+          {totalPages > 1 && (
+            <div className="px-8 py-4 border-t flex items-center gap-2 flex-wrap" style={{ borderColor: '#D8E2DC' }}>
+              {/* Anterior */}
               <button
-                type="button"
-                onClick={onCreate}
-                className="h-10 px-4 rounded-md text-[15px] transition-all inline-flex items-center gap-2"
+                onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
+                disabled={currentPage === 1}
+                className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
                 style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
               >
-                <Box className="size-4" />
-                Novo Item
+                Anterior
               </button>
-              <button 
-                onClick={onClose} 
-                className="p-1.5 rounded-md transition-colors hover:bg-gray-100"
-                style={{ color: '#9D8189' }}
+
+              {/* Páginas */}
+              {paginas.map((page, index) => (
+                <button
+                  key={index}
+                  onClick={() => typeof page === 'number' && setCurrentPage(page)}
+                  disabled={page === '...'}
+                  className="px-4 py-2 rounded-md text-[15px] transition-all"
+                  style={{
+                    backgroundColor: currentPage === page ? '#F4ACB7' : 'white',
+                    color: currentPage === page ? 'white' : '#6D6875',
+                    border: `1px solid ${currentPage === page ? '#F4ACB7' : '#D8E2DC'}`,
+                    cursor: page === '...' ? 'default' : 'pointer'
+                  }}
+                >
+                  {page}
+                </button>
+              ))}
+
+              {/* Próximo */}
+              <button
+                onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
+                disabled={currentPage === totalPages}
+                className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
+                style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
               >
-                <X className="size-5" />
+                Próximo
               </button>
-            </div>
-          </div>
-        </div>
-
-        {/* Pesquisa */}
-        <div className="px-8 pt-6 pb-5">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 size-5" style={{ color: '#9D8189' }} />
-            <Input
-              placeholder="Buscar item..."
-              value={searchTerm}
-              onChange={(e) => handleSearchChange(e.target.value)}
-              className="pl-10 h-11 text-[15px]"
-              style={{ 
-                borderColor: '#D8E2DC',
-                backgroundColor: '#F9F9F9',
-                color: '#6D6875',
-                paddingLeft: '40px'
-              }}
-            />
-          </div>
-        </div>
-
-        {/* Tabela */}
-        <div className="px-8 pb-6 overflow-y-auto" style={{ maxHeight: '500px' }}>
-          {filteredItems.length === 0 ? (
-            <div className="text-center py-12" style={{ color: '#9D8189' }}>
-              <p className="text-[15px]">Nenhum item encontrado</p>
-            </div>
-          ) : (
-            <div className="border rounded-lg overflow-hidden modal-tabela-container" style={{ borderColor: '#D8E2DC' }}>
-              <table className="w-full min-w-[900px] whitespace-nowrap">
-                <thead>
-                  <tr style={{ backgroundColor: '#FFE5D9', borderBottom: '1px solid #D8E2DC' }}>
-                    <th className="text-left px-4 py-3 text-[14px]" style={{ color: '#6D6875' }}>
-                      Descrição
-                    </th>
-                    <th className="text-left px-4 py-3 text-[14px]" style={{ color: '#6D6875' }}>
-                      Preço Venda
-                    </th>
-                    <th className="text-left px-4 py-3 text-[14px]" style={{ color: '#6D6875' }}>
-                      Custo
-                    </th>
-                    <th className="text-left px-4 py-3 text-[14px]" style={{ color: '#6D6875' }}>
-                      Prazo
-                    </th>
-                    <th className="text-left px-4 py-3 text-[14px]" style={{ color: '#6D6875' }}>
-                      Material
-                    </th>
-                    <th className="text-left px-4 py-3 text-[14px]" style={{ color: '#6D6875' }}>
-                      Qtd. Mín.
-                    </th>
-                    <th className="text-right px-4 py-3 text-[14px]" style={{ color: '#6D6875' }}>
-                      Ações
-                    </th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {filteredItems.map((item, index) => (
-                    <tr
-                      key={item.id}
-                      className="border-b transition-colors hover:bg-opacity-50"
-                      style={{
-                        borderColor: '#D8E2DC',
-                        backgroundColor: index % 2 === 0 ? 'white' : '#F9F9F9'
-                      }}
-                    >
-                      <td className="px-4 py-3">
-                        <span className="text-[15px]" style={{ color: '#6D6875' }}>
-                          {item.description}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="text-[15px]" style={{ color: '#4CAF50' }}>
-                          R$ {item.salePrice.toFixed(2)}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="text-[15px]" style={{ color: '#9D8189' }}>
-                          R$ {item.productionCost.toFixed(2)}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="text-[15px]" style={{ color: '#9D8189' }}>
-                          {item.productionDeadline || '-'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span 
-                          className="inline-flex items-center px-2 py-1 rounded-full text-[13px]"
-                          style={{
-                            backgroundColor: '#D8E2DC',
-                            color: '#6D6875'
-                          }}
-                        >
-                          {item.material || '-'}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <span className="text-[15px]" style={{ color: '#9D8189' }}>
-                          {item.minimumQuantity}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        <div className="flex gap-2 justify-end">
-                          <button
-                            onClick={() => onEdit(item)}
-                            className="p-2 rounded-md transition-all hover:bg-opacity-80"
-                            style={{ backgroundColor: '#D8E2DC' }}
-                            title="Editar"
-                          >
-                            <Pencil className="size-4" style={{ color: '#6D6875' }} />
-                          </button>
-                          <button
-                            onClick={() => onDelete(item)}
-                            className="p-2 rounded-md transition-all hover:bg-opacity-80"
-                            style={{ backgroundColor: '#FFCAD4' }}
-                            title="Excluir"
-                          >
-                            <Trash2 className="size-4" style={{ color: '#6D6875' }} />
-                          </button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
             </div>
           )}
-        </div>
 
-        {/* Paginação */}
-        {totalPages > 1 && (
-          <div className="px-8 py-4 border-t flex items-center gap-2 flex-wrap" style={{ borderColor: '#D8E2DC' }}>
-            {/* Anterior */}
+          {/* Footer */}
+          <div className="px-8 py-5 border-t flex justify-end" style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC' }}>
             <button
-              onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
-              disabled={currentPage === 1}
-              className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
-              style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
+              onClick={onClose}
+              className="px-6 py-2 rounded-md text-[15px] border transition-all hover:bg-white"
+              style={{
+                backgroundColor: 'white',
+                borderColor: '#D8E2DC',
+                color: '#9D8189'
+              }}
             >
-              Anterior
-            </button>
-
-            {/* Páginas */}
-            {paginas.map((page, index) => (
-              <button
-                key={index}
-                onClick={() => typeof page === 'number' && setCurrentPage(page)}
-                disabled={page === '...'}
-                className="px-4 py-2 rounded-md text-[15px] transition-all"
-                style={{
-                  backgroundColor: currentPage === page ? '#F4ACB7' : 'white',
-                  color: currentPage === page ? 'white' : '#6D6875',
-                  border: `1px solid ${currentPage === page ? '#F4ACB7' : '#D8E2DC'}`,
-                  cursor: page === '...' ? 'default' : 'pointer'
-                }}
-              >
-                {page}
-              </button>
-            ))}
-
-            {/* Próximo */}
-            <button
-              onClick={() => setCurrentPage(prev => Math.min(totalPages, prev + 1))}
-              disabled={currentPage === totalPages}
-              className="px-4 py-2 rounded-md text-[15px] transition-all disabled:opacity-40"
-              style={{ backgroundColor: '#F4ACB7', color: 'white', border: '1px solid #F4ACB7' }}
-            >
-              Próximo
+              Fechar
             </button>
           </div>
-        )}
+        </DialogContent>
+      </Dialog>
 
-        {/* Footer */}
-        <div className="px-8 py-5 border-t flex justify-end" style={{ backgroundColor: '#F9F9F9', borderColor: '#D8E2DC' }}>
-          <button
-            onClick={onClose}
-            className="px-6 py-2 rounded-md text-[15px] border transition-all hover:bg-white"
-            style={{
-              backgroundColor: 'white',
-              borderColor: '#D8E2DC',
-              color: '#9D8189'
-            }}
+      {/* --- DIALOG DE CONFIRMAÇÃO DE REATIVAÇÃO --- */}
+      {itemToReactivate && (
+        <Dialog open={true} onOpenChange={() => setItemToReactivate(null)}>
+          <DialogContent
+            className="max-w-[400px] p-0 gap-0 [&>button]:hidden"
+            style={{ backgroundColor: 'white', border: '1px solid #D8E2DC' }}
           >
-            Fechar
-          </button>
-        </div>
-      </DialogContent>
-    </Dialog>
+            <DialogTitle className="sr-only">Reativar item</DialogTitle>
+            <DialogDescription className="sr-only">Confirmar reativação</DialogDescription>
+            <div className="px-7 py-6 border-b" style={{ borderColor: '#D8E2DC' }}>
+              <h2 className="text-[22px]" style={{ color: '#6D6875' }}>Reativar item?</h2>
+            </div>
+            <div className="px-7 py-5">
+              <p className="text-[15px]" style={{ color: '#6D6875' }}>
+                O item <strong>{itemToReactivate.description}</strong> voltará a aparecer na lista ativa.
+              </p>
+            </div>
+            <div className="px-7 py-5 border-t flex justify-end gap-3" style={{ borderColor: '#D8E2DC', backgroundColor: '#F9F9F9' }}>
+              <button
+                onClick={() => setItemToReactivate(null)}
+                className="px-5 py-2.5 rounded-md text-[15px] border transition-all hover:bg-white"
+                style={{ backgroundColor: 'white', borderColor: '#D8E2DC', color: '#9D8189' }}
+              >
+                Cancelar
+              </button>
+              <button
+                onClick={async () => {
+                  await itemService.deletar(itemToReactivate.id);
+                  setItemToReactivate(null);
+
+                  // Força o reset para a página 1 e limpa o timeout para re-disparar o useEffect de busca
+                  setCurrentPage(1);
+                  setSearchTerm(prev => prev + ' '); // pequeno hack para garantir disparo se necessário
+                  setTimeout(() => setSearchTerm(prev => prev.trim()), 10);
+                }}
+                className="px-5 py-2.5 rounded-md text-[15px] text-white transition-all hover:opacity-90"
+                style={{ backgroundColor: '#F4ACB7' }}
+              >
+                Confirmar
+              </button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   );
 }
