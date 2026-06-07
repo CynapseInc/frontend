@@ -25,7 +25,7 @@ export default function DeleteItemDialog({ isOpen, onClose, onConfirm, itemName 
           </AlertDialogTitle>
           <AlertDialogDescription className="text-[15px]" style={{ color: '#9D8189' }}>
             Tem certeza que deseja excluir o item <strong style={{ color: '#6D6875' }}>"{itemName}"</strong>?
-            Esta ação não pode ser desfeita.
+            
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
