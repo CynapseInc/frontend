@@ -25,7 +25,7 @@ export default function DeleteThemeDialog({ isOpen, onClose, onConfirm, themeNam
           </AlertDialogTitle>
           <AlertDialogDescription className="text-[15px]" style={{ color: '#9D8189' }}>
             Tem certeza que deseja excluir o tema <strong style={{ color: '#6D6875' }}>"{themeName}"</strong>?
-            Esta ação não pode ser desfeita.
+          
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
