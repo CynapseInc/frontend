@@ -115,7 +115,7 @@ export default function ItemCombobox({ value, onChange, items, isErr }: ItemComb
 
       {open && (
         <div
-          className="absolute top-full left-0 right-0 mt-2 bg-white border rounded-md shadow-lg z-50"
+          className="absolute top-full left-0 mt-2 bg-white border rounded-md shadow-lg z-50 w-[320px]"
           style={{ borderColor: '#D8E2DC' }}
         >
           <div className="px-4 py-2 border-b" style={{ borderColor: '#D8E2DC' }}>
