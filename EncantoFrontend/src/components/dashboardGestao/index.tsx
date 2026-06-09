@@ -269,7 +269,7 @@ export default function App() {
       <main className="w-full max-w-[1600px] mx-auto px-8 py-10 box-border space-y-6">
         {/* Page Title */}
         <div style={{ marginBottom: '2vh' }}>
-          <h1 style={{ fontSize: '48px', color: '#F4ACB7', marginBottom: '0.5rem', fontWeight: '600' }}>
+          <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>
             Gestão de Pedidos
           </h1>
           <p style={{ fontSize: '16px', color: '#9D8189', marginBottom: '2rem' }}>

@@ -298,7 +298,7 @@ export function HomeCalendar() {
 
   const filteredOrders = orders.filter(order => {
     const statusNormalizado = order.status.toLowerCase();
-    if (statusNormalizado === 'finalizado' || statusNormalizado === 'concluído' || statusNormalizado === 'concluido' || statusNormalizado === 'entregue') {
+    if (statusNormalizado === 'finalizado' || statusNormalizado === 'concluído' || statusNormalizado === 'concluido' || statusNormalizado === 'entregue' || statusNormalizado === 'cancelado') {
       return false;
     }
 
@@ -401,7 +401,7 @@ export function HomeCalendar() {
               <h3 className="text-[16px] mb-3 px-2" style={{ color: '#6D6875' }}>
                 <strong>Meses</strong>
               </h3>
-              <div className="flex flex-col justify-between flex-1 min-h-0">
+              <div className="flex flex-col gap-1">
                 {monthNames.map((month, index) => {
                   const ordersCount = getOrdersForMonth(currentYear, index);
                   const isSelected = index === currentMonth;

@@ -69,7 +69,7 @@ export function DashFinanceira() {
   };
 
   // Estados para filtro de data
-  const [dataInicio, setDataInicio] = useState<string>('2025-01');
+  const [dataInicio, setDataInicio] = useState<string>('2026-01');
   const [dataFim, setDataFim] = useState<string>(obterMesAtual());
 
   // Função para formatar valores em BRL
@@ -241,7 +241,7 @@ export function DashFinanceira() {
       <div className={`w-full max-w-[1600px] mx-auto px-4 lg:px-8 py-6 lg:py-10 box-border ${styles.conteudo}`}>
 
         <div className={styles.cabecalho}>
-          <h1 className={`${styles.titulo} mb-2`}>Controle Financeiro</h1>
+          <h1 className="text-[48px] mb-2" style={{ color: '#F4ACB7' }}>Controle Financeiro</h1>
           <p className={styles.textoSecundario}>
             Acompanhe suas receitas, despesas e indicadores financeiros
           </p>

@@ -286,10 +286,10 @@ export default function App() {
         </div>
 
         {/* Barra de pesquisa e filtros */}
-        <div className="bg-white rounded-lg p-6 mb-6 shadow-sm flex flex-col gap-5" style={{ border: '1px solid #D8E2DC' }}>
+        <div className="bg-white rounded-lg p-6 mb-6 shadow-sm flex flex-col gap-4" style={{ border: '1px solid #D8E2DC' }}>
           
           {/* Linha 1: Pesquisa e Botões de Ação */}
-          <div className="flex items-center justify-between gap-6 mb-6 header-actions">
+          <div className="flex items-center justify-between gap-6 header-actions">
             <div className="flex-1 max-w-md relative">
               <Search 
                 className="absolute top-1/2 -translate-y-1/2" 
@@ -321,11 +321,14 @@ export default function App() {
           </div>
 
           {/* Linha 2: Área de Filtros */}
-          <div className="flex flex-wrap items-center gap-8 pt-5 border-t filtros-container" style={{ borderColor: '#D8E2DC' }}>
-            
+          <div className="flex flex-wrap items-center gap-6 pt-4 border-t filtros-container" style={{ borderColor: '#D8E2DC' }}>
+            <div className="flex items-center gap-2">
+              <Filter className="size-4" style={{ color: '#9D8189' }} />
+              <span className="text-[15px]" style={{ color: '#9D8189' }}>Filtrar por:</span>
+            </div>
+
             {/* Filtro por Tipo */}
             <div className="flex items-center gap-3">
-              <Filter className="size-4" style={{ color: '#9D8189' }} />
               <span className="text-[15px]" style={{ color: '#9D8189' }}>Tipo:</span>
               <div className="flex gap-2">
                 {['Todos', 'Receita', 'Despesa'].map(filter => (
@@ -347,7 +350,6 @@ export default function App() {
 
             {/* Filtro por Status */}
             <div className="flex items-center gap-3">
-              <Filter className="size-4" style={{ color: '#9D8189' }} />
               <span className="text-[15px]" style={{ color: '#9D8189' }}>Status:</span>
               <div className="flex gap-2">
                 {['Todos', 'Pago', 'Pendente'].map(filter => (

@@ -66,6 +66,28 @@ const currentStatus = statusTypes.find(st => st.id === order.statusAtual?.idStat
     onClickInSeeDetails(order.id);
   };
 
+  const onlyDigits = (value: string) => value.replace(/\D/g, '');
+
+  const formatPhone = (value?: string) => {
+    if (!value) return '';
+    const digits = onlyDigits(value);
+    if (digits.startsWith('55') && digits.length >= 12) {
+      const ddd = digits.slice(2, 4);
+      const number = digits.slice(4);
+      if (number.length > 8) return `+55 (${ddd}) ${number.slice(0, 5)}-${number.slice(5, 9)}`;
+      return `+55 (${ddd}) ${number.slice(0, 4)}-${number.slice(4, 8)}`;
+    }
+    if (digits.length > 10) return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7, 11)}`;
+    if (digits.length > 6) return `(${digits.slice(0, 2)}) ${digits.slice(2, 6)}-${digits.slice(6, 10)}`;
+    if (digits.length > 2) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+    return digits;
+  };
+
+  const formatarPesoGrama = (valor?: number): string => {
+    if (valor == null) return '0';
+    return Number.isInteger(valor) ? String(valor) : valor.toFixed(2);
+  };
+
   const formatarData = (dataStr?: string) => {
     if (!dataStr) return 'Não definida';
     return new Date(dataStr).toLocaleDateString('pt-BR');
@@ -73,7 +95,7 @@ const currentStatus = statusTypes.find(st => st.id === order.statusAtual?.idStat
 
   const formatarDataHora = (dataStr?: string) => {
     if (!dataStr) return 'Não definida';
-    return new Date(dataStr).toLocaleString('pt-BR');
+    return new Date(dataStr).toLocaleString('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
   };
 
   return (
@@ -152,7 +174,9 @@ const currentStatus = statusTypes.find(st => st.id === order.statusAtual?.idStat
                 <div>
                   <span className="block text-[13px]" style={{ color: '#9D8189' }}>Contato</span>
                   <span className="text-[16px]" style={{ color: '#6D6875' }}>
-                    {order.cliente?.telefone || order.cliente?.email || 'Sem contato registado'}
+                    {order.cliente?.telefone
+                      ? (formatPhone(order.cliente.telefone) || order.cliente.telefone)
+                      : order.cliente?.email || 'Sem contato registado'}
                   </span>
                 </div>
               </div>
@@ -179,7 +203,7 @@ const currentStatus = statusTypes.find(st => st.id === order.statusAtual?.idStat
                         <strong>{prod.quantidade}x {productNames[prod.idProduto] || 'Carregando...'}</strong>
                       </span>
                       <div className="flex gap-4 mt-1 text-[13px]" style={{ color: '#9D8189' }}>
-                        <span>Peso: {prod.pesoTotal?.toFixed(2)}g</span>
+                        <span>Peso: {formatarPesoGrama(prod.pesoTotal)} g</span>
                         <span>Preço: R$ {prod.precoTotal?.toFixed(2)}</span>
                       </div>
                     </div>

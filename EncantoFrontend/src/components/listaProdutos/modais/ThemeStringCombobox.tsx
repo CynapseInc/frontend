@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Check, ChevronDown, X } from 'lucide-react';
+import { Check, ChevronDown } from 'lucide-react';
 import {temaService} from '../../../services/TemaService';
 
 interface ProductTheme {
@@ -79,13 +79,6 @@ export default function ThemeCombobox({ value, onChange, themes, isErr }: ThemeC
     setSearch('');
   };
 
-  const handleClear = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    onChange('');
-    setSelectedName('');
-    setSearch('');
-  };
-
   return (
     <div ref={wrapperRef} className="relative w-full">
       <button
@@ -99,21 +92,10 @@ export default function ThemeCombobox({ value, onChange, themes, isErr }: ThemeC
         }}
       >
         <span>{selectedName || 'Selecione um tema...'}</span>
-        <div className="flex items-center gap-2">
-          {selectedName && (
-            <button
-              type="button"
-              onClick={handleClear}
-              className="p-0 hover:opacity-70"
-            >
-              <X className="size-4" />
-            </button>
-          )}
-          <ChevronDown 
-            className="size-4 transition-transform"
-            style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
-          />
-        </div>
+        <ChevronDown
+          className="size-4 transition-transform"
+          style={{ transform: open ? 'rotate(180deg)' : 'rotate(0deg)' }}
+        />
       </button>
 
       {open && (
@@ -121,7 +103,7 @@ export default function ThemeCombobox({ value, onChange, themes, isErr }: ThemeC
           className="absolute top-full left-0 right-0 mt-2 bg-white border rounded-md shadow-lg z-50"
           style={{ borderColor: '#D8E2DC' }}
         >
-          <div className="p-2 border-b" style={{ borderColor: '#D8E2DC' }}>
+          <div className="px-4 py-2 border-b" style={{ borderColor: '#D8E2DC' }}>
             <input
               type="text"
               placeholder="Pesquisar tema..."

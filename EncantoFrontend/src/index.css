@@ -60,7 +60,7 @@ body {
 }
 
 table tbody tr:nth-child(odd) {
-  background-color: #FFF4F6 !important;
+  background-color: #F9F9F9 !important;
 }
 
 table tbody tr:nth-child(even) {

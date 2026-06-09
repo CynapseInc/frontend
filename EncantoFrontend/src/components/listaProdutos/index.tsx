@@ -207,6 +207,17 @@ export default function App() {
                 items={items}
               />
             </div>
+
+            {(selectedCategory || selectedTheme || selectedItem) && (
+              <button
+                type="button"
+                onClick={() => { setSelectedCategory(''); setSelectedTheme(''); setSelectedItem(''); setCurrentPage(1); }}
+                className="text-[14px] underline"
+                style={{ color: '#9D8189', background: 'none', border: 'none', cursor: 'pointer' }}
+              >
+                Limpar filtros
+              </button>
+            )}
           </div>
         </div>
 
